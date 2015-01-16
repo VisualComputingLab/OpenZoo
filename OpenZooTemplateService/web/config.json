@@ -1,0 +1,40 @@
+{
+    "service":
+    {
+        "component_id": "OpenZooTemplateService",
+        "name": "MyTestModuleImpl",
+        "path": "/resources/test",
+        "description": "A service for testing the OpenZoo inheritance"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.MyTestWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "ep_from",
+                    "type": "in"
+                },
+                {
+                    "endpoint_id": "ep_to_1",
+                    "type": "out"
+                },
+                {
+                    "endpoint_id": "ep_to_2",
+                    "type": "out"
+                },
+                {
+                    "endpoint_id": "ep_to_3",
+                    "type": "out"
+                }
+            ]
+        }
+    ],
+    "keyvalue":
+    {
+        "host": "83.212.120.72",
+        "port": 6379
+    },
+    "instance_id": "1"
+}
