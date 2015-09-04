@@ -1,7 +1,5 @@
 package gr.iti.openzoo.admin;
 
-import java.util.HashMap;
-
 /**
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>

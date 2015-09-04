@@ -42,8 +42,9 @@ public class OpenZooContextListener implements ServletContextListener {
 
         sc = sce.getServletContext();
         REALPATH = sc.getRealPath("/");
-        System.setProperty("ApplicationPath", REALPATH);
-        System.out.println("ApplicationPath set!");
+        // Abandoned, because it's global
+        //System.setProperty("ApplicationPath", REALPATH);
+        //System.out.println("ApplicationPath set!");
 
         /*
          * UUID is created during web service utilization on the OpenZoo framework UI
@@ -62,7 +63,8 @@ public class OpenZooContextListener implements ServletContextListener {
             parameters.getGeneral().setDescription(properties.getJSONObject("service").getString("description"));
             parameters.getGeneral().setRealPath(REALPATH);
             
-            // set instance id
+            // set topology id, instance id
+            parameters.getGeneral().setTopologyID(properties.getString("topology_id"));
             parameters.getGeneral().setInstanceID(properties.getString("instance_id"));
         }
         catch (JSONException ex) 

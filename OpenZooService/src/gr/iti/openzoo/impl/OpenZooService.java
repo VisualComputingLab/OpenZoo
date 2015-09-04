@@ -7,11 +7,9 @@ import com.rabbitmq.client.QueueingConsumer;
 import gr.iti.openzoo.admin.KeyValueCommunication;
 import gr.iti.openzoo.admin.ServiceParameters;
 import gr.iti.openzoo.util.SerializationUtil;
-import gr.iti.openzoo.util.Utilities;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,10 +28,6 @@ public abstract class OpenZooService {
 
     protected static final Logger log = LogManager.getLogger(OpenZooService.class.getName());
     
-    protected String service_name;
-    private Utilities util = new Utilities();
-    private String myip = util.getHostname();
-    private String serverHostname = util.getHostname();
     protected ServiceParameters parameters = new ServiceParameters();
     protected JSONObject properties;
     protected ConnectionFactory factory;
@@ -42,14 +36,12 @@ public abstract class OpenZooService {
     protected Connection connectionIN;
     protected Channel channelIN;
     protected QueueingConsumer qconsumer1;
-    protected ServiceThread service1;
     protected static List<Connection> allConnections;
-    protected static List<ServiceThread> allServices;
     protected int parallelismIdx = 1;
     protected KeyValueCommunication kv;
     protected ArrayList<OpenZooWorker> workerUnion;
     protected HashSet<String> workerClasses;
-    private String realPath;
+    protected String realPath;
         
     /**
      * The class constructor
@@ -60,13 +52,17 @@ public abstract class OpenZooService {
      * @param jsonObject JSONObject, the Rest post call payload
      *
      */
-    public OpenZooService()
+    public OpenZooService(String appName)
     {
         //Configurator.initialize(OpenZooService.class.getName(), ".");
-        
+                
         log.debug("-- OpenZooService()");
 
-        realPath = System.getProperty("ApplicationPath");
+        // Abandoned, because it's global
+        //realPath = System.getProperty("ApplicationPath");
+        if ((new File("./webapps/")).exists())
+            realPath = (new File("./webapps/" + appName)).getAbsolutePath();    // linux
+        else realPath = (new File("../webapps/" + appName)).getAbsolutePath();  // windows
         
         try 
         {
@@ -83,7 +79,6 @@ public abstract class OpenZooService {
             log.error("Error class not found Service Params " + e);
         }
         
-        service_name = parameters.getGeneral().getName();
         kv = new KeyValueCommunication(parameters.getRedis().getHost(), parameters.getRedis().getPort());
         
         
@@ -94,11 +89,35 @@ public abstract class OpenZooService {
         
         // worker and endpoint parameters already there
         
-        log.debug(parameters.toString());
+        //log.debug(parameters.toString());
 
         
         workerUnion = new ArrayList<>();
         workerClasses = new HashSet<>();
+    }
+    
+    final public void readParametersFromKVOld()
+    {
+        //read from KV
+            
+        // general
+        parameters.getGeneral().setNumOfWorkersPerCore(Integer.parseInt(kv.getValue(parameters.getGeneral().getTopologyID() + ":" + parameters.getGeneral().getComponentID() + ":numOfWorkersPerCore")));
+
+        // rabbit
+        parameters.getRabbit().setHost(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:host"));
+        parameters.getRabbit().setPort(Integer.parseInt(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:port")));
+        parameters.getRabbit().setUser(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:user"));
+        parameters.getRabbit().setPasswd(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:passwd"));
+        parameters.getRabbit().setVhost(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:vhost"));
+
+        // redis is already there
+
+        // mongo      
+        parameters.getMongo().setHost(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:host"));
+        parameters.getMongo().setPort(Integer.parseInt(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:port")));
+        parameters.getMongo().setUser(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:user"));
+        parameters.getMongo().setPasswd(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:passwd"));
+        parameters.getMongo().setDb(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:db"));
     }
     
     final public void readParametersFromKV()
@@ -106,32 +125,43 @@ public abstract class OpenZooService {
         //read from KV
             
         // general
-        parameters.getGeneral().setNumOfWorkersPerCore(Integer.parseInt(kv.getValue(parameters.getGeneral().getComponentID() + ":numOfWorkersPerCore")));
+        parameters.getGeneral().setNumOfWorkersPerCore(0); // default special value, means that there should be only one thread, irrelevant of num of processors
+        String full_object = kv.getHashValue(parameters.getGeneral().getTopologyID(), "full_object");
+        try
+        {
+            JSONObject full_json = new JSONObject(full_object);
+            JSONArray jsonarr = full_json.getJSONArray("topologyNodes");
+            for (int i = 0; i < jsonarr.length(); i++)
+            {
+                if (jsonarr.getJSONObject(i).getString("id").equalsIgnoreCase(parameters.getGeneral().getComponentID()))
+                {
+                    parameters.getGeneral().setNumOfWorkersPerCore(Integer.parseInt(jsonarr.getJSONObject(i).getString("workerspercore")));
+                    break;
+                }
+            }
+        }
+        catch (JSONException e)
+        {
+            log.error("JSONException while trying to read woerkerspercore parameter from KV: " + e);
+        }
+        
 
         // rabbit
-        parameters.getRabbit().setHost(kv.getValue("rabbitmq:host"));
-        parameters.getRabbit().setPort(Integer.parseInt(kv.getValue("rabbitmq:port")));
-        parameters.getRabbit().setUser(kv.getValue("rabbitmq:user"));
-        parameters.getRabbit().setPasswd(kv.getValue("rabbitmq:passwd"));
-        parameters.getRabbit().setVhost(kv.getValue("rabbitmq:vhost"));
+        parameters.getRabbit().setHost(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:host"));
+        parameters.getRabbit().setPort(Integer.parseInt(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:port")));
+        parameters.getRabbit().setUser(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:user"));
+        parameters.getRabbit().setPasswd(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:passwd"));
+        parameters.getRabbit().setVhost(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:vhost"));
 
         // redis is already there
 
         // mongo      
-        parameters.getMongo().setHost(kv.getValue("mongodb:host"));
-        parameters.getMongo().setPort(Integer.parseInt(kv.getValue("mongodb:port")));
-        parameters.getMongo().setUser(kv.getValue("mongodb:user"));
-        parameters.getMongo().setPasswd(kv.getValue("mongodb:passwd"));
-        parameters.getMongo().setDb(kv.getValue("mongodb:db"));
+        parameters.getMongo().setHost(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:host"));
+        parameters.getMongo().setPort(Integer.parseInt(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:port")));
+        parameters.getMongo().setUser(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:user"));
+        parameters.getMongo().setPasswd(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:passwd"));
+        parameters.getMongo().setDb(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:db"));
     }
-    
-//    private void addWorker(OpenZooWorker ozw)
-//    {
-//        log.debug("-- OpenZooService.addWorker");
-//        ozw.setServiceParameters(parameters);
-//        workerUnion.add(ozw);
-//        ozw.startIt();
-//    }
     
     public JSONObject startWorkers(String className)
     {
@@ -139,18 +169,28 @@ public abstract class OpenZooService {
         
         int cores = Runtime.getRuntime().availableProcessors();
         int numOfWorkersPerCore = parameters.getGeneral().getNumOfWorkersPerCore();
-                    
-        if (cores < 1)
+        int numWorkers;
+        boolean loneWorker = false;
+        
+        if (numOfWorkersPerCore == 0)
         {
-            log.debug("Number of cores reported = " + cores);
-            cores = 1;
+            numWorkers = 1;
+            loneWorker = true;
         }
         else
         {
-            log.debug("Number of cores available = " + cores);
+            if (cores < 1)
+            {
+                log.debug("Number of cores reported = " + cores);
+                cores = 1;
+            }
+            else
+            {
+                log.debug("Number of cores available = " + cores);
+            }
+            
+            numWorkers = cores*numOfWorkersPerCore;
         }
-        
-        int numWorkers = cores*numOfWorkersPerCore;
 
         log.info("I'll start " + numWorkers + " workers");
 
@@ -173,7 +213,16 @@ public abstract class OpenZooService {
                 for (i = 0; i < numWorkers; i++)
                 {
                     threadName = "consumer_" + i;
-                    OpenZooWorker consumer = (OpenZooWorker) ctor.newInstance(threadName);
+                    
+                    OpenZooWorker consumer;
+                    if (loneWorker)
+                    {    
+                        consumer = (OpenZooLoneWorker) ctor.newInstance(threadName);
+                    }
+                    else
+                    {
+                        consumer = (OpenZooWorker) ctor.newInstance(threadName);
+                    }
 //                    addWorker(consumer);
                     consumer.setServiceParameters(parameters);
                     workerUnion.add(consumer);
@@ -268,7 +317,6 @@ public abstract class OpenZooService {
                 log.error("Error class not found Service Params " + e);
             }
 
-            service_name = parameters.getGeneral().getName();
             kv = new KeyValueCommunication(parameters.getRedis().getHost(), parameters.getRedis().getPort());
             readParametersFromKV();
             log.debug(parameters.toString());

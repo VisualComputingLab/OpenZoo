@@ -1,8 +1,6 @@
 package gr.iti.openzoo.service.impl;
 
 import gr.iti.openzoo.impl.OpenZooService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -14,7 +12,7 @@ public class MyTestModuleImpl extends OpenZooService {
     
     public MyTestModuleImpl()
     {
-        super();
+        super("OpenZooTemplateService");
         
         log.debug("-- MyTestModuleImpl()");                
     }

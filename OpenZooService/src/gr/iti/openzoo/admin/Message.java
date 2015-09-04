@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -18,38 +21,192 @@ import org.codehaus.jettison.json.JSONObject;
 public class Message {
 
     protected static Logger log = LogManager.getLogger(Message.class.getName());
+    private static Long counter = 1L;
+    private final static String hostname = getHostname();
     
-    private JSONObject message = null;
+    // id unique across the whole workflow
+    private String id = null;
+    
+    // header for various parameters, holds parameter-value pairs
+    private JSONObject header = null;
+    
+    // the actual content
+    private JSONObject payload = null;
+    
+    // logging structure, holds objects with start time, end time and component id
+    private JSONArray logging = null;
+    
+    // queue message id for acknowledging after the end of processing
     private Long deliveryTag = null;
+    
+    // routing key for forwarding the message to the correct queues after the processing
     private String routing_key = null;
     
-    public Message(QueueingConsumer.Delivery delivery)
-    {
+    // whether or not the processing was successful
+    private boolean success = true;
+    
+    public Message(QueueingConsumer.Delivery delivery, String cid, String iid, String wid, String eid)
+    {        
         if (delivery != null)
         {
             try
             {
-                message = new JSONObject(new String(delivery.getBody()));
+                JSONObject message = new JSONObject(new String(delivery.getBody()));
+                
+                id = message.optString("id", null);
+                if (id == null) id = createMessageId();
+                
+                header = message.optJSONObject("header");
+                if (header == null) header = new JSONObject();
+                
+                payload = message.optJSONObject("payload");
+                if (payload == null) payload = message;
+                
+                logging = message.optJSONArray("log");
+                if (logging == null) logging = new JSONArray();
+                
                 deliveryTag = delivery.getEnvelope().getDeliveryTag();
                 routing_key = delivery.getEnvelope().getRoutingKey();
+                
+                JSONObject newLog = new JSONObject();
+                newLog.put("compId", cid);
+                newLog.put("instId", iid);
+                newLog.put("workId", wid);
+                newLog.put("epInId", eid);
+                newLog.put("start", System.currentTimeMillis());
+                logging.put(newLog);
             }
             catch (JSONException e)
             {
                 log.error("JSONException during converting message delivery to json: " + e);
-                message = null;
                 deliveryTag = delivery.getEnvelope().getDeliveryTag();
             }
         }
     }
     
-    public Message(JSONObject json)
+    private String createMessageId()
     {
-        message = json;
+        int LENGTH_TIMESTAMP = 8;
+        int LENGTH_HOSTNAME = 6;
+        int LENGTH_THREADNR = 4;
+        int LENGTH_COUNTER = 6;
+                
+        String ts = Long.toHexString(System.currentTimeMillis() / 1000);
+        while (ts.length() < LENGTH_TIMESTAMP)
+            ts = "0" + ts;
+        String hn = Integer.toHexString(hostname.hashCode());
+        if (hn.length() > LENGTH_HOSTNAME)
+            hn = hn.substring(0, LENGTH_HOSTNAME);
+        while (hn.length() < LENGTH_HOSTNAME)
+            hn = "0" + hn;
+        String th = Long.toHexString(Thread.currentThread().getId());
+        if (th.length() > LENGTH_THREADNR)
+            th = th.substring(0, LENGTH_THREADNR);
+        while (th.length() < LENGTH_THREADNR)
+            th = "0" + th;
+        String ct = Long.toHexString(counter++);
+        if (ct.length() > LENGTH_COUNTER)
+            ct = ct.substring(0, LENGTH_COUNTER);
+        while (ct.length() < LENGTH_COUNTER)
+            ct = "0" + ct;
+                        
+        return ts + hn + th + ct;
     }
     
-    public Message()
+    public Message(JSONObject hdr, JSONObject pld, String cid, String iid, String wid, String einid)
     {
-        message = new JSONObject();
+        // create id: Timestamp:hostname:processid:counter
+        id = createMessageId();
+        
+        Long currentTime = System.currentTimeMillis() / 1000;
+//        id =    Long.toHexString(currentTime) + ":" + 
+//                Long.toHexString(hostname.hashCode()) + ":" + 
+//                Long.toHexString(Thread.currentThread().getId()) + ":" +
+//                Long.toBinaryString(counter);
+        
+        
+        header = hdr;
+        payload = pld;
+        logging = new JSONArray();
+        JSONObject newLog = new JSONObject();
+        try
+        {
+            newLog.put("compId", cid);
+            newLog.put("instId", iid);
+            newLog.put("workId", wid);
+            if (einid != null && !einid.isEmpty())
+                newLog.put("epInId", einid);
+            newLog.put("start", currentTime);
+            logging.put(newLog);
+        }
+        catch (JSONException e)
+        {
+            log.error("JSONException during creating message log: " + e);
+        }
+    }
+    
+    public Message(Message copy)
+    {
+        try
+        {
+            id = copy.id;
+            header = new JSONObject(copy.header.toString());
+            payload = new JSONObject(copy.payload.toString());
+            logging = new JSONArray(copy.logging.toString());
+            deliveryTag = copy.deliveryTag;
+            routing_key = copy.routing_key;
+            success = copy.success;
+        }
+        catch (JSONException e)
+        {
+            log.error("JSONException during copying message: " + e);
+        }
+    }
+    
+    public void setProcessingEnd()
+    {
+        if (logging != null && logging.length() > 0)
+        {
+            try
+            {
+                JSONObject lastLog = logging.getJSONObject(logging.length() - 1);
+                lastLog.put("end", System.currentTimeMillis());
+                lastLog.put("success", success);
+            }
+            catch (JSONException e)
+            {
+                log.error("JSONException during setting processing end: " + e);
+            }
+        }
+        else
+        {
+            log.error("setProcessingEnd called on empty log");
+        }
+    }
+    
+    public void setSuccess(boolean succ)
+    {
+        success = succ;
+    }
+        
+    public void setOutputEndpointId(String epoid)
+    {
+        if (logging != null && logging.length() > 0)
+        {
+            try
+            {
+                JSONObject lastLog = logging.getJSONObject(logging.length() - 1);
+                lastLog.put("epOutId", epoid);
+            }
+            catch (JSONException e)
+            {
+                log.error("JSONException during setting endpoint out id: " + e);
+            }
+        }
+        else
+        {
+            log.error("setOutputEndpointId called on empty log");
+        }
     }
     
     public void addBinaryFile(String key, String path)
@@ -62,7 +219,7 @@ public class Message {
             bytes = getBytesFromFile(new File(path));
             encodedBytes = Base64.encodeBase64String(bytes);
             
-            message.put(key, encodedBytes);
+            payload.put(key, encodedBytes);
         }
         catch (IOException ex) 
         {
@@ -76,13 +233,20 @@ public class Message {
     
     public byte[] getBinaryFile(String key)
     {
+        return getBinaryFile(key, false);
+    }
+    
+    public byte[] getBinaryFile(String key, boolean delete)
+    {
         String encodedBytes;
         byte[] bytes = null;
         
         try
         {
-            encodedBytes = message.getString(key);
+            encodedBytes = payload.getString(key);
             bytes = Base64.decodeBase64(encodedBytes);
+            
+            if (delete) payload.remove(key);
         }
         catch (JSONException ex) 
         {
@@ -118,38 +282,60 @@ public class Message {
         return bytes;
     }
     
-    /**
-     * @return the message
-     */
-    public String getMessage() {
-        return message.toString();
+    public String getID()
+    {
+        return id;
     }
     
-    public JSONObject getJSON() {
+    public JSONObject getHeader() {
+        return header;
+    }
+            
+    public JSONObject getPayload() {
+        return payload;
+    }
+    
+    public void setPayload(JSONObject pl)
+    {
+        payload = pl;
+    }
+    
+    public JSONArray getLog() {
+        return logging;
+    }
+    
+    public JSONObject getMessageJSON() {
+        
+        JSONObject message = new JSONObject();
+        try
+        {
+            message.put("id", id);
+            message.put("header", header);
+            message.put("payload", payload);
+            message.put("log", logging);
+        }
+        catch (JSONException e)
+        {
+            log.error("JSONException during converting message to byte array: " + e);
+        }
         
         return message;
     }
     
     public byte[] getBytes() {
-        
-        return message.toString().getBytes();
+                
+        return getMessageJSON().toString().getBytes();
     }
     
     public boolean isEmpty()
     {
-        return (message == null || message.toString().isEmpty());
+        return (payload == null || payload.toString().isEmpty());
     }
 
-    /**
-     * @return the deliveryTag
-     */
     public Long getDeliveryTag() {
         return deliveryTag;
     }
 
-    /**
-     * @return the routing_key
-     */
     public String getRouting_key() {
         return routing_key;
     }
@@ -158,4 +344,18 @@ public class Message {
         routing_key = rk;
     }
     
+    private static String getHostname()
+    {
+        String hn;
+        try
+        {
+            hn = InetAddress.getLocalHost().getHostName();
+        } 
+        catch (UnknownHostException ex)
+        {
+            hn="unknown";
+        }
+        
+        return hn;
+    }
 }

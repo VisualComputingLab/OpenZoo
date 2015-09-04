@@ -31,10 +31,19 @@
             ]
         }
     ],
+    "requires":
+    [
+        "consumerKey",
+	"consumerSecret",
+	"accessToken",
+	"accessTokenSecret",
+        "keywords"
+    ],
     "keyvalue":
     {
         "host": "83.212.120.72",
         "port": 6379
     },
-    "instance_id": "1"
+    "instance_id": "1",
+    "topology_id": "top1"
 }

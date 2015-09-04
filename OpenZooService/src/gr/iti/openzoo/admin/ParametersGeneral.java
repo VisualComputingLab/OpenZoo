@@ -10,6 +10,7 @@ public class ParametersGeneral implements java.io.Serializable {
     private String path = null;
     private String description = null;
     private String realPath = null;
+    private String topologyID = null;
     private String componentID = null;
     private String instanceID = null;
     private Integer numOfWorkersPerCore = 1;
@@ -70,11 +71,19 @@ public class ParametersGeneral implements java.io.Serializable {
         this.realPath = realPath;
     }
 
+    public String getComponentID() {
+        return componentID;
+    }
+
+    public void setTopologyID(String topologyID) {
+        this.topologyID = topologyID;
+    }
+    
     /**
      * @return the id
      */
-    public String getComponentID() {
-        return componentID;
+    public String getTopologyID() {
+        return topologyID;
     }
 
     /**
@@ -113,6 +122,7 @@ public class ParametersGeneral implements java.io.Serializable {
     public String toString()
     {
         String out = "-- GENERAL PARAMETERS --\n";
+        out += "Topology ID: " + topologyID + "\n";
         out += "Component ID: " + componentID + "\n";
         out += "Instance ID: " + instanceID + "\n";
         out += "Name: " + name + "\n";

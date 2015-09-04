@@ -4,6 +4,7 @@ import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.impl.OpenZooInputConnection;
 import gr.iti.openzoo.impl.OpenZooOutputConnection;
 import gr.iti.openzoo.impl.OpenZooWorker;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -26,28 +27,27 @@ public class MyTestWorker extends OpenZooWorker {
     }
     
     @Override
-    public JSONObject doWork(JSONObject json_in) {
+    public boolean doWork(Message message) {
         
         log.debug("-- MyTestWorker.doWork");
-        
-        JSONObject json_out = json_in;
-        
+                
         try
-        {
-            JSONObject whoAmI = new JSONObject();
-            whoAmI.put("component_name", serviceParams.getGeneral().getComponentID());
-            whoAmI.put("component_instance", serviceParams.getGeneral().getInstanceID());
-            whoAmI.put("worker_name", new Throwable().getStackTrace()[0].getClassName().toString());
-            whoAmI.put("worker_instance", thread_name);
+        {   
+            // either create and insert a new payload:
+            //JSONObject json_out = new JSONObject();
+            //json_out.put("processed", true);
+            //message.setPayload(json_out);
             
-            json_out.put("processedBy", whoAmI);
+            // or work on the existing one:
+            message.getPayload().put("processed", true);
         }
         catch (JSONException e)
         {
             log.error("JSONException: " + e);
+            return false;
         }
         
-        return json_in;
+        return true;
     }
 
     @Override
@@ -61,45 +61,64 @@ public class MyTestWorker extends OpenZooWorker {
             return;
         }
         
+        // Access hier the required parameters
+        String conKey = getRequiredParameter("consumerKey");
+        String conSec = getRequiredParameter("consumerSecret");
+        String accTok = getRequiredParameter("accessToken");
+        String accTokSec = getRequiredParameter("accessTokenSecret");
+        JSONArray keywords = null;
+        try
+        {
+            keywords = new JSONArray(getRequiredParameter("keywords"));
+        }
+        catch (JSONException e)
+        {
+            log.error("JSONException while reading keywords from KV: " + e);
+            return;
+        }
+        
+        log.info("Read required parameters from KV: " + conKey + " " + conSec + " " + accTok + " " + accTokSec + " " + keywords);
+        
         log.info("Born!");
-        JSONObject jobj_out;
-        Message message_in, message_out;
+        Message message;
         
         while (!enough) 
         {
-            message_in = inFromAny.getNext();
+            message = inFromAny.getNext();
             
-            if (message_in == null)
+            if (message == null)
             {
                 log.error("Received null message, aborting");
                 break;
             }
-            else if (message_in.isEmpty())
+            else if (message.isEmpty())
             {
                 log.error("Received empty message, discarding");
-                inFromAny.ack(message_in);
+                inFromAny.ack(message);
                 continue;
             }
             
-            jobj_out = doWork(message_in.getJSON());
-            message_out = new Message(jobj_out);
+            boolean success = doWork(message);
+            message.setSuccess(success);
             
-            if (jobj_out.has("all"))
+            
+            String type = message.getPayload().optString("type", "text");
+            
+            if (type.equalsIgnoreCase("text"))
             {
-                outToAll.put(message_out);
+                outToAny.put(message);
             }
-            else if (jobj_out.has("route"))
+            else if (type.equalsIgnoreCase("image"))
             {
-                message_out.setRoutingKey("index");
-                outToSelected.put(message_out);
+                message.setRoutingKey("index");
+                outToSelected.put(message);
             }
             else
             {
-                outToAny.put(message_out);
+                outToAll.put(message);
             }
             
-            //enough = !inFromAny.ack(message_in);
-            inFromAny.ack(message_in);
+            inFromAny.ack(message);
         }
 
         log.info("Died!");

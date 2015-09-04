@@ -30,6 +30,7 @@ public class OpenZooOutputConnection {
     private String exchange_name = null;
     private OpenZooWorker worker;
     private KeyValueCommunication kv;
+    private String topologyId, componentId, instanceId, workerId;
     
     public OpenZooOutputConnection(OpenZooWorker ozw, String id)
     {
@@ -42,20 +43,40 @@ public class OpenZooOutputConnection {
         channel = worker.channel;
         kv = new KeyValueCommunication(worker.serviceParams.getRedis().getHost(), worker.serviceParams.getRedis().getPort());
                 
-        // get component_id, name, worker_id
-        String cid = worker.serviceParams.getGeneral().getComponentID();
-        String iid = worker.serviceParams.getGeneral().getInstanceID();
+        // get topology_id, component_id, name, worker_id
+        topologyId = worker.serviceParams.getGeneral().getTopologyID();
+        componentId = worker.serviceParams.getGeneral().getComponentID();
+        instanceId = worker.serviceParams.getGeneral().getInstanceID();
         //String cname = worker.serviceParams.getGeneral().getName();
-        String wid = new Throwable().getStackTrace()[1].getClassName().toString();
+        workerId = new Throwable().getStackTrace()[1].getClassName().toString();
         
         // connection id has the form
         // component_id_source:worker_id_source:output_endpoint_id_source:component_id_target:worker_id_target:input_endpoint_id_target[:instance_id_target]
         // Since this is an output connection, we are the source (to the next component), so we don't care about the instance_id_target (if any)
         // We just need a queue or exchange name        
+//        try
+//        {
+//            String pattern = topologyId + ":" + componentId + ":" + workerId + ":" + id + ":*:*:*";
+//            String keyval = kv.getFirstKeyLike(pattern);
+//            
+//            if (keyval == null)
+//            {
+//                log.error("Could not find an appropriate KV record: " + pattern);
+//                return false;
+//            }
+//                        
+//            JSONObject queue = new JSONObject(kv.getValue(keyval));
+//            queueParams = new ParametersQueue(queue);
+//        }
+//        catch (JSONException e)
+//        {
+//            log.error("JSONException while creating JSONObject from KV: " + e);
+//        }
+        
         try
         {
-            String pattern = cid + ":" + wid + ":" + id + ":*:*:*";
-            String keyval = kv.getFirstKeyLike(pattern);
+            String pattern = componentId + ":" + workerId + ":" + id + ":(.*):(.*):(.*)";
+            String keyval = kv.getFirstHashKeyLike(topologyId, pattern);
             
             if (keyval == null)
             {
@@ -63,7 +84,7 @@ public class OpenZooOutputConnection {
                 return false;
             }
                         
-            JSONObject queue = new JSONObject(kv.getValue(keyval));
+            JSONObject queue = new JSONObject(kv.getHashValue(topologyId, keyval));
             queueParams = new ParametersQueue(queue);
         }
         catch (JSONException e)
@@ -103,21 +124,25 @@ public class OpenZooOutputConnection {
     // put to ROUTE is put to ALL
     public void put(Message message)
     {        
+        Message copy = new Message(message);
+        copy.setProcessingEnd();
+        copy.setOutputEndpointId(id);
+        
         try
         {
             switch (mapping)
             {
                 case AVAIL:
                     log.debug("Publishing to available");
-                    channel.basicPublish( "", queue_name, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes());
+                    channel.basicPublish( "", queue_name, MessageProperties.PERSISTENT_TEXT_PLAIN, copy.getBytes());
                     break;
                 case ALL:
                     log.debug("Publishing to all");
-                    channel.basicPublish(exchange_name, "#", null, message.getBytes());
+                    channel.basicPublish(exchange_name, "#", null, copy.getBytes());
                     break;
                 case ROUTE:
                     log.debug("Publishing to selected");
-                    channel.basicPublish(exchange_name, message.getRouting_key(), null, message.getBytes());
+                    channel.basicPublish(exchange_name, copy.getRouting_key(), null, copy.getBytes());
                     break;
             }
         }

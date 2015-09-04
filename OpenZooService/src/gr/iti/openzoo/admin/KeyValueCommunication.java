@@ -1,5 +1,6 @@
 package gr.iti.openzoo.admin;
 
+import java.util.Map;
 import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,7 +75,39 @@ public class KeyValueCommunication {
             }
             catch (Exception ex)
             {
-                log.error("Redis exception (getValue): " + ex);
+                log.error("Redis exception (getFirstKeyLike): " + ex);
+                return null;
+            }
+        }
+        
+        return null;
+    }
+    
+    public String getFirstHashKeyLike(String key, String pattern)
+    {
+        if (jedis != null)
+        {
+            try
+            {
+                Set<String> ss = jedis.hkeys(key);
+                if (ss.isEmpty())
+                    return null;
+                else
+                {
+                    for (String kk : ss)
+                    {
+                        if (kk.matches(pattern)) return kk;
+                    }
+                }
+            }
+            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
+            {
+                restartJedis();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                log.error("Redis exception (getFirstHashKeyLike): " + ex);
                 return null;
             }
         }
@@ -146,6 +179,54 @@ public class KeyValueCommunication {
             catch (Exception ex)
             {
                 log.error("Redis is not accessible (incrValue): " + ex);
+            }
+        }
+    }
+    
+    public String getHashValue(String key, String field)
+    {
+        return getHashValue(key, field, false);
+    }
+    
+    public String getHashValue(String key, String field, boolean delete)
+    {
+        if (jedis != null)
+        {
+            try
+            {
+                String value = jedis.hget(key, field);
+                if (delete) jedis.hdel(key, field);
+                return value;
+            }
+            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
+            {
+                restartJedis();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                log.error("Redis exception (getHashValue): " + ex);
+                return null;
+            }
+        }
+        else return null;
+    }
+    
+    public void setHashValue(String key, String field, String value)
+    {        
+        if (jedis != null)
+        {
+            try
+            {
+                jedis.hsetnx(key, field, value);
+            }
+            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
+            {
+                restartJedis();
+            }
+            catch (Exception ex)
+            {
+                log.error("Redis exception (setValue): " + ex);
             }
         }
     }

@@ -31,9 +31,6 @@ public class OpenZooBeholder implements Runnable {
     private int serverPort;
     private String serverHostname;
     private String service_name;
-    private String service_path;
-    private String service_rest;
-    private String real_path;
     private Boolean enough = false;
     private KeyValueCommunication kv;
 
@@ -101,8 +98,6 @@ public class OpenZooBeholder implements Runnable {
         }
 
         service_name = parameters.getGeneral().getName();
-        service_path = parameters.getGeneral().getPath();
-        real_path = parameters.getGeneral().getRealPath();
     }
 
     /**
@@ -130,12 +125,27 @@ public class OpenZooBeholder implements Runnable {
         runner.interrupt();
     }
     
+    private boolean checkKVForParameterUpdatesOld()
+    {
+        // check if flag component_id:instance_id:reset exists in KV
+        // if it exists, delete it and return true
+        
+        String reset = kv.getValue(parameters.getGeneral().getTopologyID() + ":" + parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":reset", true);
+        
+        if (reset != null && reset.equalsIgnoreCase("true"))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
     private boolean checkKVForParameterUpdates()
     {
         // check if flag component_id:instance_id:reset exists in KV
         // if it exists, delete it and return true
         
-        String reset = kv.getValue(parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":reset", true);
+        String reset = kv.getHashValue(parameters.getGeneral().getTopologyID(), parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":" + "reset", true);
         
         if (reset != null && reset.equalsIgnoreCase("true"))
         {

@@ -4,6 +4,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import gr.iti.openzoo.admin.KeyValueCommunication;
+import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.admin.ServiceParameters;
 import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +38,9 @@ public abstract class OpenZooWorker implements Runnable {
         //this.webAppPath = webpath;
     }
     
-    public abstract JSONObject doWork(JSONObject json_in);
+    public abstract boolean doWork(Message message);
+//    public abstract String publish(JSONObject obj);
+//    public abstract JSONObject get(String hash);
     @Override
     public abstract void run();
 
@@ -48,6 +51,13 @@ public abstract class OpenZooWorker implements Runnable {
         kv = new KeyValueCommunication(serviceParams.getRedis().getHost(), serviceParams.getRedis().getPort());
                 
         factory.setHost(serviceParams.getRabbit().getHost());
+        String usr = serviceParams.getRabbit().getUser();
+        String pwd = serviceParams.getRabbit().getPasswd();
+        if (usr != null && !usr.isEmpty())
+        {
+            factory.setUsername(usr);
+            factory.setPassword(pwd);
+        }
         
         try
         {
@@ -69,6 +79,7 @@ public abstract class OpenZooWorker implements Runnable {
         log.debug("-- OpenZooWorker.stopIt");
         
         enough = true;
+        runner.interrupt(); // -M-
         
         if (connection != null)
             try
@@ -86,5 +97,27 @@ public abstract class OpenZooWorker implements Runnable {
         log.debug("-- OpenZooWorker.setServiceParameters");
         
         serviceParams = spv2;
+    }
+    
+    public String getRequiredParameterOld(String param)
+    {
+        String key = serviceParams.getGeneral().getTopologyID() + ":" + serviceParams.getGeneral().getComponentID() + ":" + param;
+        return kv.getValue(key);
+    }
+    
+    // TODO: add instance id for giving  different parameters to different instances
+    public String getRequiredParameter(String param)
+    {
+        return kv.getHashValue(serviceParams.getGeneral().getTopologyID(), serviceParams.getGeneral().getComponentID() + ":" + param);
+    }
+    
+    protected Message createEmptyMessage()
+    {
+        return new Message( new JSONObject(), 
+                            new JSONObject(), 
+                            serviceParams.getGeneral().getComponentID(), 
+                            serviceParams.getGeneral().getInstanceID(), 
+                            new Throwable().getStackTrace()[1].getClassName().toString(), 
+                            null);
     }
 }

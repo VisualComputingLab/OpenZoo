@@ -1,0 +1,8 @@
+{
+    "keyvalue":
+    {
+        "host": "160.40.51.165",
+        "port": 6379
+    },
+    "localRepository": "./repo"
+}
