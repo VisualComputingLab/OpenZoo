@@ -21,7 +21,7 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class Servers extends HttpServlet {
+public class DrawTopology extends HttpServlet {
 
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
@@ -30,7 +30,7 @@ public class Servers extends HttpServlet {
     @Override
     public void init()
     {
-        System.out.println("Calling Servers init method");
+        System.out.println("Calling DrawTopology init method");
         try
         {
             String webAppPath = getServletContext().getRealPath("/");
@@ -56,6 +56,8 @@ public class Servers extends HttpServlet {
             System.err.println("IOexception during initializing template configuration: " + e);
         }
     }
+    
+    
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -69,31 +71,33 @@ public class Servers extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        Template servers_tmpl = cfg.getTemplate("servers.ftl");
+        Template draw_tmpl = cfg.getTemplate("draw.ftl");
         
         Map<String, Object> root = new HashMap<>();
+                
+        String name = request.getParameter("topo-name");
         
         // Fill data model from redis
-        ArrayList<Server> allServers = kv.getServers();
-        System.out.println("num of servers in redis: " + allServers.size());
+        Topology topo = kv.getTopology(name);
+//        ArrayList<TopologyService> allServices = kv.getServices(name);
+//        System.out.println("num of service for topology " + name + " in redis: " + allServices.size());
         
-        for (Server srv : allServers)
-        {
-            if (srv.statusUpdated())
-                kv.putServer(srv);
-        }
-        root.put("servers", allServers);
+        ArrayList<WarFile> allWarfiles = kv.getWarFiles();
+        
+        root.put("topology", topo);
+        root.put("services", allWarfiles);
         
         response.setContentType("text/html;charset=UTF-8");
         
         try (PrintWriter out = response.getWriter())
         {
-            servers_tmpl.process(root, out);
+            draw_tmpl.process(root, out);
         }
         catch (TemplateException ex)
         {
             System.err.println("TemplateException during processing template: " + ex);
         }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -125,41 +129,6 @@ public class Servers extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String action = request.getParameter("action");
-        String name = request.getParameter("srv-name");
-        
-        System.out.println("POST Servers: action = " + action + ", name = " + name);
-        
-        if (action.equalsIgnoreCase("delete") && name != null)
-        {
-            kv.getServer(name, true);
-            
-            processRequest(request, response);
-            return;
-        }
-        
-        
-        String address = request.getParameter("srv-ip");
-        int port = 80;
-        try
-        {
-            port = Integer.parseInt(request.getParameter("tmc-port"));
-        }
-        catch (NumberFormatException e)
-        {
-            System.err.println("Wrong format for port number: " + e);
-        }
-        
-        String user = request.getParameter("tmc-user");
-        String pass = request.getParameter("tmc-pass");
-        
-        Server srv = new Server(name, address, port, user, pass, "inactive");
-        
-//        System.out.println("Servers::POST called: " + request);
-        
-        // add or update new server to redis
-        kv.putServer(srv);
-        
         processRequest(request, response);
     }
 
@@ -170,6 +139,6 @@ public class Servers extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Servers interface";
+        return "Draw Topology interface";
     }// </editor-fold>
 }

@@ -1,5 +1,9 @@
 package gr.iti.openzoo.ui;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 /**
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
@@ -91,8 +95,29 @@ public class RepositoryParameters {
         this.path = path;
     }
     
+    @Override
     public String toString()
     {
         return host + " " + port + " " + user + " " + passwd + " " + path;
+    }
+    
+    public JSONObject toJSON()
+    {
+        JSONObject ret = new JSONObject();
+        
+        try
+        {
+            ret.put("host", host);
+            ret.put("port", port);
+            ret.put("user", user);
+            ret.put("passwd", passwd);
+            ret.put("path", path);
+        }
+        catch (JSONException e)
+        {
+            System.err.println("JSONException in toJSON: " + e);
+        }
+        
+        return ret;
     }
 }

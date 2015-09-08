@@ -458,7 +458,15 @@ public class KeyValueCommunication {
                     jedis.del(key);
                 }
                 
-                WarFile war = new WarFile(prop.get("filename"), prop.get("folder"), prop.get("version"), prop.get("status"));
+                ArrayList<String> reqs = new ArrayList<>();
+                String sreq = prop.get("requires");
+                if (sreq != null)
+                {
+                    String[] split = sreq.split(" ");
+                    for (int i = 0; i < split.length; i++)
+                        reqs.add(split[i]);
+                }
+                WarFile war = new WarFile(prop.get("filename"), prop.get("folder"), prop.get("version"), prop.get("status"), reqs);
                 
                 return war;
             }
@@ -484,6 +492,11 @@ public class KeyValueCommunication {
         prop.put("folder", war.getFolder());
         prop.put("version", war.getVersion());
         prop.put("status", war.getStatus());
+        ArrayList<String> reqs = war.getRequires();
+        String sarr = "";
+        for (String ss : reqs)
+            sarr += ss + " ";
+        prop.put("requires", sarr.trim());
         
         if (jedis != null)
         {
@@ -501,6 +514,116 @@ public class KeyValueCommunication {
             }
         }
     }
+    
+    public ArrayList<Topology> getTopologies()
+    {
+        return getTopologies(false);
+    }
+    
+    public ArrayList<Topology> getTopologies(boolean delete)
+    {
+        if (jedis != null)
+        {
+            try
+            {
+                Set<String> ss = jedis.keys("topologies:*");
+                ArrayList<Topology> allTopologies = new ArrayList<>();
+                for (String topname : ss)
+                {
+                    allTopologies.add(getTopology(topname, delete));
+                }
+                
+                return allTopologies;
+            }
+            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
+            {
+                restartJedis();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                error("Redis exception (getTopologies): " + ex);
+                return null;
+            }
+        }
+        else return null;
+    }
+    
+    public Topology getTopology(String toponame)
+    {
+        return getTopology(toponame, false);
+    }
+    
+    public Topology getTopology(String toponame, boolean delete)
+    {
+        String key = toponame;
+        if (!key.startsWith("topologies:"))
+            key = "topologies:" + toponame;
+        
+        if (jedis != null)
+        {
+            try
+            {
+                Map<String, String> prop = jedis.hgetAll(key);
+                if (delete)
+                {
+                    jedis.del(key);
+//                    for (String s : prop.keySet())
+//                        jedis.hdel("servers:" + servername, s);
+                }
+                
+                Topology topo = new Topology(prop.get("name"), prop.get("description"), prop.get("rabbit_host"), Integer.parseInt(prop.get("rabbit_port")), prop.get("rabbit_user"), prop.get("rabbit_passwd"), prop.get("mongo_host"), Integer.parseInt(prop.get("mongo_port")), prop.get("mongo_user"), prop.get("mongo_passwd"));
+                
+                return topo;
+            }
+            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
+            {
+                restartJedis();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                error("Redis exception (getTopology): " + ex);
+                return null;
+            }
+        }
+        else return null;
+    }
+    
+    public void putTopology(Topology topo)
+    {
+        Map<String, String> prop = new HashMap<>();
+        
+        prop.put("name", topo.getName());
+        prop.put("description", topo.getDescription());
+        prop.put("rabbit_host", topo.getRabbit_host());
+        prop.put("rabbit_port", "" + topo.getRabbit_port());
+        prop.put("rabbit_user", topo.getRabbit_user());
+        prop.put("rabbit_passwd", topo.getRabbit_passwd());
+        prop.put("mongo_host", topo.getMongo_host());
+        prop.put("mongo_port", "" + topo.getMongo_port());
+        prop.put("mongo_user", topo.getMongo_user());
+        prop.put("mongo_passwd", topo.getMongo_passwd());
+        
+        if (jedis != null)
+        {
+            try
+            {
+                jedis.hmset("topologies:" + topo.getName(), prop);
+            }
+            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
+            {
+                restartJedis();
+            }
+            catch (Exception ex)
+            {
+                error("Redis exception (putTopology): " + ex);
+            }
+        }
+    }
+        
+    
+    
     
     private void info(String s)
     {

@@ -9,6 +9,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -16,12 +17,16 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -141,9 +146,11 @@ public class Repository extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        System.out.println(request);
+        //System.out.println(request);
         
         String action = request.getParameter("action");
+        
+        System.out.println("POST Repository: action = " + action);
         
         switch (action)
         {
@@ -171,6 +178,7 @@ public class Repository extends HttpServlet {
                 // add or update new server to redis
                 kv.putRepositoryParameters(repo);
                 break;
+                
             case "uploadFile":
                 System.out.println("Uploading war file");
                 
@@ -182,12 +190,33 @@ public class Repository extends HttpServlet {
                     File f = new File(localRepository + "/" + fileName);
                     Files.copy(filePart.getInputStream(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     System.out.println("Downloaded file at: " + f.getAbsolutePath());
-                    
-                    WarFile w = new WarFile(fileName, localRepository, "1.0", "inactive");
+                    JSONObject config = readJSONFromWAR(f.getAbsolutePath(), "config.json");
+                    ArrayList<String> reqList = new ArrayList<>();
+                    if (config != null)
+                    {
+                        try
+                        {
+                            JSONArray requires = config.getJSONArray("requires");
+                            for (int i = 0; i < requires.length(); i++)
+                                reqList.add(requires.getString(i));
+                            
+                            for (String ss : reqList)
+                                System.out.println("Req: " + ss);
+                        }
+                        catch (JSONException ex)
+                        {
+                            System.err.println("JSONException while extracting service requirements: " + ex);
+                        }
+                    }
+                    WarFile w = new WarFile(fileName, localRepository, "1.0", "inactive", reqList);
                     
                     kv.putWarFile(w);
                 }
+                break;
                 
+            case "delete":
+                String warname = request.getParameter("war-filename");
+                kv.getWarFile(warname, true);
                 break;
         }
         
@@ -209,6 +238,48 @@ public class Repository extends HttpServlet {
             }
         }
         return null;
+    }
+    
+    private static JSONObject readJSONFromWAR(String warPath, String jsonPath)
+    {
+        JSONObject response = null;
+        
+        try
+        {
+            ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath));
+            ZipEntry entry = zipIn.getNextEntry();
+            // iterates over entries in the zip file
+            while (entry != null)
+            {
+                System.out.println("WAR content: " + entry.getName());
+                
+                if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(jsonPath))
+                {
+                    // extract
+                    String content = convertStreamToString(zipIn);
+                    response = new JSONObject(content);
+                    zipIn.closeEntry();
+                    break;
+                }
+                
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
+            }
+            zipIn.close();
+        }
+        catch (IOException | JSONException e)
+        {
+            System.err.println("Exception at readJSONFromWAR: " + e);
+            return null;
+        }
+        
+        return response;
+    }
+    
+    static String convertStreamToString(java.io.InputStream is)
+    {
+        Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
     
     /**

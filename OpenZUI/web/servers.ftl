@@ -74,6 +74,7 @@
                   <label for="srv-name" class="col-sm-4 control-label">server name</label>
                   <div class="col-sm-8">
                   <input type="text" class="form-control" name="srv-name" placeholder="server name">
+                  <input type="hidden" class="form-control" name="action" value="create">
                   </div>
                   </div>
                   <div class="form-group">
@@ -98,12 +99,11 @@
                   <label for="tmc-pass" class="col-sm-4 control-label">Tomcat pass</label>
                   <div class="col-sm-8">
                   <input type="text" class="form-control" name="tmc-pass" placeholder="password">
-                  <!--<input type="hidden" class="form-control" name="action" value="add">-->
                   </div>
                   </div>
                   <div class="form-group">
                   <div class="col-sm-offset-2 col-sm-10">
-                  <button type="submit" class="btn btn-success pull-right" id="submitServerBtn">Post</button>
+                  <button type="submit" class="btn btn-success pull-right" id="createBtn">Post</button>
                   </div>
                   </div>
         </form>
@@ -243,6 +243,7 @@
             <label for="srv-upd-name" class="col-sm-4 control-label">server name</label>
             <div class="col-sm-8">
               <input type="text" class="form-control" id="srv-upd-name" name="srv-name" readonly >
+              <input type="hidden" class="form-control" id="post-action" name="action" value="">
             </div>
           </div>
           <div class="form-group">
@@ -279,7 +280,8 @@
         <div class="modal-footer">
           <!--<button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>-->
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button id="submitBtn" type="submit" class="btn btn-primary">Submit</button>
+          <button id="deleteBtn" type="submit" class="btn btn-primary">Delete</button>
+          <button id="updateBtn" type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
     </div><!-- /.modal-content -->

@@ -8,6 +8,22 @@
         <servlet-name>Repository</servlet-name>
         <servlet-class>gr.iti.openzoo.ui.Repository</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Topologies</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.Topologies</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DrawTopology</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.DrawTopology</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProcessTopology</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.ProcessTopology</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>KeyValueServlet</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.KeyValueServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Servers</servlet-name>
         <url-pattern>/Servers</url-pattern>
@@ -15,6 +31,22 @@
     <servlet-mapping>
         <servlet-name>Repository</servlet-name>
         <url-pattern>/Repository</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Topologies</servlet-name>
+        <url-pattern>/Topologies</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DrawTopology</servlet-name>
+        <url-pattern>/DrawTopology</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProcessTopology</servlet-name>
+        <url-pattern>/ProcessTopology</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>KeyValueServlet</servlet-name>
+        <url-pattern>/KeyValueServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

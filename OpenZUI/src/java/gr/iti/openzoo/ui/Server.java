@@ -4,6 +4,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  *
@@ -118,6 +120,27 @@ public class Server {
     public String toString()
     {
         return name + " " + address + " " + port + " " + user + " " + passwd + " " + status;
+    }
+    
+    public JSONObject toJSON()
+    {
+        JSONObject ret = new JSONObject();
+        
+        try
+        {
+            ret.put("name", name);
+            ret.put("address", address);
+            ret.put("port", port);
+            ret.put("user", user);
+            ret.put("passwd", passwd);
+            ret.put("status", status);
+        }
+        catch (JSONException e)
+        {
+            System.err.println("JSONException in toJSON: " + e);
+        }
+        
+        return ret;
     }
     
     public boolean statusUpdated()

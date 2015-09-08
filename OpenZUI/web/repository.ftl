@@ -298,6 +298,7 @@
             <label for="war-upd-filename" class="col-sm-4 control-label">filename</label>
             <div class="col-sm-8">
               <input type="text" class="form-control" id="war-upd-filename" name="war-filename" readonly >
+              <input type="hidden" class="form-control" id="post-action" name="action" value="">
             </div>
           </div>
           <div class="form-group">
@@ -322,6 +323,7 @@
         </div>
       <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button id="deleteBtn" type="submit" class="btn btn-primary">Delete</button>
           <!--<button id="submitBtn" type="submit" class="btn btn-primary">Submit</button>-->
       </div>
     </div><!-- /.modal-content -->

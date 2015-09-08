@@ -50,3 +50,34 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
     $("#war-upd-status").val(status);
     $('#detailsModal').modal('show');
  };
+
+ function detailsTopology(name, description, rhost, rport, ruser, rpasswd, mhost, mport, muser, mpasswd){
+            
+    $("#topo-upd-name").val(name);
+    $("#topo-upd-descr").val(description);
+    $("#topo-upd-rhost").val(rhost);
+    $("#topo-upd-rport").val(rport);
+    $("#topo-upd-ruser").val(ruser);
+    $("#topo-upd-rpass").val(rpasswd);
+    $("#topo-upd-mhost").val(mhost);
+    $("#topo-upd-mport").val(mport);
+    $("#topo-upd-muser").val(muser);
+    $("#topo-upd-mpass").val(mpasswd);
+    $('#detailsModal').modal('show');
+ };
+
+ function detailsService(name){
+            
+    
+    $('#detailsModal').modal('show');
+ };
+
+ $('#deleteBtn').on('click',function(){
+
+    $("#post-action").val('delete');
+ });
+
+ $('#updateBtn').on('click',function(){
+
+    $("#post-action").val('update');
+ });
