@@ -1,7 +1,9 @@
-package gr.iti.openzoo.ui;
+package gr.iti.openzoo.ui.servlets;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
+import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,7 +19,7 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class ProcessTopology extends HttpServlet {
+public class ProcessTopologyServlet extends HttpServlet {
 
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();

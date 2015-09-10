@@ -2,12 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.iti.openzoo.ui;
+package gr.iti.openzoo.ui.servlets;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.RepositoryParameters;
+import gr.iti.openzoo.ui.Utilities;
+import gr.iti.openzoo.ui.WarFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,7 +39,7 @@ import org.codehaus.jettison.json.JSONObject;
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
 @MultipartConfig
-public class Repository extends HttpServlet {
+public class RepositoryServlet extends HttpServlet {
 
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
@@ -173,7 +177,7 @@ public class Repository extends HttpServlet {
 
                 RepositoryParameters repo = new RepositoryParameters(host, port, user, pass, path);
 
-                //System.out.println("Repository::POST called: " + request);
+                //System.out.println("RepositoryServlet::POST called: " + request);
 
                 // add or update new server to redis
                 kv.putRepositoryParameters(repo);

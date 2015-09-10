@@ -1,5 +1,11 @@
-package gr.iti.openzoo.ui;
+package gr.iti.openzoo.ui.servlets;
 
+import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.RepositoryParameters;
+import gr.iti.openzoo.ui.Server;
+import gr.iti.openzoo.ui.Topology;
+import gr.iti.openzoo.ui.Utilities;
+import gr.iti.openzoo.ui.WarFile;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;

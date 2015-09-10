@@ -276,6 +276,24 @@
               <input type="text" class="form-control" id="tmc-upd-status" name="tmc-status" readonly >
             </div>
           </div>
+          <div class="form-group">
+            <label for="stats-cpu" class="col-sm-4 control-label">CPU Usage</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="stats-cpu" readonly >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="stats-mem" class="col-sm-4 control-label">Memory Usage</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="stats-mem" readonly >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="stats-disc" class="col-sm-4 control-label">Disc Usage</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="stats-disc" readonly >
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <!--<button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>-->

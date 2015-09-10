@@ -2,27 +2,27 @@
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <servlet>
         <servlet-name>Servers</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.Servers</servlet-class>
+        <servlet-class>gr.iti.openzoo.ui.servlets.ServersServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Repository</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.Repository</servlet-class>
+        <servlet-class>gr.iti.openzoo.ui.servlets.RepositoryServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Topologies</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.Topologies</servlet-class>
+        <servlet-class>gr.iti.openzoo.ui.servlets.TopologiesServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DrawTopology</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.DrawTopology</servlet-class>
+        <servlet-class>gr.iti.openzoo.ui.servlets.DrawTopologyServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProcessTopology</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.ProcessTopology</servlet-class>
+        <servlet-class>gr.iti.openzoo.ui.servlets.ProcessTopologyServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>KeyValueServlet</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.KeyValueServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.ui.servlets.KeyValueServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Servers</servlet-name>

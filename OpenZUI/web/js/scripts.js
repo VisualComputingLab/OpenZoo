@@ -39,6 +39,15 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
     $("#tmc-upd-user").val(user);
     $("#tmc-upd-pass").val(passwd);
     $("#tmc-upd-status").val(status);
+
+    var URL = "http://" + address + ":" + port + "/ServerStatistics/resources/stats";
+    $.getJSON(URL, function(result){
+        $("#stats-cpu").val("" + Math.floor(result.cpu.systemCpuLoad * 100.0) + " %");
+        $("#stats-mem").val("" + Math.floor(result.mem.physicalFree / 1024 / 1024) + " MB free / " + Math.floor(result.mem.physicalTotal / 1024 / 1024) + " MB total");
+        $("#stats-disc").val("" + Math.floor(result.space.free / 1024 / 1024) + " MB free / " + Math.floor(result.space.total / 1024 / 1024) + " MB total");
+    });
+
+
     $('#detailsModal').modal('show');
  };
 
