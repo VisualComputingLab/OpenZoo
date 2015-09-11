@@ -102,3 +102,13 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
 
     $("#post-action").val('update');
  });
+
+ $('#startBtn').on('click',function(){
+
+    $("#post-action").val('start');
+ });
+
+ $('#stopBtn').on('click',function(){
+
+    $("#post-action").val('stop');
+ });

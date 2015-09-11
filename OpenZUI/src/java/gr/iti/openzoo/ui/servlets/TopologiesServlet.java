@@ -133,17 +133,8 @@ public class TopologiesServlet extends HttpServlet {
         
         String action = request.getParameter("action");        
         String name = request.getParameter("topo-name");
-        
+                
         System.out.println("POST Topologies: action = " + action + ", name = " + name);
-        
-        if (action.equalsIgnoreCase("delete") && name != null)
-        {
-            kv.getTopology(name, true);
-            
-            processRequest(request, response);
-            return;
-        }
-        
         
         String descr = request.getParameter("topo-descr");
         
@@ -174,22 +165,40 @@ public class TopologiesServlet extends HttpServlet {
         String mongo_user = request.getParameter("topo-mongo-user");
         String mongo_pass = request.getParameter("topo-mongo-pass");
         
-        
-        Topology top = new Topology(name, descr, rabbit_host, rabbit_port, rabbit_user, rabbit_pass, mongo_host, mongo_port, mongo_user, mongo_pass);
-        
-        System.out.println("Topologies::POST called: " + request);
-        
-        // add or update new server to redis
-        kv.putTopology(top);
-        
-        
-        // At this point we have to open the topology drawing interface
-        // This will update the topology and call (GET) the TopologiesServlet servlet again
-        RequestDispatcher rd = request.getRequestDispatcher("DrawTopology");
-        //rd.include(request, response);
-        rd.forward(request,response);
-        
-        //processRequest(request, response);
+        switch (action)
+        {
+            case "delete":
+                if (name != null)
+                {
+                    kv.getTopology(name, true);
+            
+                    processRequest(request, response);
+                    return;
+                }
+                break;
+                
+            case "create":
+                
+            case "update":
+                // create topology object
+                Topology top = new Topology(name, descr, rabbit_host, rabbit_port, rabbit_user, rabbit_pass, mongo_host, mongo_port, mongo_user, mongo_pass);
+
+                // add or update topology in redis
+                kv.putTopology(top);
+
+                // At this point we have to open the topology drawing interface
+                // This will update the topology and call (GET) the TopologiesServlet servlet again
+                RequestDispatcher rd = request.getRequestDispatcher("DrawTopology");
+                //rd.include(request, response);
+                rd.forward(request,response);
+                break;
+                
+            case "start":
+                break;
+                
+            case "stop":
+                break;
+        }
     }
 
     /**
