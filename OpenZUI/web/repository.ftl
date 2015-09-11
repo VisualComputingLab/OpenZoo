@@ -172,6 +172,10 @@
           <thead>
             <tr>
               <th>#</th>
+              <th>Comp ID</th>
+              <th>Name</th>
+              <th>Service Path</th>
+              <th>Description</th>
               <th>Filename</th>
               <th>Folder</th>
               <th>Version</th>
@@ -181,8 +185,12 @@
           <tbody>
             <#assign row=1>
             <#list warfiles as warfile>
-              <tr onclick="detailsWarfile('${warfile.filename}', '${warfile.folder}', '${warfile.version}', '${warfile.status}');">
+              <tr onclick="detailsWarfile('${warfile.filename}');">
                 <td>${row}</td>
+                <td>${warfile.component_id}</td>
+                <td>${warfile.name}</td>
+                <td>${warfile.service_path}</td>
+                <td>${warfile.description}</td>
                 <td>${warfile.filename}</td>
                 <td>${warfile.folder}</td>
                 <td>${warfile.version}</td>
@@ -299,6 +307,30 @@
             <div class="col-sm-8">
               <input type="text" class="form-control" id="war-upd-filename" name="war-filename" readonly >
               <input type="hidden" class="form-control" id="post-action" name="action" value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="war-upd-compoid" class="col-sm-4 control-label">component id</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="war-upd-compoid" name="war-compoid" readonly >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="war-upd-name" class="col-sm-4 control-label">name</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="war-upd-name" name="war-name" readonly >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="war-upd-servpath" class="col-sm-4 control-label">service path</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="war-upd-servpath" name="war-servpath" readonly >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="war-upd-descr" class="col-sm-4 control-label">description</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="war-upd-descr" name="war-descr" readonly >
             </div>
           </div>
           <div class="form-group">

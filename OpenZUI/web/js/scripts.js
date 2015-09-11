@@ -31,48 +31,60 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
  	  $('#detailsModal').modal('show');
  };
 
- function detailsServer(name, address, port, user, passwd, status){
+ function detailsServer(name){
             
-    $("#srv-upd-name").val(name);
-    $("#srv-upd-ip").val(address);
-    $("#tmc-upd-port").val(port);
-    $("#tmc-upd-user").val(user);
-    $("#tmc-upd-pass").val(passwd);
-    $("#tmc-upd-status").val(status);
-
-    var URL = "http://" + address + ":" + port + "/ServerStatistics/resources/stats";
+    var URL = "/OpenZUI/KeyValueServlet?action=server&name="+name;
     $.getJSON(URL, function(result){
-        $("#stats-cpu").val("" + Math.floor(result.cpu.systemCpuLoad * 100.0) + " %");
-        $("#stats-mem").val("" + Math.floor(result.mem.physicalFree / 1024 / 1024) + " MB free / " + Math.floor(result.mem.physicalTotal / 1024 / 1024) + " MB total");
-        $("#stats-disc").val("" + Math.floor(result.space.free / 1024 / 1024) + " MB free / " + Math.floor(result.space.total / 1024 / 1024) + " MB total");
+        $("#srv-upd-name").val(name);
+        $("#srv-upd-ip").val(result.response.address);
+        $("#tmc-upd-port").val(result.response.port);
+        $("#tmc-upd-user").val(result.response.user);
+        $("#tmc-upd-pass").val(result.response.passwd);
+        $("#tmc-upd-status").val(result.response.status);
+
+        var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerStatistics/resources/stats";
+        $.getJSON(StatsURL, function(sresult){
+            $("#stats-cpu").val("" + Math.floor(sresult.cpu.systemCpuLoad * 100.0) + " %");
+            $("#stats-mem").val("" + Math.floor(sresult.mem.physicalFree / 1024 / 1024) + " MB free / " + Math.floor(sresult.mem.physicalTotal / 1024 / 1024) + " MB total");
+            $("#stats-disc").val("" + Math.floor(sresult.space.free / 1024 / 1024) + " MB free / " + Math.floor(sresult.space.total / 1024 / 1024) + " MB total");
+        });
+
+        $('#detailsModal').modal('show');
     });
-
-
-    $('#detailsModal').modal('show');
  };
 
- function detailsWarfile(filename, folder, version, status){
+ function detailsWarfile(filename){
             
-    $("#war-upd-filename").val(filename);
-    $("#war-upd-folder").val(folder);
-    $("#war-upd-version").val(version);
-    $("#war-upd-status").val(status);
-    $('#detailsModal').modal('show');
+    var URL = "/OpenZUI/KeyValueServlet?action=war&name="+filename;
+    $.getJSON(URL, function(result){
+        $("#war-upd-compoid").val(result.response.component_id);
+        $("#war-upd-name").val(result.response.name);
+        $("#war-upd-servpath").val(result.response.service_path);
+        $("#war-upd-descr").val(result.response.description);
+        $("#war-upd-filename").val(filename);
+        $("#war-upd-folder").val(result.response.folder);
+        $("#war-upd-version").val(result.response.version);
+        $("#war-upd-status").val(result.response.status);
+        $('#detailsModal').modal('show');
+    });
  };
 
- function detailsTopology(name, description, rhost, rport, ruser, rpasswd, mhost, mport, muser, mpasswd){
-            
-    $("#topo-upd-name").val(name);
-    $("#topo-upd-descr").val(description);
-    $("#topo-upd-rhost").val(rhost);
-    $("#topo-upd-rport").val(rport);
-    $("#topo-upd-ruser").val(ruser);
-    $("#topo-upd-rpass").val(rpasswd);
-    $("#topo-upd-mhost").val(mhost);
-    $("#topo-upd-mport").val(mport);
-    $("#topo-upd-muser").val(muser);
-    $("#topo-upd-mpass").val(mpasswd);
-    $('#detailsModal').modal('show');
+ function detailsTopology(name){
+
+    var URL = "/OpenZUI/KeyValueServlet?action=topology&name="+name;
+    $.getJSON(URL, function(result){
+        $("#topo-upd-name").val(name);
+        $("#topo-upd-descr").val(result.response.description);
+        $("#topo-upd-rhost").val(result.response.rabbit.host);
+        $("#topo-upd-rport").val(result.response.rabbit.port);
+        $("#topo-upd-ruser").val(result.response.rabbit.user);
+        $("#topo-upd-rpass").val(result.response.rabbit.passwd);
+        $("#topo-upd-mhost").val(result.response.mongo.host);
+        $("#topo-upd-mport").val(result.response.mongo.port);
+        $("#topo-upd-muser").val(result.response.mongo.user);
+        $("#topo-upd-mpass").val(result.response.mongo.passwd);
+        $('#detailsModal').modal('show');
+    });
  };
 
  function detailsService(name){

@@ -167,7 +167,7 @@
           <tbody>
             <#assign row=1>
             <#list topologies as topo>
-              <tr onclick="detailsTopology('${topo.name}', '${topo.description}', '${topo.rabbit_host}','${topo.rabbit_port?string.computer}', '${topo.rabbit_user}', '${topo.rabbit_passwd}', '${topo.mongo_host}','${topo.mongo_port?string.computer}', '${topo.mongo_user}', '${topo.mongo_passwd}');">
+              <tr onclick="detailsTopology('${topo.name}');">
                 <td>${row}</td>
                 <td>${topo.name}</td>
                 <td>${topo.description}</td>

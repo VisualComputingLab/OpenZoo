@@ -458,15 +458,8 @@ public class KeyValueCommunication {
                     jedis.del(key);
                 }
                 
-                ArrayList<String> reqs = new ArrayList<>();
-                String sreq = prop.get("requires");
-                if (sreq != null)
-                {
-                    String[] split = sreq.split(" ");
-                    for (int i = 0; i < split.length; i++)
-                        reqs.add(split[i]);
-                }
-                WarFile war = new WarFile(prop.get("filename"), prop.get("folder"), prop.get("version"), prop.get("status"), reqs);
+                //WarFile war = new WarFile(prop.get("component_id"), prop.get("name"), prop.get("service_path"), prop.get("description"), prop.get("filename"), prop.get("folder"), prop.get("version"), prop.get("status"), sreq, swrk);
+                WarFile war = new WarFile(prop);
                 
                 return war;
             }
@@ -488,6 +481,10 @@ public class KeyValueCommunication {
     {
         Map<String, String> prop = new HashMap<>();
         
+        prop.put("component_id", war.getComponent_id());
+        prop.put("name", war.getName());
+        prop.put("service_path", war.getService_path());
+        prop.put("description", war.getDescription());
         prop.put("filename", war.getFilename());
         prop.put("folder", war.getFolder());
         prop.put("version", war.getVersion());
@@ -497,6 +494,12 @@ public class KeyValueCommunication {
         for (String ss : reqs)
             sarr += ss + " ";
         prop.put("requires", sarr.trim());
+        
+        ArrayList<Worker> works= war.getWorkers();
+        String warr = "";
+        for (Worker ww : works)
+            warr += ww.toString() + " ";
+        prop.put("workers", warr.trim());
         
         if (jedis != null)
         {

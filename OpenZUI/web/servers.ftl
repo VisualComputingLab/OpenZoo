@@ -136,7 +136,7 @@
           <tbody>
             <#assign row=1>
             <#list servers as server>
-              <tr onclick="detailsServer('${server.name}', '${server.address}', '${server.port?string.computer}', '${server.user}', '${server.passwd}', '${server.status}');">
+              <tr onclick="detailsServer('${server.name}');">
                 <td>${row}</td>
                 <td>${server.name}</td>
                 <td>${server.address}</td>

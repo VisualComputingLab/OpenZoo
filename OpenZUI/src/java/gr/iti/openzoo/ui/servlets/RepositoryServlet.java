@@ -12,6 +12,7 @@ import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.RepositoryParameters;
 import gr.iti.openzoo.ui.Utilities;
 import gr.iti.openzoo.ui.WarFile;
+import gr.iti.openzoo.ui.Worker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -195,24 +196,8 @@ public class RepositoryServlet extends HttpServlet {
                     Files.copy(filePart.getInputStream(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     System.out.println("Downloaded file at: " + f.getAbsolutePath());
                     JSONObject config = readJSONFromWAR(f.getAbsolutePath(), "config.json");
-                    ArrayList<String> reqList = new ArrayList<>();
-                    if (config != null)
-                    {
-                        try
-                        {
-                            JSONArray requires = config.getJSONArray("requires");
-                            for (int i = 0; i < requires.length(); i++)
-                                reqList.add(requires.getString(i));
-                            
-                            for (String ss : reqList)
-                                System.out.println("Req: " + ss);
-                        }
-                        catch (JSONException ex)
-                        {
-                            System.err.println("JSONException while extracting service requirements: " + ex);
-                        }
-                    }
-                    WarFile w = new WarFile(fileName, localRepository, "1.0", "inactive", reqList);
+                    
+                    WarFile w = new WarFile(fileName, localRepository, "1.0", "inactive", config);
                     
                     kv.putWarFile(w);
                 }
@@ -255,7 +240,7 @@ public class RepositoryServlet extends HttpServlet {
             // iterates over entries in the zip file
             while (entry != null)
             {
-                System.out.println("WAR content: " + entry.getName());
+                //System.out.println("WAR content: " + entry.getName());
                 
                 if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(jsonPath))
                 {

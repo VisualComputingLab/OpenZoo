@@ -106,15 +106,19 @@ public class KeyValueServlet extends HttpServlet {
                     if (name == null || name.equalsIgnoreCase("all"))
                     {
                         ArrayList<Server> allServers = kv.getServers();
-                        JSONArray jarr = new JSONArray();
-                        for (Server srv : allServers)
-                            jarr.put(srv.toJSON());
-                        json.put("response", jarr);
+                        if (allServers != null)
+                        {
+                            JSONArray jarr = new JSONArray();
+                            for (Server srv : allServers)
+                                jarr.put(srv.toJSON());
+                            json.put("response", jarr);
+                        }
                     }
                     else
                     {
                         Server server = kv.getServer(name);
-                        json.put("response", server.toJSON());
+                        if (server != null)
+                            json.put("response", server.toJSON());
                     }
                     break;
 
@@ -122,15 +126,19 @@ public class KeyValueServlet extends HttpServlet {
                     if (name == null || name.equalsIgnoreCase("all"))
                     {
                         ArrayList<WarFile> allWarfiles = kv.getWarFiles();
-                        JSONArray jarr = new JSONArray();
-                        for (WarFile war : allWarfiles)
-                            jarr.put(war.toJSON());
-                        json.put("response", jarr);
+                        if (allWarfiles != null)
+                        {
+                            JSONArray jarr = new JSONArray();
+                            for (WarFile war : allWarfiles)
+                                jarr.put(war.toJSON());
+                            json.put("response", jarr);
+                        }
                     }
                     else
                     {
                         WarFile war = kv.getWarFile(name);
-                        json.put("response", war.toJSON());
+                        if (war != null)
+                            json.put("response", war.toJSON());
                     }
                     break;
 
@@ -138,22 +146,27 @@ public class KeyValueServlet extends HttpServlet {
                     if (name == null || name.equalsIgnoreCase("all"))
                     {
                         ArrayList<Topology> allTopologies = kv.getTopologies();
-                        JSONArray jarr = new JSONArray();
-                        for (Topology topo : allTopologies)
-                            jarr.put(topo.toJSON());
-                        json.put("response", jarr);
+                        if (allTopologies != null)
+                        {
+                            JSONArray jarr = new JSONArray();
+                            for (Topology topo : allTopologies)
+                                jarr.put(topo.toJSON());
+                            json.put("response", jarr);
+                        }
                     }
                     else
                     {
                         Topology topo = kv.getTopology(name);
-                        json.put("response", topo.toJSON());
+                        if (topo != null)
+                            json.put("response", topo.toJSON());
                     }
                     break;
 
                 case "repository":
 
                     RepositoryParameters repo = kv.getRepositoryParameters();
-                    json.put("response", repo.toJSON());
+                    if (repo != null)
+                        json.put("response", repo.toJSON());
                     break;
             }
         }

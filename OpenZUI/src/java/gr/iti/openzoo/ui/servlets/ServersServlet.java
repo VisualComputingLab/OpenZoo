@@ -27,9 +27,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import sun.misc.BASE64Encoder;
 
 /**
  *
@@ -207,7 +207,8 @@ public class ServersServlet extends HttpServlet {
         {
             URL url = new URL(httpserverandport + "/manager/text/deploy?path=" + webservicepath + "&update=true");
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
+            //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
+            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
             httpCon.setDoOutput(true);
             httpCon.setRequestMethod("PUT");
             copyInputStream(new FileInputStream(warfilepath), httpCon.getOutputStream());
@@ -230,7 +231,8 @@ public class ServersServlet extends HttpServlet {
         {
             URL url = new URL(httpserverandport + "/manager/text/undeploy?path=" + webservicepath);
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
+            //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
+            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
             httpCon.setDoOutput(true);
             httpCon.setRequestMethod("GET");
             output = convertStreamToString(httpCon.getInputStream());
