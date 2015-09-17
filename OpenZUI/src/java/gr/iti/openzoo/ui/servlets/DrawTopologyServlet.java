@@ -88,8 +88,7 @@ public class DrawTopologyServlet extends HttpServlet {
         
         ArrayList<WarFile> allWarfiles = kv.getWarFiles();
         
-        root.put("topology", topo);
-        root.put("services", allWarfiles);
+        root.put("topology_name", name);
         
         response.setContentType("text/html;charset=UTF-8");
         

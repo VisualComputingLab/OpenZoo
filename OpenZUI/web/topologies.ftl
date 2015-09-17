@@ -271,7 +271,7 @@
       <form class="form-horizontal" method="POST" action="Topologies">
         <div class="modal-body" id="detailsModalBody">
           <div class="form-group">
-            <label for="topo-upd-name" class="col-sm-4 control-label">Server name</label>
+            <label for="topo-upd-name" class="col-sm-4 control-label">Topology name</label>
             <div class="col-sm-8">
               <input type="text" class="form-control" id="topo-upd-name" name="topo-name" readonly >
               <input type="hidden" class="form-control" id="post-action" name="action" value="">

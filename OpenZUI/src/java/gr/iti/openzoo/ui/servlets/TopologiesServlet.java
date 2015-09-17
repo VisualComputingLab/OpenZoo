@@ -4,6 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
@@ -30,6 +31,7 @@ public class TopologiesServlet extends HttpServlet {
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
+    private Deployer deployer;
     
     @Override
     public void init()
@@ -49,6 +51,8 @@ public class TopologiesServlet extends HttpServlet {
             {
                 System.err.println("ERROR retrieving keyValue server: " + ex);
             }           
+            
+            deployer = new Deployer(properties);
             
             cfg.setDirectoryForTemplateLoading(new File(webAppPath));
             cfg.setDefaultEncoding("UTF-8");
@@ -165,6 +169,9 @@ public class TopologiesServlet extends HttpServlet {
         String mongo_user = request.getParameter("topo-mongo-user");
         String mongo_pass = request.getParameter("topo-mongo-pass");
         
+        Topology top;
+        RequestDispatcher rd;
+        
         switch (action)
         {
             case "delete":
@@ -173,30 +180,53 @@ public class TopologiesServlet extends HttpServlet {
                     kv.getTopology(name, true);
             
                     processRequest(request, response);
-                    return;
                 }
                 break;
                 
             case "create":
+                // create topology object
+                top = new Topology(name, descr, rabbit_host, rabbit_port, rabbit_user, rabbit_pass, mongo_host, mongo_port, mongo_user, mongo_pass);
+                
+                // add topology to redis
+                kv.putTopology(top);
+                
+                // At this point we have to open the topology drawing interface
+                // This will update the topology and call (GET) the TopologiesServlet servlet again
+                rd = request.getRequestDispatcher("DrawTopology");
+                //rd.include(request, response);
+                rd.forward(request,response);
+                break;
                 
             case "update":
-                // create topology object
-                Topology top = new Topology(name, descr, rabbit_host, rabbit_port, rabbit_user, rabbit_pass, mongo_host, mongo_port, mongo_user, mongo_pass);
-
-                // add or update topology in redis
+                // load topology object
+                top = kv.getTopology(name);
+                
+                top.setDescription(descr);
+                top.setRabbit_host(rabbit_host);
+                top.setRabbit_port(rabbit_port);
+                top.setRabbit_user(rabbit_user);
+                top.setRabbit_passwd(rabbit_pass);
+                top.setMongo_host(mongo_host);
+                top.setMongo_port(mongo_port);
+                top.setMongo_user(mongo_user);
+                top.setMongo_passwd(mongo_pass);
+                
+                // update topology in redis
                 kv.putTopology(top);
 
                 // At this point we have to open the topology drawing interface
                 // This will update the topology and call (GET) the TopologiesServlet servlet again
-                RequestDispatcher rd = request.getRequestDispatcher("DrawTopology");
+                rd = request.getRequestDispatcher("DrawTopology");
                 //rd.include(request, response);
                 rd.forward(request,response);
                 break;
                 
             case "start":
+                deployer.deployTopology(name);
                 break;
                 
             case "stop":
+                deployer.undeployTopology(name);
                 break;
         }
     }

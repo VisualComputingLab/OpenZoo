@@ -3,11 +3,14 @@ package gr.iti.openzoo.ui.servlets;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -59,11 +62,27 @@ public class ProcessTopologyServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-                
-        // do stuff here
-        
-        // redirect to Topologies.GET
-        response.sendRedirect("Topologies");
+        try
+        {
+            String name = request.getParameter("topo-name");
+            String graphStr = request.getParameter("topo-graph");
+            
+            System.out.println("ProcessTopologyServlet received: " + name + " " + graphStr);
+            
+            JSONObject graph = new JSONObject(graphStr);
+            
+            // save graph object to kv
+            Topology topo = kv.getTopology(name);
+            topo.setGraph_object(graph);
+            kv.putTopology(topo);
+            
+            // redirect to Topologies.GET
+            response.sendRedirect("Topologies");
+        } 
+        catch (JSONException ex) 
+        {
+            Logger.getLogger(ProcessTopologyServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

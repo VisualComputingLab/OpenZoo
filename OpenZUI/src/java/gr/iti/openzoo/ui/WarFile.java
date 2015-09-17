@@ -61,7 +61,7 @@ public class WarFile {
                 {
                     for (int i = 0; i < jarr_workers.length(); i++)
                     {
-                        Worker w = new Worker(jarr_workers.getJSONObject(i));
+                        Worker w = new Worker(jarr_workers.getJSONObject(i), component_id);
                         workers.add(w);
                     }
                 }
@@ -102,7 +102,7 @@ public class WarFile {
                 for (int i = 0; i < split.length; i++)
                 {
                     JSONObject json = new JSONObject(split[i]);
-                    Worker w = new Worker(json);
+                    Worker w = new Worker(json, component_id);
                     workers.add(w);
                 }
             }

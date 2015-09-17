@@ -119,3 +119,14 @@ color: green;
 .inactive{
 color: red;		
 }
+
+.topologyBox{
+border: 1px black solid;
+}
+
+.floatRightBox{
+z-index: 10;  
+position: absolute;  
+right: 10;  
+top: 100;
+}

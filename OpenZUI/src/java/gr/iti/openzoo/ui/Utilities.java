@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -149,6 +150,39 @@ public class Utilities {
         os.close();
 
         return responseSB.toString();
+    }
+    
+    public String callPOST(URL url, JSONObject object) throws IOException
+    {
+        try
+        {
+            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+            httpCon.setDoOutput(true);
+            httpCon.setRequestProperty("Content-Type", "application/json");
+            httpCon.setRequestProperty("Accept", "application/json");
+            //httpCon.setRequestProperty("Content-Length", String.valueOf(data.length()));
+            httpCon.setRequestMethod("POST");
+            
+            String objectStr = object.toString();
+            try (OutputStreamWriter osw = new OutputStreamWriter(httpCon.getOutputStream())) {
+                osw.write(objectStr);
+            }
+            
+            int status = ((HttpURLConnection) httpCon).getResponseCode();
+            if (status != 200)
+            {
+                System.err.println("callPOST returned with status: " + status);
+                return null;
+            }
+            
+            String output = convertStreamToString(httpCon.getInputStream());
+            return output;
+        }
+        catch (IOException e)
+        {
+            System.err.println("callPOST : IOException: " + e);
+            return null;
+        }
     }
 
     public String callDELETE(URL url) {

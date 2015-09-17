@@ -86,9 +86,32 @@
 <!--main-->
 <div class="container" id="main">
    <div class="row">
-   <div class="col-md-4 col-sm-6">
-        
-     <div class="well"> 
+  
+
+  	<div class="col-md-4 col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4>Upload WAR files</h4>
+        </div>
+        <div class="panel-body">
+             
+          <form class="form-horizontal" action="Repository" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="fileToUpload" class="col-sm-4 control-label">Select file:</label>
+              <div class="col-sm-8">
+                <input type="file" name="fileToUpload" id="fileToUpload">
+                <input type="hidden" class="form-control" name="action" value="uploadFile">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-success pull-right">Upload</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="well"> 
           <form class="form-horizontal" method="POST" action="Repository">
             <h4>Repository parameters / FTP</h4>
             <div class="form-group">
@@ -129,38 +152,10 @@
             </div>
           </form>
         </div>
-
-       
-     
-
-	</div>
-  	<div class="col-md-4 col-sm-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h4>Upload WAR files</h4>
-        </div>
-        <div class="panel-body">
-             
-          <form class="form-horizontal" action="Repository" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-              <label for="fileToUpload" class="col-sm-4 control-label">Select file:</label>
-              <div class="col-sm-8">
-                <input type="file" name="fileToUpload" id="fileToUpload">
-                <input type="hidden" class="form-control" name="action" value="uploadFile">
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-success pull-right">Upload</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
       
   	</div>
 
-    <div class="col-md-4 col-sm-6">
+    <div class="col-md-8 col-sm-6">
          
          
          <div class="panel panel-default">
@@ -174,10 +169,10 @@
               <th>#</th>
               <th>Comp ID</th>
               <th>Name</th>
-              <th>Service Path</th>
+              <!-- <th>Service Path</th> -->
               <th>Description</th>
               <th>Filename</th>
-              <th>Folder</th>
+              <!-- <th>Folder</th> -->
               <th>Version</th>
               <th>Status</th>
             </tr>
@@ -189,10 +184,10 @@
                 <td>${row}</td>
                 <td>${warfile.component_id}</td>
                 <td>${warfile.name}</td>
-                <td>${warfile.service_path}</td>
+                <!-- <td>${warfile.service_path}</td> -->
                 <td>${warfile.description}</td>
                 <td>${warfile.filename}</td>
-                <td>${warfile.folder}</td>
+                <!-- <td>${warfile.folder}</td> -->
                 <td>${warfile.version}</td>
                 <td><i class="${warfile.status} fa fa-check-circle fa-1x"></i></td>
               </tr>
@@ -210,14 +205,15 @@
   </div><!--/row-->
 
   
-  <!--
-  <hr>
+ 
+  <!-- <hr>
    <div class="row">
-    <div class="col-md-12"><h2>Repository</h2></div>
-    <div class="col-md-4 col-sm-6"></div>
-    <div class="col-md-4 col-sm-6"></div>
-    <div class="col-md-4 col-sm-6"></div>
-  </div> -->
+     <div class="col-md-4 col-sm-6">
+        
+     
+
+  </div>
+  </div>  -->
  
   	
     <div class="clearfix"></div>

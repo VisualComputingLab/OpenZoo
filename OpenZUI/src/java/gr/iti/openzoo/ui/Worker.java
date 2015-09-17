@@ -12,14 +12,16 @@ import org.codehaus.jettison.json.JSONObject;
 public class Worker {
 
     private String worker_id;
+    private String component_id;
     private ArrayList<String> in;
     private ArrayList<String> out;
     
-    public Worker(JSONObject w)
+    public Worker(JSONObject w, String c_id)
     {
         try
         {
             worker_id = w.getString("worker_id");
+            component_id = c_id;
             in = new ArrayList<>();
             out = new ArrayList<>();
             
@@ -88,5 +90,12 @@ public class Worker {
         sb.append("]}");
         
         return sb.toString();
+    }
+
+    /**
+     * @return the component_id
+     */
+    public String getComponent_id() {
+        return component_id;
     }
 }

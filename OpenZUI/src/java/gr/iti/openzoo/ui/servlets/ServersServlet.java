@@ -4,22 +4,13 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Server;
 import gr.iti.openzoo.ui.Utilities;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -40,6 +30,7 @@ public class ServersServlet extends HttpServlet {
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
+    private Deployer deployer;
     
     @Override
     public void init()
@@ -59,6 +50,8 @@ public class ServersServlet extends HttpServlet {
             {
                 System.err.println("ERROR retrieving keyValue server: " + ex);
             }           
+            
+            deployer = new Deployer(properties);
             
             cfg.setDirectoryForTemplateLoading(new File(webAppPath));
             cfg.setDefaultEncoding("UTF-8");
@@ -148,7 +141,7 @@ public class ServersServlet extends HttpServlet {
         {
             Server srv = kv.getServer(name, true);
             
-            String output = undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/ServerStatistics");
+            String output = deployer.undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/ServerStatistics");
 
             System.out.println("---------- UNDEPLOY --------------");
             System.out.println("Undeployment output = " + output);
@@ -184,7 +177,7 @@ public class ServersServlet extends HttpServlet {
         {
             // deploy ServerStatistics war on new server
             String warfilepath = getServletContext().getRealPath("/") + "ServerStatistics.war";
-            String output = deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerStatistics");
+            String output = deployer.deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerStatistics");
 
             System.out.println("---------- DEPLOY --------------");
             System.out.println("Deployment output = " + output);
@@ -194,113 +187,7 @@ public class ServersServlet extends HttpServlet {
         processRequest(request, response);
     }
 
-    private String deployService(String httpserverandport, String servercredentials, String warfilepath, String webservicepath)
-    {
-        // httpserverandport: server to call, e.g. "http://localhost:8080"
-        // servercredentials: server credentials, e.g. "admin:passwd"
-        // warfilepath: path to the WAR file
-        // webservicepath: service path, e.g. "/SEIndexShardService"
-        
-        String output = null;
-            
-        try
-        {
-            URL url = new URL(httpserverandport + "/manager/text/deploy?path=" + webservicepath + "&update=true");
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
-            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("PUT");
-            copyInputStream(new FileInputStream(warfilepath), httpCon.getOutputStream());
-            output = convertStreamToString(httpCon.getInputStream());
-            output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
-        }
-        catch (IOException e)
-        {
-            output = "IOException during web service deployment: " + e;
-        }
-        
-        return output;
-    }
     
-    private String undeployService(String httpserverandport, String servercredentials, String webservicepath)
-    {
-        String output = null;
-        
-        try
-        {
-            URL url = new URL(httpserverandport + "/manager/text/undeploy?path=" + webservicepath);
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
-            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("GET");
-            output = convertStreamToString(httpCon.getInputStream());
-            output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
-        }
-        catch (IOException e)
-        {
-            output = "IOException during web service undeployment: " + e;
-        }
-        
-        return output;
-    }
-    
-    private static String convertStreamToString(InputStream is) throws IOException {
-        //
-        // To convert the InputStream to String we use the
-        // Reader.read(char[] buffer) method. We iterate until the
-        // Reader return -1 which means there's no more data to
-        // read. We use the StringWriter class to produce the string.
-        //
-        if (is != null) 
-        {
-            Writer writer = new StringWriter();
- 
-            char[] buffer = new char[1024];
-            try 
-            {
-                Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                int n;
-                while ((n = reader.read(buffer)) != -1) 
-                {
-                    writer.write(buffer, 0, n);
-                }
-            } 
-            finally 
-            {
-                is.close();
-            }
-            
-            return writer.toString();
-        } 
-        else 
-        {       
-            return "";
-        }
-    }
-    
-    private static boolean copyInputStream(InputStream in, OutputStream out)
-    {
-        byte[] buffer = new byte[1024];
-        int len;
-
-        try
-        {
-            while((len = in.read(buffer)) >= 0)
-                out.write(buffer, 0, len);
-
-            in.close();
-            out.close();
-        }
-        catch(IOException ioe)
-        {
-            System.err.println("Error while unziping: " + ioe);
-            return false;
-        }
-
-        return true;
-    }
     
     /**
      * Returns a short description of the servlet.

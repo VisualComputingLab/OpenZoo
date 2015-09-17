@@ -112,3 +112,45 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
 
     $("#post-action").val('stop');
  });
+
+
+function fetchServicesList(){
+
+    var url = "/OpenZUI/KeyValueServlet?action=war";
+
+    $.getJSON(url,function(result){
+      
+        //console.log(result);
+        var listItems= "";
+        var services =[];
+        $.each(result['response'], function(key, val){
+            var svc={};
+            var svc_in=[];
+            var svc_out=[];
+
+            if (val.workers.length>0){
+                for (var i = 0; i < val.workers.length; i++){
+                    for(var x = 0; x < val.workers[i].endpoints.length; x++){
+                        if (val.workers[i].endpoints[x].type == 'in'){
+                            svc_in.push(val.workers[i].endpoints[x].endpoint_id)   
+                        }
+                        else if (val.workers[i].endpoints[x].type == 'out'){
+                            svc_out.push(val.workers[i].endpoints[x].endpoint_id)   
+                        }     
+                    }
+                }
+
+                svc={name:val.filename, in_ep:svc_in, out_ep:svc_out}                    
+                //svc={ in_ep:svc_in, out_ep:svc_out}    
+                listItems+= "<option value='" + val.filename + "'>" + val.filename + "</option>";
+                //console.log(svc);
+                localStorage[val.filename] = JSON.stringify(svc);
+                //services.push(svc);
+            }
+        });
+
+        localStorage["WAR"] = JSON.stringify(result['response']);
+        $("#openzooServiceSelect").html(listItems);      
+    });
+};
+

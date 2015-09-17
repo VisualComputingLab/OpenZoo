@@ -12,7 +12,6 @@ import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.RepositoryParameters;
 import gr.iti.openzoo.ui.Utilities;
 import gr.iti.openzoo.ui.WarFile;
-import gr.iti.openzoo.ui.Worker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -204,8 +202,8 @@ public class RepositoryServlet extends HttpServlet {
                 break;
                 
             case "delete":
-                String warname = request.getParameter("war-filename");
-                kv.getWarFile(warname, true);
+                String warcompid = request.getParameter("war-compoid");
+                kv.getWarFile(warcompid, true);
                 break;
         }
         

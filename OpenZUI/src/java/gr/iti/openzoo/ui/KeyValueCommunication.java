@@ -437,16 +437,16 @@ public class KeyValueCommunication {
         else return null;
     }
     
-    public WarFile getWarFile(String warname)
+    public WarFile getWarFile(String warcompid)
     {
-        return getWarFile(warname, false);
+        return getWarFile(warcompid, false);
     }
     
-    public WarFile getWarFile(String warname, boolean delete)
+    public WarFile getWarFile(String warcompid, boolean delete)
     {
-        String key = warname;
+        String key = warcompid;
         if (!key.startsWith("warfiles:"))
-            key = "warfiles:" + warname;
+            key = "warfiles:" + warcompid;
         
         if (jedis != null)
         {
@@ -505,7 +505,7 @@ public class KeyValueCommunication {
         {
             try
             {
-                jedis.hmset("warfiles:" + war.getFilename(), prop);
+                jedis.hmset("warfiles:" + war.getComponent_id(), prop);
             }
             catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
             {
@@ -575,7 +575,7 @@ public class KeyValueCommunication {
 //                        jedis.hdel("servers:" + servername, s);
                 }
                 
-                Topology topo = new Topology(prop.get("name"), prop.get("description"), prop.get("rabbit_host"), Integer.parseInt(prop.get("rabbit_port")), prop.get("rabbit_user"), prop.get("rabbit_passwd"), prop.get("mongo_host"), Integer.parseInt(prop.get("mongo_port")), prop.get("mongo_user"), prop.get("mongo_passwd"));
+                Topology topo = new Topology(prop);
                 
                 return topo;
             }
@@ -599,14 +599,86 @@ public class KeyValueCommunication {
         
         prop.put("name", topo.getName());
         prop.put("description", topo.getDescription());
-        prop.put("rabbit_host", topo.getRabbit_host());
-        prop.put("rabbit_port", "" + topo.getRabbit_port());
-        prop.put("rabbit_user", topo.getRabbit_user());
-        prop.put("rabbit_passwd", topo.getRabbit_passwd());
-        prop.put("mongo_host", topo.getMongo_host());
-        prop.put("mongo_port", "" + topo.getMongo_port());
-        prop.put("mongo_user", topo.getMongo_user());
-        prop.put("mongo_passwd", topo.getMongo_passwd());
+        prop.put("rabbit:host", topo.getRabbit_host());
+        prop.put("rabbit:port", "" + topo.getRabbit_port());
+        prop.put("rabbit:user", topo.getRabbit_user());
+        prop.put("rabbit:passwd", topo.getRabbit_passwd());
+        prop.put("mongo:host", topo.getMongo_host());
+        prop.put("mongo:port", "" + topo.getMongo_port());
+        prop.put("mongo:user", topo.getMongo_user());
+        prop.put("mongo:passwd", topo.getMongo_passwd());
+        
+        ArrayList<TopologyGraphNode> nodes = topo.getNodes();
+        StringBuilder sb, sb2;
+        for (TopologyGraphNode nod : nodes)
+        {
+            sb = new StringBuilder();
+            sb.append("{'name':'");
+            sb.append(nod.getName());
+            sb.append("','instances':");
+            sb.append(nod.getInstances());
+            sb.append(",'workerspercore':");
+            sb.append(nod.getWorkerspercore());
+            sb.append("}");
+            prop.put("node:" + nod.getName(), sb.toString());
+            
+            HashMap<String,String> req = nod.getRequirements();
+            for (String key : req.keySet())
+                prop.put("requires:" + nod.getName() + ":" + key, req.get(key));
+        }
+        
+        ArrayList<TopologyGraphConnection> connections = topo.getConnections();
+        for (TopologyGraphConnection conn : connections)
+        {
+            sb = new StringBuilder();
+            sb.append("{'mapping':'");
+            sb.append(conn.getMapping());
+            if (conn.getQueue_name() != null && !conn.getQueue_name().isEmpty())
+            {
+                sb.append(",'queue_name':'");
+                sb.append(conn.getQueue_name());
+                sb.append("'");
+            }
+            if (conn.getExchange_name() != null && !conn.getExchange_name().isEmpty())
+            {
+                sb.append(",'exchange_name':'");
+                sb.append(conn.getExchange_name());
+                sb.append("'");
+            }
+            if (conn.getRouting_keys() != null && !conn.getRouting_keys().isEmpty())
+            {
+                sb.append(",'routing_keys':'");
+                sb.append(conn.getExchange_name());
+                sb.append("'");
+            }
+            sb.append("}");
+            
+            sb2 = new StringBuilder();
+            sb2.append("connection:");
+            sb2.append(conn.getSource_component());
+            sb2.append(":");
+            sb2.append(conn.getSource_worker());
+            sb2.append(":");
+            sb2.append(conn.getSource_endpoint());
+            sb2.append(":");
+            sb2.append(conn.getTarget_component());
+            sb2.append(":");
+            sb2.append(conn.getTarget_worker());
+            sb2.append(":");
+            sb2.append(conn.getTarget_endpoint());
+            if (conn.getTarget_instance() >= 0)
+            {
+                sb2.append(":");
+                sb2.append(conn.getTarget_instance());
+            }
+            prop.put(sb2.toString(), sb.toString());
+        }
+        
+        if (topo.hasGraph_object())
+            prop.put("graph_object", topo.getGraph_object().toString());
+        
+        if (topo.hasServer_config())
+            prop.put("server_config", topo.getServer_config().toString());
         
         if (jedis != null)
         {
