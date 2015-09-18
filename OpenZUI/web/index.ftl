@@ -45,21 +45,35 @@
         <div class="col-md-12"><h2>Running Topologies</h2></div>
         <div class="col-md-4 col-sm-6">
           <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>CPU load</h4></div>
+            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Statistics</h4></div>
             <div class="panel-body">
               <img src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=70" class="img-circle pull-right"> <a href="#">Guidance and Tools</a>
               <div class="clearfix"></div>
               <hr>
-              <p>Migrating from Bootstrap 2.x to 3 is not a simple matter of swapping out the JS and CSS files.
-                Bootstrap 3 is a major overhaul, and there are a lot of changes from Bootstrap 2.x. <a href="http://bootply.com/bootstrap-3-migration-guide">This guidance</a> is intended to help 2.x developers transition to 3.
-              </p>
-              <h5><a href="http://google.com/+bootply">More on Upgrading from +Bootply</a></h5>
+              <p>Per topology statistics: <a href="Servers">CPU</a>, Memory, Disc space.</p>
+              <h5><a href="Servers">More on this</a></h5>
             </div>
           </div> 
         </div>
-        <div class="col-md-4 col-sm-6">
+
+        <div class="col-md-8 col-sm-6">
           <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Memory</h4></div>
+            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Logs</h4></div>
+            <div class="panel-body">
+              The GUI logs appear here
+              <hr>
+              <div class="well well-sm">
+                <textarea id="logTextArea" >
+                  
+                </textarea>
+              </div>
+            </div>
+          </div> 
+        </div>
+
+        <!-- <div class="col-md-8 col-sm-6">
+          <div class="panel panel-default">
+            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Logs</h4></div>
             <div class="panel-body">
               Check out some of our member profiles..
               <hr>
@@ -80,8 +94,8 @@
               </div>
             </div>
           </div> 
-        </div>
-        <div class="col-md-4 col-sm-6">
+        </div> -->
+        <!-- <div class="col-md-4 col-sm-6">
           <div class="panel panel-default">
             <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Storage</h4></div>
             <div class="panel-body">
@@ -94,18 +108,18 @@
               <div class="clearfix"></div>              
             </div>
           </div> 
-        </div><!--/articles-->
+        </div> -->
       </div>
 
       <div class="clearfix"></div>
       <hr>
-      <div class="col-md-12 text-center">
-        <p>
-          <a href="http://openzoo.org" target="_ext">openzoo website</a>
-          <br>
-          <a href="http://vcl.iti.gr" target="_ext">vcl@iti.gr</a> || <a href="http://www.certh.gr" target="_ext">CERTH</a>
-        </p>
-      </div>
+        <div class="col-md-12 text-center">
+          <p>
+            <a href="http://openzoo.org" target="_ext">openzoo website</a>
+            <br>
+            <a href="http://vcl.iti.gr" target="_ext">vcl@iti.gr</a> || <a href="http://www.certh.gr" target="_ext">CERTH</a>
+          </p>
+        </div>
       <hr>
     </div>
   </div><!--/main-->
