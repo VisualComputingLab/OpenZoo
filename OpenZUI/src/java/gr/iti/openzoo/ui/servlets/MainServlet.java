@@ -4,14 +4,12 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Server;
 import gr.iti.openzoo.ui.Utilities;
+import static gr.iti.openzoo.ui.servlets.DrawTopologyServlet.cfg;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -25,17 +23,16 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class ServersServlet extends HttpServlet {
+public class MainServlet extends HttpServlet {
 
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
-    private Deployer deployer;
     
     @Override
     public void init()
     {
-        System.out.println("Calling Servers init method");
+        System.out.println("Calling Main init method");
         try
         {
             String webAppPath = getServletContext().getRealPath("/");
@@ -50,8 +47,6 @@ public class ServersServlet extends HttpServlet {
             {
                 System.err.println("ERROR retrieving keyValue server: " + ex);
             }           
-            
-            deployer = new Deployer(properties);
             
             cfg.setDirectoryForTemplateLoading(new File(webAppPath));
             cfg.setDefaultEncoding("UTF-8");
@@ -75,27 +70,18 @@ public class ServersServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-                
-        Template servers_tmpl = cfg.getTemplate("servers.ftl");
+        
+        Template draw_tmpl = cfg.getTemplate("index.ftl");
         
         Map<String, Object> root = new HashMap<>();
-        
-        // Fill data model from redis
-        ArrayList<Server> allServers = kv.getServers();
-        System.out.println("num of servers in redis: " + allServers.size());
-        
-        for (Server srv : allServers)
-        {
-            if (srv.statusUpdated())
-                kv.putServer(srv);
-        }
-        root.put("servers", allServers);
+//        String name = request.getParameter("topo-name");
+//        root.put("topology_name", name);
         
         response.setContentType("text/html;charset=UTF-8");
         
         try (PrintWriter out = response.getWriter())
         {
-            servers_tmpl.process(root, out);
+            draw_tmpl.process(root, out);
         }
         catch (TemplateException ex)
         {
@@ -131,67 +117,9 @@ public class ServersServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String action = request.getParameter("action");
-        String name = request.getParameter("srv-name");
-        
-        System.out.println("POST Servers: action = " + action + ", name = " + name);
-        
-        if (action.equalsIgnoreCase("delete") && name != null)
-        {
-            Server srv = kv.getServer(name, true);
-            
-            if (srv.isActive())
-            {
-                String output = deployer.undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/ServerStatistics");
-
-                System.out.println("---------- UNDEPLOY --------------");
-                System.out.println("Undeployment output = " + output);
-                System.out.println("---------- UNDEPLOY END --------------");
-            }
-            
-            processRequest(request, response);
-            return;
-        }
-        
-        
-        String address = request.getParameter("srv-ip");
-        int port = 80;
-        try
-        {
-            port = Integer.parseInt(request.getParameter("tmc-port"));
-        }
-        catch (NumberFormatException e)
-        {
-            System.err.println("Wrong format for port number: " + e);
-        }
-        
-        String user = request.getParameter("tmc-user");
-        String pass = request.getParameter("tmc-pass");
-        
-        Server srv = new Server(name, address, port, user, pass);
-        
-//        System.out.println("ServersServlet::POST called: " + request);
-        
-        // add or update new server to redis
-        kv.putServer(srv);
-        
-        if (action.equalsIgnoreCase("create") && srv.isActive())
-        {
-            // deploy ServerStatistics war on new server
-            String warfilepath = getServletContext().getRealPath("/") + "ServerStatistics.war";
-            String output = deployer.deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerStatistics");
-
-            System.out.println("---------- DEPLOY --------------");
-            System.out.println("Deployment output = " + output);
-            System.out.println("---------- DEPLOY END --------------");
-        }
-                
         processRequest(request, response);
     }
 
-    
-    
     /**
      * Returns a short description of the servlet.
      *
@@ -199,6 +127,6 @@ public class ServersServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Servers interface";
+        return "Short description";
     }// </editor-fold>
 }

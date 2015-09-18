@@ -1,68 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <title>OpenZoo management tool</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href="./libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./libs/font-awesome-4.4.0/css/font-awesome.min.css">
-    <!--[if lt IE 9]>
-      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link href="./css/styles.css" rel="stylesheet">
-    <link href="./css/joint.css" rel="stylesheet">
-  </head>
+  <#include "header.ftl">
   <body>
-    <nav class="navbar navbar-fixed-top header">
-      <div class="col-md-12">
-        <div class="navbar-header">
-          <a href="index.html" class="navbar-brand"><img height="40" src="./img/openzoo.png"></img></a>
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse1">
-            <i class="glyphicon glyphicon-search"></i>
-          </button>
-              
-        </div>
-        <div class="collapse navbar-collapse" id="navbar-collapse1">
-          <form class="navbar-form pull-left">
-            <div class="input-group" style="max-width:470px;">
-              <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term">
-              <div class="input-group-btn">
-                <button class="btn btn-default btn-primary" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-              </div>
-            </div>
-          </form>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="https://github.com/VisualComputingLab" target="_ext">github</a></li>
-            <li>
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-bell"></i></a>
-              <ul class="dropdown-menu">
-                <li><a href="#"><span class="badge pull-right">40</span>Link</a></li>
-                <li><a href="#"><span class="badge pull-right">2</span>Link</a></li>
-                <li><a href="#"><span class="badge pull-right">0</span>Link</a></li>
-                <li><a href="#"><span class="label label-info pull-right">1</span>Link</a></li>
-                <li><a href="#"><span class="badge pull-right">13</span>Link</a></li>
-              </ul>
-            </li>
-            <li><a href="#" id="btnToggle"><i class="glyphicon glyphicon-th-large"></i></a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-user"></i></a></li>
-          </ul>
-        </div>	
-      </div>	
-    </nav>
-    <div class="navbar navbar-default" id="subnav">
-      <div class="col-md-12">
-        <div class="collapse navbar-collapse" id="navbar-collapse2">
-          <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="#">Dashboard</a></li>
-            <li><a href="#loginModal" role="button" data-toggle="modal">Login</a></li>
-            <li><a href="#aboutModal" role="button" data-toggle="modal">About</a></li>
-          </ul>
-        </div>	
-      </div>	
-    </div>
-
-
+    <#include "navigation.ftl">
 
 
     <!--main-->
@@ -75,6 +15,7 @@
             <form class="form-horizontal" id="topoSubmitForm" method="POST" action="ProcessTopology">
               <input type="hidden" class="form-control" name="topo-name" value="${topology_name}">
               <input type="hidden" class="form-control" name="topo-graph" id="topo-graph" >
+              <div type="button" id="cancelTopoBtn" class="btn btn-default"> Close</div>
               <div type="button" id="submitTopoBtn" class="btn btn-success"><i class="fa fa-send"></i> Submit</div>
             </form>
           </div> 
@@ -166,62 +107,6 @@
       </div>
             
     </div><!--/main-->
-
-    <!--login modal-->
-    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h2 class="text-center">
-              <!-- <img src="./img/openzoo.png" height="50" class="img-circle"><br> -->
-              Login</h2>
-          </div>
-          <div class="modal-body">
-            <form class="form col-md-12 center-block">
-              <div class="form-group">
-                <input type="text" class="form-control input-lg" placeholder="Email">
-              </div>
-              <div class="form-group">
-                <input type="password" class="form-control input-lg" placeholder="Password">
-              </div>
-              <div class="form-group">
-                <button class="btn btn-primary btn-lg btn-block">Sign In</button>
-                <span class="pull-right"><a href="#">Register</a></span><span><a href="#">Need help?</a></span>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <div class="col-md-12">
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            </div>  
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <!--about modal-->
-    <div id="aboutModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h2 class="text-center">About</h2>
-          </div>
-          <div class="modal-body">
-            <div class="col-md-12 text-center">
-              <a href=""><strong>OpenZoo</strong> </a>was made with <i class="glyphicon glyphicon-heart"></i> <br> by the <a href="http://vcl.iti.gr">Visual Computing Lab</a>
-              <br><br>
-              <a href="http://www.openzoo.org">www.openzoo.org</a>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
 
     <!-- details modal-->

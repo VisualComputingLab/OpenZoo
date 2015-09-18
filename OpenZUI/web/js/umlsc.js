@@ -177,80 +177,172 @@
         })
 
 
+        // graph.on('change:source change:target', function(cell){
+
+
+        //    // console.log(cell);
+        //     if(("id" in cell.attributes.source) && ("id" in cell.attributes.target)){
+        //         //console.log(cell);
+        //         objectId= cell.id; 
+                
+        //         var sourceId = cell.attributes.source.id;
+        //         var targetId = cell.attributes.target.id;
+                
+        //         if(sourceId=="undefined" || targetId=="undefined"){
+        //            console.log("...");
+        //             return;
+        //         }
+
+        //         if ((sourceId == "transition-source") && (targetId == "transition-target")){
+        //                     return;
+        //                 }
+
+        //                 else if ((sourceId == "transition-source") && (targetId !== "transition-target") /*&& targetEndpoints.length<0*/){
+        //                     //console.log("target only" + targetId)
+
+        //                     var t = localStorage[targetId];
+        //                     var tf = JSON.parse(t); 
+
+        //                     if (tf.in_ep.length <= 0){
+        //                        alert("no target endpoints defined")
+
+        //                         cell.remove();
+        //                     }
+
+        //                     //console.log(tf.in_ep);
+
+        //                 }else if ((targetId == "transition-target") && (sourceId !== "transition-source")/*&& sourceEndpoints.length<0*/){
+        //                     //console.log("source only" + sourceId)
+
+        //                     var s = localStorage[sourceId];
+        //                     var sf = JSON.parse(s); 
+
+        //                     if (sf.out_ep.length <= 0){
+        //                        alert("no target endpoints defined")
+
+        //                         cell.remove();
+        //                     }
+
+        //                     //console.log(sf.out_ep);
+                        
+        //                 }else {
+        //                     //console.log("both" + targetId + sourceId )
+        //                     var t = localStorage[targetId];
+        //                     var tf = JSON.parse(t); 
+
+        //                     if (tf.in_ep.length <= 0){
+        //                        alert("no target endpoints defined")
+
+        //                         cell.remove();
+        //                     }
+
+        //                     var s = localStorage[sourceId];
+        //                     var sf = JSON.parse(s); 
+
+        //                     if (sf.out_ep.length <= 0){
+        //                        alert("no target endpoints defined")
+
+        //                         cell.remove();
+        //                     }
+        //                 }
+        //     }
+        //     else{
+        //         //console.log("cell");
+        //     }
+
+        // });
+
         graph.on('change:source change:target', function(cell){
 
 
-           // console.log(cell);
-            if(("id" in cell.attributes.source) && ("id" in cell.attributes.target)){
-                //console.log(cell);
-                objectId= cell.id; 
-                
-                var sourceId = cell.attributes.source.id;
-                var targetId = cell.attributes.target.id;
-                
-                if(sourceId=="undefined" || targetId=="undefined"){
-                   console.log("...");
-                    return;
-                }
+            // console.log(cell);
+             if(("id" in cell.attributes.source) && ("id" in cell.attributes.target)){
+                 //console.log(cell);
+                 objectId= cell.id;
 
-                if ((sourceId == "transition-source") && (targetId == "transition-target")){
-                            return;
-                        }
+                 var sourceId = cell.attributes.source.id;
+                 var targetId = cell.attributes.target.id;
 
-                        else if ((sourceId == "transition-source") && (targetId !== "transition-target") /*&& targetEndpoints.length<0*/){
-                            //console.log("target only" + targetId)
+                 if(sourceId=="undefined" || targetId=="undefined"){
+                    console.log("...");
+                     return;
+                 }
 
-                            var t = localStorage[targetId];
-                            var tf = JSON.parse(t); 
+                 if ((sourceId == "transition-source") && (targetId == "transition-target")){
+                             return;
+                         }
 
-                            if (tf.in_ep.length <= 0){
-                               alert("no target endpoints defined")
+                         else if ((sourceId == "transition-source") && (targetId !== "transition-target") /*&& targetEndpoints.length<0*/){
+                             //console.log("target only" + targetId)
 
-                                cell.remove();
-                            }
+                             var t = localStorage[targetId];
+                             var tf = JSON.parse(t);
+                             if (tf.hasOwnProperty('in_ep')){
+                                 if (tf.in_ep.length <= 0){
+                                    alert("no target endpoints defined")
 
-                            //console.log(tf.in_ep);
+                                     cell.remove();
+                                 }
+                             }
+                             else{
+                                 cell.remove();
+                             }
+                             //console.log(tf.in_ep);
 
-                        }else if ((targetId == "transition-target") && (sourceId !== "transition-source")/*&& sourceEndpoints.length<0*/){
-                            //console.log("source only" + sourceId)
+                         }else if ((targetId == "transition-target") && (sourceId !== "transition-source")/*&& sourceEndpoints.length<0*/){
+                             //console.log("source only" + sourceId)
 
-                            var s = localStorage[sourceId];
-                            var sf = JSON.parse(s); 
+                             var s = localStorage[sourceId];
+                             var sf = JSON.parse(s);
 
-                            if (sf.out_ep.length <= 0){
-                               alert("no target endpoints defined")
+                             if (sf.hasOwnProperty('out_ep')){
+                                 if (sf.out_ep.length <= 0){
+                                    alert("no target endpoints defined")
 
-                                cell.remove();
-                            }
+                                     cell.remove();
+                                 }
+                             }
+                             else{
+                                 cell.remove();
+                             }
 
-                            //console.log(sf.out_ep);
-                        
-                        }else {
-                            //console.log("both" + targetId + sourceId )
-                            var t = localStorage[targetId];
-                            var tf = JSON.parse(t); 
+                             //console.log(sf.out_ep);
 
-                            if (tf.in_ep.length <= 0){
-                               alert("no target endpoints defined")
+                         }else {
+                             //console.log("both" + targetId + sourceId )
+                             var t = localStorage[targetId];
+                             var tf = JSON.parse(t);
 
-                                cell.remove();
-                            }
+                             if (tf.hasOwnProperty('in_ep')){
+                                 if (tf.in_ep.length <= 0){
+                                    alert("no target endpoints defined")
 
-                            var s = localStorage[sourceId];
-                            var sf = JSON.parse(s); 
+                                     cell.remove();
+                                 }
+                             }
+                             else{
+                                 cell.remove();
+                             }
 
-                            if (sf.out_ep.length <= 0){
-                               alert("no target endpoints defined")
+                             var s = localStorage[sourceId];
+                             var sf = JSON.parse(s);
 
-                                cell.remove();
-                            }
-                        }
-            }
-            else{
-                //console.log("cell");
-            }
+                             if (sf.hasOwnProperty('out_ep')){
+                                 if (sf.out_ep.length <= 0){
+                                    alert("no target endpoints defined")
 
-        });
+                                     cell.remove();
+                                 }
+                             }
+                             else{
+                                 cell.remove();
+                             }
+                         }
+             }
+
+
+         });
+
     
        paper.on('cell:pointerup',myAdjustVertices);
 
@@ -289,15 +381,29 @@
 
                         for (var i = 0; i < warfiles.length; i++){
                             if (warfiles[i].filename == objectId){
-                                //get requires flieds from WAR
-                                var reqs =  warfiles[i].requires;
+                                // //get requires flieds from WAR
+                                // var reqs =  warfiles[i].requires;
+                                // $(".addToServiceForm").remove();
+                                // $("#service_form").removeClass();
+
+                                // for(var y = 0; y < reqs.length; y++){
+                                //     //console.log(reqs[y]);
+                                //     $("#service_form").prepend('<div class="addToServiceForm"><label for="'+reqs[y]+'">'+reqs[y]+'</label><input type="text" class="form-control" id="'+reqs[y]+'" name="'+reqs[y]+'"></div>');
+                                // }
+
                                 $(".addToServiceForm").remove();
                                 $("#service_form").removeClass();
-
-                                for(var y = 0; y < reqs.length; y++){
-                                    //console.log(reqs[y]);
-                                    $("#service_form").prepend('<div class="addToServiceForm"><label for="'+reqs[y]+'">'+reqs[y]+'</label><input type="text" class="form-control" id="'+reqs[y]+'" name="'+reqs[y]+'"></div>');
+                                //get requires flieds from WAR
+                                if (warfiles[i].hasOwnProperty('requires')){
+                                    var reqs =  warfiles[i].requires;
+                                    for(var y = 0; y < reqs.length; y++){
+                                        //console.log(reqs[y]);
+                                        if (reqs[y] != '')
+                                            $("#service_form").prepend('<div class="addToServiceForm"><label for="'+reqs[y]+'">'+reqs[y]+'</label><input type="text" class="form-control" id="'+reqs[y]+'" name="'+reqs[y]+'"></div>');
+                                    }
                                 }
+
+
 
                                 $("#service_form").prepend('<div class="addToServiceForm"><label>Service <i>'+warfiles[i].filename+'</i> configuration</label><hr></div>');
                                 $("#service_form").addClass(objectId);
@@ -488,6 +594,13 @@
             localStorage.setItem("graphComplete", JSON.stringify(graphComplete));
 
             $("#topo-graph").val(JSON.stringify(graphComplete));
+
+            $("#topoSubmitForm").submit();
+        });
+
+        $("#cancelTopoBtn").on('click',function(){
+
+            $("#topo-graph").val('');
 
             $("#topoSubmitForm").submit();
         });

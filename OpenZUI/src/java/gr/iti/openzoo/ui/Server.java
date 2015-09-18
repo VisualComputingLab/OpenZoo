@@ -22,14 +22,16 @@ public class Server {
     
     private static Utilities util = new Utilities();
 
-    public Server(String n, String a, int p, String u, String pw, String s)
+    public Server(String n, String a, int p, String u, String pw)
     {
         name = n;
         address = a;
         port = p;
         user = u;
         passwd = pw;
-        status = s;
+        status = "inactive";
+        
+        statusUpdated();
     }
     
     /**
@@ -169,5 +171,13 @@ public class Server {
         status = newStatus;
         
         return true;
+    }
+    
+    public boolean isActive()
+    {
+        if (status.equalsIgnoreCase("active"))
+            return true;
+        
+        return false;
     }
 }

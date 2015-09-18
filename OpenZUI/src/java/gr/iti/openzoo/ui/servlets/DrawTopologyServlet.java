@@ -80,14 +80,7 @@ public class DrawTopologyServlet extends HttpServlet {
         Map<String, Object> root = new HashMap<>();
                 
         String name = request.getParameter("topo-name");
-        
-        // Fill data model from redis
-        Topology topo = kv.getTopology(name);
-//        ArrayList<TopologyService> allServices = kv.getServices(name);
-//        System.out.println("num of service for topology " + name + " in redis: " + allServices.size());
-        
-        ArrayList<WarFile> allWarfiles = kv.getWarFiles();
-        
+                
         root.put("topology_name", name);
         
         response.setContentType("text/html;charset=UTF-8");
@@ -100,7 +93,6 @@ public class DrawTopologyServlet extends HttpServlet {
         {
             System.err.println("TemplateException during processing template: " + ex);
         }
-        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -53,15 +53,15 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
     });
  };
 
- function detailsWarfile(filename){
+ function detailsWarfile(comp_id){
             
-    var URL = "/OpenZUI/KeyValueServlet?action=war&name="+filename;
+    var URL = "/OpenZUI/KeyValueServlet?action=war&name="+comp_id;
     $.getJSON(URL, function(result){
-        $("#war-upd-compoid").val(result.response.component_id);
+        $("#war-upd-compoid").val(comp_id);
         $("#war-upd-name").val(result.response.name);
         $("#war-upd-servpath").val(result.response.service_path);
         $("#war-upd-descr").val(result.response.description);
-        $("#war-upd-filename").val(filename);
+        $("#war-upd-filename").val(result.response.filename);
         $("#war-upd-folder").val(result.response.folder);
         $("#war-upd-version").val(result.response.version);
         $("#war-upd-status").val(result.response.status);

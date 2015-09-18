@@ -50,11 +50,9 @@ public class ServerResources {
         }
     }
     
-    public void addDeployedServices(String ds)
+    public void addDeployedServices(ArrayList<String> ds)
     {
-        System.out.println("- DS -");
-        System.out.println(ds);
-        System.out.println("- DS end -");
+        deployedServices.addAll(ds);
     }
     
     public boolean isServiceDeployed(String serv)

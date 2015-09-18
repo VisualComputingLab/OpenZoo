@@ -24,6 +24,10 @@
         <servlet-name>KeyValueServlet</servlet-name>
         <servlet-class>gr.iti.openzoo.ui.servlets.KeyValueServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MainServlet</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.servlets.MainServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Servers</servlet-name>
         <url-pattern>/Servers</url-pattern>
@@ -47,6 +51,10 @@
     <servlet-mapping>
         <servlet-name>KeyValueServlet</servlet-name>
         <url-pattern>/KeyValueServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MainServlet</servlet-name>
+        <url-pattern>/Main</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

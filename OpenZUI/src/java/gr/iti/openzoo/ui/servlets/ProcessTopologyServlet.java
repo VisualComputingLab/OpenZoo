@@ -7,8 +7,6 @@ import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -69,12 +67,15 @@ public class ProcessTopologyServlet extends HttpServlet {
             
             System.out.println("ProcessTopologyServlet received: " + name + " " + graphStr);
             
-            JSONObject graph = new JSONObject(graphStr);
+            if (graphStr != null && !graphStr.isEmpty())
+            {
+                JSONObject graph = new JSONObject(graphStr);
             
-            // save graph object to kv
-            Topology topo = kv.getTopology(name);
-            topo.setGraph_object(graph);
-            kv.putTopology(topo);
+                // save graph object to kv
+                Topology topo = kv.getTopology(name);
+                topo.setGraph_object(graph);
+                kv.putTopology(topo);
+            }
             
             // redirect to Topologies.GET
             response.sendRedirect("Topologies");

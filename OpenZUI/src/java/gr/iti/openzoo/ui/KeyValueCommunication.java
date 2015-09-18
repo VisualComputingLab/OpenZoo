@@ -288,7 +288,7 @@ public class KeyValueCommunication {
 //                        jedis.hdel("servers:" + servername, s);
                 }
                 
-                Server srv = new Server(prop.get("name"), prop.get("address"), Integer.parseInt(prop.get("port")), prop.get("user"), prop.get("passwd"), prop.get("status"));
+                Server srv = new Server(prop.get("name"), prop.get("address"), Integer.parseInt(prop.get("port")), prop.get("user"), prop.get("passwd"));
                 
                 return srv;
             }
@@ -493,7 +493,8 @@ public class KeyValueCommunication {
         String sarr = "";
         for (String ss : reqs)
             sarr += ss + " ";
-        prop.put("requires", sarr.trim());
+        if (sarr.length() > 0)
+            prop.put("requires", sarr.trim());
         
         ArrayList<Worker> works= war.getWorkers();
         String warr = "";

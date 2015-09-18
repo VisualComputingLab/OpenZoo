@@ -61,7 +61,7 @@ public class Deployer {
         URL url;
         JSONObject stat;
         ServerResources sr;
-        String slist;
+        ArrayList<String> slist;
         
         try
         {
@@ -285,9 +285,11 @@ public class Deployer {
         return output;
     }
     
-    public String listServices(String httpserverandport, String servercredentials)
+    public ArrayList<String> listServices(String httpserverandport, String servercredentials)
     {
-        String output;
+        String output, sname;
+        ArrayList<String> result = new ArrayList<>();
+        String[] split;
 
         try
         {
@@ -297,14 +299,25 @@ public class Deployer {
             httpCon.setDoOutput(true);
             httpCon.setRequestMethod("GET");
             output = convertStreamToString(httpCon.getInputStream());
-            output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
+            split = output.split("\n");
+            for (String line : split)
+            {
+                if (line.startsWith("/"))
+                {
+                    sname = line.substring(1, line.indexOf(":"));
+                    if (sname != null && !sname.isEmpty())
+                        result.add(sname);
+                }
+            }
+//            output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
         }
         catch (IOException e)
         {
-            output = "IOException during web service listing: " + e;
+            System.err.println("IOException during web service listing: " + e);
+            return null;
         }
         
-        return output;
+        return result;
     }
     
     public String serverStatus(String httpserverandport, String servercredentials)
