@@ -42,8 +42,16 @@
       <hr>
 
       <div class="row">
-        <div class="col-md-12"><h2>Running Topologies</h2></div>
-        <div class="col-md-4 col-sm-6">
+        <!-- <div class="col-md-12">
+          <h2>Running Topologies</h2>
+          <select id="topologyDropdown" name="topologyDropdown" class="selectpicker" title='Select a topology'>
+            <#list topologies as topo>
+            <option>${topo.name}</option>
+            </#list>
+          </select>
+        </div> -->
+        
+        <!-- <div class="col-md-4 col-sm-6">
           <div class="panel panel-default">
             <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Statistics</h4></div>
             <div class="panel-body">
@@ -54,18 +62,50 @@
               <h5><a href="Servers">More on this</a></h5>
             </div>
           </div> 
-        </div>
+        </div> -->
 
-        <div class="col-md-8 col-sm-6">
+        <div class="col-md-12 col-sm-6">
           <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Logs</h4></div>
+            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Topology Monitor</h4></div>
             <div class="panel-body">
-              The GUI logs appear here
+              Please select topology:
+              <select id="topologyDropdown" name="topologyDropdown" class="selectpicker" title='Select a topology'>
+                <#list topologies as topo>
+                <option>${topo.name}</option>
+                </#list>
+              </select>
               <hr>
+              Server statistics
+
+              <div class="table-responsive">
+                <table class="table table-condensed table-hover">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>CPU Usage</th>
+                      <th>Memory Usage</th>
+                      <th>Disc Usage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>name</td>
+                      <td>bar1</td>
+                      <td>bar2</td>
+                      <td>bar3</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <hr>
+              Service logs
               <div class="well well-sm">
-                <textarea id="logTextArea" >
-                  
-                </textarea>
+                <textarea style="width:100%" rows="10" id="serviceLogTextArea">Service logs appear here
+One after the other
+Updated periodically
+Format: Component Time Message
+With component filter and time constrains</textarea>
               </div>
             </div>
           </div> 
@@ -110,6 +150,28 @@
           </div> 
         </div> -->
       </div>
+
+      <hr>
+
+      <div class="row">
+        <!-- <div class="col-md-12"><h2>User Interface Logs</h2></div> -->
+        <div class="col-md-12 col-sm-6">
+          <div class="panel panel-default">
+            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Logs</h4></div>
+            <div class="panel-body">
+              <hr>
+              <div class="well well-sm">
+                <textarea style="width:100%" rows="10" id="uiLogTextArea" >The GUI logs appear here
+One after the other
+Updated continuously
+Format: Time Message
+With time constrains</textarea>
+              </div>
+            </div>
+          </div> 
+        </div>
+      </div>
+
 
       <div class="clearfix"></div>
       <hr>

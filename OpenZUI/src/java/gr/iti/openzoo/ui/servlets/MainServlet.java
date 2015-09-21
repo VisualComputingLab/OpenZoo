@@ -5,11 +5,13 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import static gr.iti.openzoo.ui.servlets.DrawTopologyServlet.cfg;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -74,6 +76,10 @@ public class MainServlet extends HttpServlet {
         Template draw_tmpl = cfg.getTemplate("index.ftl");
         
         Map<String, Object> root = new HashMap<>();
+        
+        ArrayList<Topology> allTopos = kv.getTopologies();
+        root.put("topologies", allTopos);
+        
 //        String name = request.getParameter("topo-name");
 //        root.put("topology_name", name);
         

@@ -1,19 +1,38 @@
 
 $(document).ready(function(){/* jQuery toggle layout */
-$('#btnToggle').click(function(){
-  if ($(this).hasClass('on')) {
-    $('#main .col-md-6').addClass('col-md-4').removeClass('col-md-6');
-    $(this).removeClass('on');
-  }
-  else {
-    $('#main .col-md-4').addClass('col-md-6').removeClass('col-md-4');
-    $(this).addClass('on');
-  }
+    $('#btnToggle').click(function(){
+        if ($(this).hasClass('on')) {
+            $('#main .col-md-6').addClass('col-md-4').removeClass('col-md-6');
+            $(this).removeClass('on');
+        }
+        else {
+            $('#main .col-md-4').addClass('col-md-6').removeClass('col-md-4');
+            $(this).addClass('on');
+        }
+    });
 });
 
-});
 
+function loadTopologyStatistics(name){
+    var URL = "/OpenZUI/KeyValueServlet?action=servers=";
+    $.getJSON(URL, function(result){
+        $("#srv-upd-name").val(name);
+        $("#srv-upd-ip").val(result.response.address);
+        $("#tmc-upd-port").val(result.response.port);
+        $("#tmc-upd-user").val(result.response.user);
+        $("#tmc-upd-pass").val(result.response.passwd);
+        $("#tmc-upd-status").val(result.response.status);
 
+        var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerStatistics/resources/stats";
+        $.getJSON(StatsURL, function(sresult){
+            $("#stats-cpu").val("" + Math.floor(sresult.cpu.systemCpuLoad * 100.0) + " %");
+            $("#stats-mem").val("" + Math.floor(sresult.mem.physicalFree / 1024 / 1024) + " MB free / " + Math.floor(sresult.mem.physicalTotal / 1024 / 1024) + " MB total");
+            $("#stats-disc").val("" + Math.floor(sresult.space.free / 1024 / 1024) + " MB free / " + Math.floor(sresult.space.total / 1024 / 1024) + " MB total");
+        });
+
+        $('#detailsModal').modal('show');
+    });
+}
 
 function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
             

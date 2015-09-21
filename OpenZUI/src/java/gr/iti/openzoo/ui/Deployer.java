@@ -13,9 +13,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
@@ -47,13 +50,20 @@ public class Deployer {
     
     public String deployTopology(String topo_name)
     {
-        // get topology json from kv
+        // get topology and servers from kv
         Topology topo = kv.getTopology(topo_name);
-        
-        // get servers from kv
         ArrayList<Server> servers = kv.getServers();
+        
         ArrayList<ServerResources> resources = new ArrayList<>();
         ArrayList<TopologyGraphNode> nodes = topo.getNodes();
+        TreeMap<String, ServerResources> sortedResourcesTreeMap = new TreeMap<>(new Comparator(){
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                
+                return (int) (((ServerResources) o1).getSystemCpuLoad() - ((ServerResources) o1).getSystemCpuLoad());
+            }
+        });
         
         // for each service instance, choose a server based on server statistics and previously installed services
         // if servers not sufficient, create less instances and print warning
@@ -75,7 +85,8 @@ public class Deployer {
                 {
                     slist = listServices("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd());
                     sr.addDeployedServices(slist);
-                    resources.add(sr);
+                    sortedResourcesTreeMap.put(sr.getServername(), sr);
+                    //resources.add(sr);
                 }
                 else
                 {
@@ -88,55 +99,60 @@ public class Deployer {
             System.err.println("Exception at deployTopology: " + e);
         }
         
-        Map<String, Double> sortedOnCpu = new HashMap<>();
+        // copy TreeMap into an ArrayList
+        Set set = sortedResourcesTreeMap.entrySet();
+        Iterator iterator = set.iterator();
+        ArrayList<ServerResources> sortedResources = new ArrayList<>();
+        while(iterator.hasNext())
+        {
+            Map.Entry mentry = (Map.Entry) iterator.next();
+            sortedResources.add((ServerResources) mentry.getValue());
+        }
+        
+        // Cycle now through sortedResources and throw a service instance at each server
+        int res_index = 0;
+        int assigned;
+        ArrayList<Pair<String, WarFile>> pairs = new ArrayList<>();
+        
         for (TopologyGraphNode nod : nodes)
         {
             WarFile wfile = kv.getWarFile(nod.getName());
             int instances = nod.getInstances();
+            assigned = 0;
+            ServerResources sres;
             
             // check if service not already deployed
             // ensure that instances < num of available servers
             
-            sortedOnCpu.clear();
-            for (ServerResources sres : resources)
+            for (int i = 0; i < sortedResources.size() && assigned < instances; i++)
             {
-                if (sres.isServiceDeployed(wfile.getComponent_id())) continue;
-                sortedOnCpu.put(sres.getServername(), sres.getSystemCpuLoad());
+                sres = sortedResources.get((i + res_index) % sortedResources.size());
+                res_index++;
+                
+                if (sres.isServiceDeployed(wfile.getComponent_id()))
+                    continue;
+                
+                pairs.add(new Pair(sres.getServername(), wfile));
+                assigned++;
             }
-            
-            if (sortedOnCpu.size() < 1)
+            if (assigned == 0)
             {
-                System.err.println("There are no servers for deploying, aborting...");
+                System.err.println("There are no servers for deploying service " + nod.getName() + ", aborting...");
                 return null; // <----------------------------------------------------------------------------------- Vorsicht !!! ------------
             }
-            
-            if (instances > sortedOnCpu.size())
+            else if (assigned < instances)
             {
-                System.out.println("There are not enough servers for deploying " + instances + " instances of service " + nod.getName());
-                System.out.println("Setting instances = " + sortedOnCpu.size());
-                instances = sortedOnCpu.size();
+                System.out.println("There are not enough servers for deploying " + instances + " instances of service " + nod.getName() + ". Instance number is set to " + assigned);
                 nod.setInstances(instances);
             }
-            
-            // take the most appropriate server(s) (sort remaining based on cpu usage)
-            sortedOnCpu = MapUtil.sortByValueAscending(sortedOnCpu);
-            Iterator<Map.Entry<String, Double>> iter = sortedOnCpu.entrySet().iterator();
-            
-            // now we want to deploy 'instances' instances of WarFile 'wfile' to the remaining servers
-            int num_deployed = 0;
-            while (iter.hasNext() && num_deployed < instances) 
-            {
-                Server srv = kv.getServer(iter.next().getKey());
-                
-                
-            }
-            
-            // open war file
-            // include kv host,port topology id, instance id
-            // deploy services according to configuration
-            // on error, print and exit
-            // on success, set stati to 'installed'
         }
+        
+        // open war file
+        // include kv host,port topology id, instance id
+        // deploy services according to configuration
+        // on error, print and exit
+        // on success, set stati to 'installed'
+        
         
         // create a configuration json
         JSONObject server_conf = new JSONObject();
