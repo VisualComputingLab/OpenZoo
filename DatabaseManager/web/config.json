@@ -1,0 +1,35 @@
+{
+    "service":
+    {
+        "component_id": "DatabaseManager",
+        "name": "DBMgrImpl",
+        "path": "/resources/db",
+        "description": "A service for storing results into a database"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.DBWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "ep_from",
+                    "type": "in"
+                }
+            ]
+        }
+    ],
+    "requires":
+    [
+        "mongo_database",
+	"mongo_collection_images",
+        "mongo_collection_messages"
+    ],
+    "__keyvalue":
+    {
+        "host": "83.212.120.72",
+        "port": 6379
+    },
+    "__instance_id": "1",
+    "__topology_id": "tOne"
+}

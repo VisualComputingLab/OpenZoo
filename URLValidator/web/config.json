@@ -1,0 +1,33 @@
+{
+    "service":
+    {
+        "component_id": "URLValidator",
+        "name": "URLValidImpl",
+        "path": "/resources/url",
+        "description": "A service for extracting valid URLs out of tweets"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.URLWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "ep_from",
+                    "type": "in"
+                },
+                {
+                    "endpoint_id": "ep_to",
+                    "type": "out"
+                }
+            ]
+        }
+    ],
+    "__keyvalue":
+    {
+        "host": "160.40.51.165",
+        "port": 6379
+    },
+    "__instance_id": "0",
+    "__topology_id": "TopoOne"
+}
