@@ -1,6 +1,7 @@
 package gr.iti.openzoo.ui;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,17 +11,13 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -34,12 +31,16 @@ public class Deployer {
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
     private String repo;
+    private static String kv_host;
+    private static Integer kv_port;
     
     public Deployer(JSONObject properties)
     {
         try 
-        {        
-            kv = new KeyValueCommunication(properties.getJSONObject("keyvalue").getString("host"), properties.getJSONObject("keyvalue").getInt("port"));
+        {
+            kv_host = properties.getJSONObject("keyvalue").getString("host");
+            kv_port = properties.getJSONObject("keyvalue").getInt("port");
+            kv = new KeyValueCommunication(kv_host, kv_port);
             repo = properties.getString("localRepository");
         }
         catch (JSONException ex) 
@@ -48,22 +49,14 @@ public class Deployer {
         }
     }
     
-    public String deployTopology(String topo_name)
+    public boolean deployTopology(String topo_name)
     {
         // get topology and servers from kv
         Topology topo = kv.getTopology(topo_name);
         ArrayList<Server> servers = kv.getServers();
         
-        ArrayList<ServerResources> resources = new ArrayList<>();
         ArrayList<TopologyGraphNode> nodes = topo.getNodes();
-        TreeMap<String, ServerResources> sortedResourcesTreeMap = new TreeMap<>(new Comparator(){
-
-            @Override
-            public int compare(Object o1, Object o2) {
-                
-                return (int) (((ServerResources) o1).getSystemCpuLoad() - ((ServerResources) o1).getSystemCpuLoad());
-            }
-        });
+        Map<String, ServerResources> server2resources = new HashMap<>();
         
         // for each service instance, choose a server based on server statistics and previously installed services
         // if servers not sufficient, create less instances and print warning
@@ -85,8 +78,8 @@ public class Deployer {
                 {
                     slist = listServices("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd());
                     sr.addDeployedServices(slist);
-                    sortedResourcesTreeMap.put(sr.getServername(), sr);
-                    //resources.add(sr);
+                    server2resources.put(sr.getServername(), sr);
+//                    System.out.println("Server " + srv.getName() + " will be used");
                 }
                 else
                 {
@@ -97,26 +90,31 @@ public class Deployer {
         catch (IOException | JSONException e)
         {
             System.err.println("Exception at deployTopology: " + e);
+            return false;
         }
         
-        // copy TreeMap into an ArrayList
-        Set set = sortedResourcesTreeMap.entrySet();
-        Iterator iterator = set.iterator();
+        server2resources = MapUtil.sortByValueAscending( server2resources );
+                
         ArrayList<ServerResources> sortedResources = new ArrayList<>();
-        while(iterator.hasNext())
-        {
-            Map.Entry mentry = (Map.Entry) iterator.next();
-            sortedResources.add((ServerResources) mentry.getValue());
+        for(Map.Entry<String, ServerResources> entry : server2resources.entrySet()) {
+//            System.out.println("Resource " + entry.getValue().getServername() + ": " + entry.getValue().getSystemCpuLoad());
+            sortedResources.add(entry.getValue());
         }
+        
+//        System.out.println("Size of sortedResources is " + sortedResources.size());
         
         // Cycle now through sortedResources and throw a service instance at each server
         int res_index = 0;
         int assigned;
-        ArrayList<Pair<String, WarFile>> pairs = new ArrayList<>();
+        ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
+        JSONObject server_conf;
         
         for (TopologyGraphNode nod : nodes)
-        {
+        {            
             WarFile wfile = kv.getWarFile(nod.getName());
+            
+//            System.out.println("Checking node " + nod.getName() + "(" + wfile.getComponent_id() + ")");
+            
             int instances = nod.getInstances();
             assigned = 0;
             ServerResources sres;
@@ -126,19 +124,28 @@ public class Deployer {
             
             for (int i = 0; i < sortedResources.size() && assigned < instances; i++)
             {
-                sres = sortedResources.get((i + res_index) % sortedResources.size());
+                sres = sortedResources.get((res_index) % sortedResources.size());
+//                System.out.println("Checking resource " + sres.getServername());
                 res_index++;
                 
                 if (sres.isServiceDeployed(wfile.getComponent_id()))
                     continue;
-                
-                pairs.add(new Pair(sres.getServername(), wfile));
+                try
+                {
+                    server_conf = new JSONObject().put("instance_id", assigned).put("workerspercore", nod.getWorkerspercore()).put("status", "void");
+                    triples.add(new Triple(sres.getServername(), wfile, server_conf));
+                }
+                catch (JSONException ex)
+                {
+                    System.err.println("JSONException while creating triple: " + ex);
+                }
+//                System.out.println("Triple added");
                 assigned++;
             }
             if (assigned == 0)
             {
                 System.err.println("There are no servers for deploying service " + nod.getName() + ", aborting...");
-                return null; // <----------------------------------------------------------------------------------- Vorsicht !!! ------------
+                return false;
             }
             else if (assigned < instances)
             {
@@ -147,109 +154,274 @@ public class Deployer {
             }
         }
         
-        // open war file
-        // include kv host,port topology id, instance id
-        // deploy services according to configuration
-        // on error, print and exit
-        // on success, set stati to 'installed'
-        
-        
         // create a configuration json
-        JSONObject server_conf = new JSONObject();
+        JSONObject conf_object = new JSONObject();
+        JSONObject service_conf;
         
+        WarFile war;
+        String servername;
         
-        
+        for (Triple triplo : triples)
+        {
+            System.out.println(triplo.toString());
+            
+            servername = (String) triplo.getLeft();
+            war = (WarFile) triplo.getMiddle();
+            server_conf = (JSONObject) triplo.getRight();
+            
+            // open war file
+            // include kv_host, kv_port, topo_name, instance_id into config.json
+            File f_copy;
+            JSONObject config = Utilities.readJSONFromWAR(war.getFolder() + "/" + war.getFilename(), "config.json");
+            try
+            {
+                config.put("keyvalue", new JSONObject().put("host", kv_host).put("port", kv_port));
+                config.put("instance_id", server_conf.getInt("instance_id"));
+                config.put("topology_id", topo_name);
+                
+                File f = new File(war.getFolder() + "/" + war.getFilename());
+                f_copy = new File(war.getFolder() + "/" + war.getFilename() + "_" + servername + ".war");
+                Files.copy(f.toPath(), f_copy.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                System.out.println("Updating config.json in " + f_copy.getAbsolutePath());
+                Utilities.writeJSONToWAR(f_copy.getAbsolutePath(), "config.json", config);
+                
+                if (conf_object.has(war.getComponent_id()))
+                {
+                    service_conf = conf_object.getJSONObject(war.getComponent_id());
+                    service_conf.put(servername, server_conf);
+                }
+                else
+                {
+                    service_conf = new JSONObject();
+                    service_conf.put(servername, server_conf);
+                    conf_object.put(war.getComponent_id(), service_conf);
+                }
+            }
+            catch (IOException | JSONException e)
+            {
+                System.out.println("Exception during writing to config.json: " + e);
+                return false;
+            }
+                        
+            
+            // deploy services according to configuration
+            Server srv = kv.getServer(servername);
+            JSONObject outjson = deployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), f_copy.getAbsolutePath(), "/" + war.getComponent_id());
+            
+            // on error, print and go to next
+            // on success, set stati to 'installed'
+            try
+            {
+                if (outjson.getString("status").equalsIgnoreCase("success"))
+                {
+                    conf_object.getJSONObject(war.getComponent_id()).getJSONObject(servername).put("status", "installed");
+                }
+                else
+                {
+                    System.err.println("Service deployment failed with: " + outjson.getString("message"));
+                    continue;
+                }
+            }
+            catch (JSONException e)
+            {
+                System.out.println("Exception during updating conf_object: " + e);
+                return false;
+            }
+        }      
+                
         // save configuration to the topology
-        topo.setServer_config(server_conf);
+        topo.setConf_object(conf_object);
         
         // save topology to the kv
+        // update topo.getGraph_object()
         kv.putTopology(topo);
                 
-        return null;
+        return true;
     }
     
-    public String startTopology(String topo_name)
+    public JSONObject startTopology(String topo_name)
     {
+        return callTopologyServices(topo_name, "start");
+    }
+    
+    public JSONObject stopTopology(String topo_name)
+    {
+        return callTopologyServices(topo_name, "stop");
+    }
+    
+    public JSONObject statusTopology(String topo_name)
+    {
+        return callTopologyServices(topo_name, "status");
+    }
+    
+    public JSONObject resetTopology(String topo_name)
+    {
+        return callTopologyServices(topo_name, "reset");
+    }
+    
+    public JSONObject callTopologyServices(String topo_name, String command)
+    {
+        JSONObject response = new JSONObject();
+        
         // get topology json from kv
         Topology topo = kv.getTopology(topo_name);
-        
-        // get servers from kv
-        ArrayList<Server> servers = kv.getServers();
-        
+                
         // get the configuration json
-        JSONObject server_conf = topo.getServer_config();
+        JSONObject conf_object = topo.getConf_object();
+        
         try
         {
-            // run services
-            util.callGET(new URL(""));
-            // on error, print and exit
-            // on success, set stati to 'running'
+            Iterator it_service = conf_object.keys();
+            String service_id, server_id;
+            JSONObject service_json, server_json;
+            
+            while (it_service.hasNext())
+            {
+                service_id = (String) it_service.next();
+                service_json = conf_object.getJSONObject(service_id);
+                Iterator it_server = service_json.keys();
+                while (it_server.hasNext())
+                {
+                    server_id = (String) it_server.next();
+                    server_json = service_json.getJSONObject(server_id);
+                    
+                    // run services
+                    Server srv = kv.getServer(server_id);
+                    WarFile war = kv.getWarFile(service_id);
+                    URL url = new URL("http://" + srv.getAddress() + ":" + srv.getPort() + "/" + war.getComponent_id() + war.getService_path() + "?action=" + command);
+                    JSONObject output = new JSONObject(util.callGET(url));
+                    
+                    // on error, print and exit
+                    // on success, set stati to 'running'
+                    if (output.has("error"))
+                    {
+                        System.err.println("Calling " + command + " on service " + service_id + " on server " + server_id + " failed with output: " + output.toString(4));
+                        response.put(service_id + "_" + server_id, output);
+//                        return null;
+                        
+                    }
+                    else
+                    {
+                        switch (command)
+                        {
+                            case "start":
+                                server_json.put("status", "running");
+                                break;
+                                
+                            case "stop":
+                                server_json.put("status", "installed");
+                                break;
+                        }
+                        response.put(service_id + "_" + server_id, output);
+                    }
+                }
+            }
         }
-        catch (IOException ex)
+        catch (JSONException | IOException ex)
         {
-            Logger.getLogger(Deployer.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("Exception in callTopologyServices: " + ex);
         }
         
         // save configuration to the topology
-        topo.setServer_config(server_conf);
+        topo.setConf_object(conf_object);
         
         // save topology to the kv
         kv.putTopology(topo);
                 
-        return null;
+        return response;
     }
-    
-    public String stopTopology(String topo_name)
+        
+    public boolean undeployTopology(String topo_name)
     {        
-        // get topology json from kv
+        // get topology and servers from kv
         Topology topo = kv.getTopology(topo_name);
-                
-        // get servers from kv
-        ArrayList<Server> servers = kv.getServers();
+        JSONObject conf_object = topo.getConf_object();
         
-        // get server configuration
-        JSONObject server_conf = topo.getServer_config();
-        
-        // for each server, call stop
+        // for each service/server pair in config, call undeploy
+        // on success, set status to void
         // on error, print warning
-        // on success, set stati to 'installed'
+        if (conf_object != null)
+            try
+            {
+                Iterator it_service = conf_object.keys();
+                String service_id, server_id;
+                JSONObject service_json, server_json;
+
+                // server items to be deleted from each service item
+                ArrayList<String> serversToDelete = new ArrayList<>();
+                ArrayList<String> servicesToDelete = new ArrayList<>();
+
+                while (it_service.hasNext())
+                {
+                    service_id = (String) it_service.next();
+                    service_json = conf_object.getJSONObject(service_id);
+                    serversToDelete.clear();
+
+                    Iterator it_server = service_json.keys();
+                    while (it_server.hasNext())
+                    {
+                        server_id = (String) it_server.next();
+                        server_json = service_json.getJSONObject(server_id);
+
+                        // run services
+                        Server srv = kv.getServer(server_id);
+                        WarFile war = kv.getWarFile(service_id);
+                        JSONObject outjson = undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/" + war.getComponent_id());
+
+                        // on error, print and exit
+                        // on success, set stati to 'running'
+                        if (outjson.getString("status").equalsIgnoreCase("success"))
+                        {
+                            server_json.put("status", "void");
+                            serversToDelete.add(server_id);
+                        }
+                        else
+                        {
+                            System.err.println("Service undeployment failed with: " + outjson.getString("message"));
+                            continue;
+                        }
+                    }
+
+                    // delete all server items with status void
+                    for (String srid : serversToDelete)
+                    {
+                        service_json.remove(srid);
+                    }
+
+                    if (service_json.length() == 0)
+                    {
+                        servicesToDelete.add(service_id);
+                    }
+                }
+
+                // delete all empty service items
+                for (String ssid : servicesToDelete)
+                {
+                    conf_object.remove(ssid);
+                }
+
+                // if everything ok, conf_object should be empty
+                if (conf_object.length() == 0)
+                    conf_object = null;
+            }
+            catch (JSONException ex)
+            {
+                System.err.println("JSONException in undeployTopology: " + ex);
+                return false;
+            }
+         
         
         // save configuration to the topology
-        topo.setServer_config(server_conf);
+        topo.setConf_object(conf_object);
         
         // save topology to the kv
         kv.putTopology(topo);
                 
-        return null;
+        return true;
     }
     
-    public String undeployTopology(String topo_name)
-    {        
-        // get topology json from kv
-        Topology topo = kv.getTopology(topo_name);
-                
-        // get servers from kv
-        ArrayList<Server> servers = kv.getServers();
-        
-        // get server configuration
-        JSONObject server_conf = topo.getServer_config();
-        
-        // for each server, call undeploy
-        // on error, print warning
-        // on success, delete item from config
-        
-        // if everything ok, server_conf should be empty
-        
-        // save configuration to the topology
-        topo.setServer_config(null);
-        
-        // save topology to the kv
-        kv.putTopology(topo);
-                
-        return null;
-    }
-    
-    public String deployService(String httpserverandport, String servercredentials, String warfilepath, String webservicepath)
+    public JSONObject deployService(String httpserverandport, String servercredentials, String warfilepath, String webservicepath)
     {
         // httpserverandport: server to call, e.g. "http://localhost:8080"
         // servercredentials: server credentials, e.g. "admin:passwd"
@@ -257,48 +429,76 @@ public class Deployer {
         // webservicepath: service path, e.g. "/SEIndexShardService"
         
         String output;
-            
+        JSONObject outjson = new JSONObject();
+        
         try
         {
-            URL url = new URL(httpserverandport + "/manager/text/deploy?path=" + webservicepath + "&update=true");
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
-            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("PUT");
-            copyInputStream(new FileInputStream(warfilepath), httpCon.getOutputStream());
-            output = convertStreamToString(httpCon.getInputStream());
-            output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
+            try
+            {
+                URL url = new URL(httpserverandport + "/manager/text/deploy?path=" + webservicepath + "&update=true");
+                HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+                //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
+                httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+                httpCon.setDoOutput(true);
+                httpCon.setRequestMethod("PUT");
+                copyInputStream(new FileInputStream(warfilepath), httpCon.getOutputStream());
+                output = convertStreamToString(httpCon.getInputStream());
+                outjson.put("status", "success");
+                outjson.put("message", output);
+                outjson.put("response_code", httpCon.getResponseCode());
+                outjson.put("response_message", httpCon.getResponseMessage());
+            }
+            catch (IOException e)
+            {
+                output = "IOException during web service deployment: " + e;
+                outjson.put("status", "failure");
+                outjson.put("message", output);
+            }
         }
-        catch (IOException e)
+        catch (JSONException ex)
         {
-            output = "IOException during web service deployment: " + e;
+            System.err.println("JSONException in deployService: " + ex);
+            return null;
         }
         
-        return output;
+        return outjson;
     }
     
-    public String undeployService(String httpserverandport, String servercredentials, String webservicepath)
+    public JSONObject undeployService(String httpserverandport, String servercredentials, String webservicepath)
     {
         String output;
+        JSONObject outjson = new JSONObject();
         
         try
         {
-            URL url = new URL(httpserverandport + "/manager/text/undeploy?path=" + webservicepath);
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
-            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("GET");
-            output = convertStreamToString(httpCon.getInputStream());
-            output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
+            try
+            {
+                URL url = new URL(httpserverandport + "/manager/text/undeploy?path=" + webservicepath);
+                HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+                //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
+                httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+                httpCon.setDoOutput(true);
+                httpCon.setRequestMethod("GET");
+                output = convertStreamToString(httpCon.getInputStream());
+                outjson.put("status", "success");
+                outjson.put("message", output);
+                outjson.put("response_code", httpCon.getResponseCode());
+                outjson.put("response_message", httpCon.getResponseMessage());
+            }
+            catch (IOException e)
+            {
+                output = "IOException during web service undeployment: " + e;
+                outjson.put("status", "failure");
+                outjson.put("message", output);
+            }
         }
-        catch (IOException e)
+        catch (JSONException ex)
         {
-            output = "IOException during web service undeployment: " + e;
+            System.err.println("JSONException in undeployService: " + ex);
+            return null;
         }
         
-        return output;
+        return outjson;
     }
     
     public ArrayList<String> listServices(String httpserverandport, String servercredentials)

@@ -143,10 +143,10 @@ public class ServersServlet extends HttpServlet {
             
             if (srv.isActive())
             {
-                String output = deployer.undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/ServerStatistics");
+                JSONObject outjson = deployer.undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/ServerStatistics");
 
                 System.out.println("---------- UNDEPLOY --------------");
-                System.out.println("Undeployment output = " + output);
+                System.out.println("Undeployment output = " + outjson.toString());
                 System.out.println("---------- UNDEPLOY END --------------");
             }
             
@@ -180,10 +180,10 @@ public class ServersServlet extends HttpServlet {
         {
             // deploy ServerStatistics war on new server
             String warfilepath = getServletContext().getRealPath("/") + "ServerStatistics.war";
-            String output = deployer.deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerStatistics");
+            JSONObject outjson = deployer.deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerStatistics");
 
             System.out.println("---------- DEPLOY --------------");
-            System.out.println("Deployment output = " + output);
+            System.out.println("Deployment output = " + outjson.toString());
             System.out.println("---------- DEPLOY END --------------");
         }
                 

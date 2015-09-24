@@ -11,9 +11,10 @@ import org.codehaus.jettison.json.JSONObject;
 public class TopologyGraphNode {
 
     private String component_id;
-    private int instances;
-    private int workerspercore;
+    private int instances = 1;
+    private int workerspercore = 1;
     private HashMap<String, String> requirements = null;
+//    private HashMap<String, String> instance2routingkeys = null;
 
     public TopologyGraphNode(String cid, JSONObject json)
     {
@@ -28,6 +29,12 @@ public class TopologyGraphNode {
             System.err.println("JSONException in TopologyGraphNode.constr: " + e);
         }
         requirements = new HashMap<>();
+    }
+    
+    public TopologyGraphNode(String cid)
+    {
+        component_id = cid;
+        requirements = new HashMap();
     }
     
     public String getName() {

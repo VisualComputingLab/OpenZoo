@@ -13,7 +13,6 @@ import gr.iti.openzoo.ui.RepositoryParameters;
 import gr.iti.openzoo.ui.Utilities;
 import gr.iti.openzoo.ui.WarFile;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -21,9 +20,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
@@ -193,11 +189,17 @@ public class RepositoryServlet extends HttpServlet {
                     File f = new File(localRepository + "/" + fileName);
                     Files.copy(filePart.getInputStream(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     System.out.println("Downloaded file at: " + f.getAbsolutePath());
-                    JSONObject config = readJSONFromWAR(f.getAbsolutePath(), "config.json");
+                    JSONObject config = Utilities.readJSONFromWAR(f.getAbsolutePath(), "config.json");
                     
-                    WarFile w = new WarFile(fileName, localRepository, "1.0", "inactive", config);
-                    
-                    kv.putWarFile(w);
+                    if (config == null)
+                    {
+                        System.err.println("War file does not contain a config.json, or config.json is not in json format");
+                    }
+                    else
+                    {
+                        WarFile w = new WarFile(fileName, localRepository, "1.0", "inactive", config);
+                        kv.putWarFile(w);
+                    }
                 }
                 break;
                 
@@ -226,49 +228,7 @@ public class RepositoryServlet extends HttpServlet {
         }
         return null;
     }
-    
-    private static JSONObject readJSONFromWAR(String warPath, String jsonPath)
-    {
-        JSONObject response = null;
         
-        try
-        {
-            ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath));
-            ZipEntry entry = zipIn.getNextEntry();
-            // iterates over entries in the zip file
-            while (entry != null)
-            {
-                //System.out.println("WAR content: " + entry.getName());
-                
-                if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(jsonPath))
-                {
-                    // extract
-                    String content = convertStreamToString(zipIn);
-                    response = new JSONObject(content);
-                    zipIn.closeEntry();
-                    break;
-                }
-                
-                zipIn.closeEntry();
-                entry = zipIn.getNextEntry();
-            }
-            zipIn.close();
-        }
-        catch (IOException | JSONException e)
-        {
-            System.err.println("Exception at readJSONFromWAR: " + e);
-            return null;
-        }
-        
-        return response;
-    }
-    
-    static String convertStreamToString(java.io.InputStream is)
-    {
-        Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-    
     /**
      * Returns a short description of the servlet.
      *

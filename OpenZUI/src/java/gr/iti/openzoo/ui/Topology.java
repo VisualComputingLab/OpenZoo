@@ -2,6 +2,7 @@ package gr.iti.openzoo.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -29,7 +30,9 @@ public class Topology {
     private ArrayList<TopologyGraphConnection> connections;
     
     private JSONObject graph_object = null;
-    private JSONObject server_config = null;
+    private JSONObject conf_object = null;
+    
+    public enum Status { CREATED, DESIGNED, SEMIDEPLOYED, DEPLOYED, SEMISTARTED, STARTED }
     
     //private static Utilities util = new Utilities();
 
@@ -77,7 +80,7 @@ public class Topology {
                     case "mongo:user": mongo_user = prop.get(key); break;
                     case "mongo:passwd": mongo_passwd = prop.get(key); break;
                     case "graph_object": graph_object = new JSONObject(prop.get(key)); break;
-                    case "server_config": server_config = new JSONObject(prop.get(key)); break;
+                    case "conf_object": conf_object = new JSONObject(prop.get(key)); break;
                     default:
                         if (key.startsWith("node:"))
                         {
@@ -283,23 +286,7 @@ public class Topology {
     {
         getConnections().add(c);
     }
-
-    public void loadGraphObject(Object o)
-    {
-        // set nodes
-        // set connections
-    }
-    
-    public Object getGraphObject()
-    {
-        Object o = null;
         
-        // construct o from nodes and connections
-        
-        
-        return o;
-    }
-    
     @Override
     public String toString()
     {
@@ -314,6 +301,7 @@ public class Topology {
         {            
             ret.put("name", name);
             ret.put("description", description);
+            ret.put("status", getStatus());
             
             JSONObject rabbit = new JSONObject();
             rabbit.put("host", rabbit_host);
@@ -377,9 +365,9 @@ public class Topology {
                 ret.put("graph_object", graph_object);
             }
             
-            if (hasServer_config())
+            if (hasConf_object())
             {
-                ret.put("server_config", server_config);
+                ret.put("conf_object", conf_object);
             }
         }
         catch (JSONException e)
@@ -425,8 +413,111 @@ public class Topology {
     /**
      * @param graph the graph to set
      */
-    public void setGraph_object(JSONObject graph) {
-        this.graph_object = graph;
+    public void setGraph_object(JSONObject graph_object) {
+        this.graph_object = graph_object;
+        
+        TopologyGraphNode nod;
+        TopologyGraphConnection conn;
+        HashMap<String, JSONArray> config = new HashMap<>();
+        String id;
+        JSONArray conf;
+        JSONObject property;
+        
+        try
+        {
+            // first read configuration and save it in a more convenient format
+            JSONArray graphConfiguration = graph_object.getJSONArray("graphConfiguration");
+            for (int i = 0; i < graphConfiguration.length(); i++)
+            {
+                JSONObject objs = graphConfiguration.getJSONObject(i);
+                config.put(objs.getString("objectId"), objs.getJSONArray("conf"));
+            }
+            
+            // then read nodes and connections and fill in the configuration information
+            JSONArray cells = graph_object.getJSONObject("graph").getJSONArray("cells");
+            for (int i = 0; i < cells.length(); i++)
+            {
+                JSONObject cell = cells.getJSONObject(i);
+                
+                switch (cell.getString("type"))
+                {
+                    case "uml.StartState":
+                        // do no shit, this is a help node for drawing vertices
+                        break;
+                        
+                    case "uml.State":
+                        // this is a node
+                        id = cell.getString("id");
+                        nod = new TopologyGraphNode(id);
+                        conf = config.get(id);
+                        for (int j = 0; j < conf.length(); j++)
+                        {
+                            property = conf.getJSONObject(j);
+                            switch (property.getString("name"))
+                            {
+                                case "instances":
+                                    nod.setInstances(Integer.parseInt(property.getString("value")));
+                                    break;
+                                    
+                                case "wpc":
+                                    nod.setWorkerspercore(Integer.parseInt(property.getString("value")));
+                                    break;
+                                    
+                                default:
+                                    nod.addRequirement(property.getString("name"), property.getString("value"));
+                            }
+                        }                        
+                        this.addNode(nod);
+                        break;
+                        
+                    case "uml.Transition":
+                        // this is a connection
+                        id = cell.getString("id");
+                        String source_component = cell.getJSONObject("source").getString("id");
+                        String target_component = cell.getJSONObject("target").getString("id");
+                        String source_worker, target_worker, source_endpoint, target_endpoint;
+                        String value, mapstr, routkeys;
+                        
+                        source_worker = target_worker = source_endpoint = target_endpoint = mapstr = routkeys = "";
+                        
+                        conf = config.get(id);
+                        for (int j = 0; j < conf.length(); j++)
+                        {
+                            property = conf.getJSONObject(j);
+                            value = property.getString("value");
+                            switch (property.getString("name"))
+                            {
+                                case "outEndpointsList":
+                                    source_worker = value.substring(0, value.indexOf(":"));
+                                    source_endpoint = value.substring(value.indexOf(":") + 1);
+                                    break;
+                                    
+                                case "inEndpointsList":
+                                    target_worker = value.substring(0, value.indexOf(":"));
+                                    target_endpoint = value.substring(value.indexOf(":") + 1);
+                                    break;
+                                    
+                                case "conn_mapping":
+                                    mapstr = value;
+                                    break;
+                                    
+                                case "routing":
+                                    routkeys = value;
+                                    break;
+                            }
+                        }
+                        
+                        conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, mapstr, routkeys);
+                        this.addConnection(conn);
+                        break;
+                }
+            }
+            
+        }
+        catch (JSONException e)
+        {
+            System.err.println("JSONException in setGraph_object: " + e);
+        }
     }
     
     public boolean hasGraph_object()
@@ -438,24 +529,88 @@ public class Topology {
     }
 
     /**
-     * @return the server_config
+     * @return the conf_object
      */
-    public JSONObject getServer_config() {
-        return server_config;
+    public JSONObject getConf_object() {
+        return conf_object;
     }
 
     /**
-     * @param server_config the server_config to set
+     * @param conf_object the conf_object to set
      */
-    public void setServer_config(JSONObject server_config) {
-        this.server_config = server_config;
+    public void setConf_object(JSONObject conf_object) {
+        this.conf_object = conf_object;
     }
     
-    public boolean hasServer_config()
+    public boolean hasConf_object()
     {
-        if (server_config != null)
+        if (conf_object != null)
             return true;
         
         return false;
+    }
+    
+    public Status getStatus()
+    {        
+        if (graph_object == null || graph_object.length() == 0)
+        {
+            return Status.CREATED;
+        }
+        
+        if (conf_object == null || conf_object.length() == 0)
+        {
+            return Status.DESIGNED;
+        }
+        
+        int num_void = 0;
+        int num_installed = 0;
+        int num_running = 0;
+        
+        try
+        {
+            Iterator it_service = conf_object.keys();
+            String service_id, server_id;
+            JSONObject service_json, server_json;
+            
+            while (it_service.hasNext())
+            {
+                service_id = (String) it_service.next();
+                service_json = conf_object.getJSONObject(service_id);
+                Iterator it_server = service_json.keys();
+                while (it_server.hasNext())
+                {
+                    server_id = (String) it_server.next();
+                    server_json = service_json.getJSONObject(server_id);
+                    
+                    switch (server_json.getString("status"))
+                    {
+                        case "void": num_void++; break;
+                        case "installed": num_installed++; break;
+                        case "running": num_running++; break;
+                    }
+                }
+            }
+        }
+        catch (JSONException ex)
+        {
+            System.err.println("JSONException in getStatus: " + ex);
+            return Status.SEMIDEPLOYED;
+        }
+        
+        if (num_running > 0)
+        {
+            if (num_void > 0 || num_installed > 0) return Status.SEMISTARTED;
+            else return Status.STARTED;
+        }
+        else
+        {
+            if (num_installed > 0)
+            {
+                if (num_void > 0) return Status.SEMIDEPLOYED;
+                else return Status.DEPLOYED;
+            }
+        }
+        
+        return Status.DESIGNED;
     }
 }

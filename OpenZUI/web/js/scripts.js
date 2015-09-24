@@ -14,7 +14,7 @@ $(document).ready(function(){/* jQuery toggle layout */
 
 
 function loadTopologyStatistics(name){
-    var URL = "/OpenZUI/KeyValueServlet?action=servers=";
+    var URL = "/OpenZUI/KeyValueServlet?action=servers";
     $.getJSON(URL, function(result){
         $("#srv-upd-name").val(name);
         $("#srv-upd-ip").val(result.response.address);
@@ -102,6 +102,53 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
         $("#topo-upd-mport").val(result.response.mongo.port);
         $("#topo-upd-muser").val(result.response.mongo.user);
         $("#topo-upd-mpass").val(result.response.mongo.passwd);
+
+        switch (result.response.status)
+        {
+            case 'CREATED':
+                $("#deleteBtn").show();
+                $("#deployBtn").hide();
+                $("#undeployBtn").hide();
+                $("#startBtn").hide();
+                $("#stopBtn").hide();
+                break;
+            case 'DESIGNED':
+                $("#deleteBtn").show();
+                $("#deployBtn").show();
+                $("#undeployBtn").hide();
+                $("#startBtn").hide();
+                $("#stopBtn").hide();
+                break;
+            case 'SEMIDEPLOYED':
+                $("#deleteBtn").hide();
+                $("#deployBtn").show();
+                $("#undeployBtn").show();
+                $("#startBtn").hide();
+                $("#stopBtn").hide();
+                break;
+            case 'DEPLOYED':
+                $("#deleteBtn").hide();
+                $("#deployBtn").hide();
+                $("#undeployBtn").show();
+                $("#startBtn").show();
+                $("#stopBtn").hide();
+                break;
+            case 'SEMISTARTED':
+                $("#deleteBtn").hide();
+                $("#deployBtn").hide();
+                $("#undeployBtn").hide();
+                $("#startBtn").show();
+                $("#stopBtn").show();
+                break;
+            case 'STARTED':
+                $("#deleteBtn").hide();
+                $("#deployBtn").hide();
+                $("#undeployBtn").hide();
+                $("#startBtn").hide();
+                $("#stopBtn").show();
+                break;
+        }
+
         $('#detailsModal').modal('show');
     });
  };
@@ -132,6 +179,16 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
     $("#post-action").val('stop');
  });
 
+ $('#deployBtn').on('click',function(){
+
+    $("#post-action").val('deploy');
+ });
+
+ $('#undeployBtn').on('click',function(){
+
+    $("#post-action").val('undeploy');
+ });
+
 
 function fetchServicesList(){
 
@@ -151,19 +208,19 @@ function fetchServicesList(){
                 for (var i = 0; i < val.workers.length; i++){
                     for(var x = 0; x < val.workers[i].endpoints.length; x++){
                         if (val.workers[i].endpoints[x].type == 'in'){
-                            svc_in.push(val.workers[i].endpoints[x].endpoint_id)   
+                            svc_in.push(val.workers[i].worker_id + ":" + val.workers[i].endpoints[x].endpoint_id)   
                         }
                         else if (val.workers[i].endpoints[x].type == 'out'){
-                            svc_out.push(val.workers[i].endpoints[x].endpoint_id)   
+                            svc_out.push(val.workers[i].worker_id + ":" + val.workers[i].endpoints[x].endpoint_id)   
                         }     
                     }
                 }
 
-                svc={name:val.filename, in_ep:svc_in, out_ep:svc_out}                    
+                svc={name:val.component_id, in_ep:svc_in, out_ep:svc_out}                    
                 //svc={ in_ep:svc_in, out_ep:svc_out}    
-                listItems+= "<option value='" + val.filename + "'>" + val.filename + "</option>";
+                listItems+= "<option value='" + val.component_id + "'>" + val.component_id + "</option>";
                 //console.log(svc);
-                localStorage[val.filename] = JSON.stringify(svc);
+                localStorage[val.component_id] = JSON.stringify(svc);
                 //services.push(svc);
             }
         });

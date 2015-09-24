@@ -95,72 +95,42 @@ public abstract class OpenZooService {
         workerUnion = new ArrayList<>();
         workerClasses = new HashSet<>();
     }
-    
-    final public void readParametersFromKVOld()
-    {
-        //read from KV
-            
-        // general
-        parameters.getGeneral().setNumOfWorkersPerCore(Integer.parseInt(kv.getValue(parameters.getGeneral().getTopologyID() + ":" + parameters.getGeneral().getComponentID() + ":numOfWorkersPerCore")));
-
-        // rabbit
-        parameters.getRabbit().setHost(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:host"));
-        parameters.getRabbit().setPort(Integer.parseInt(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:port")));
-        parameters.getRabbit().setUser(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:user"));
-        parameters.getRabbit().setPasswd(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:passwd"));
-        parameters.getRabbit().setVhost(kv.getValue(parameters.getGeneral().getTopologyID() + ":rabbitmq:vhost"));
-
-        // redis is already there
-
-        // mongo      
-        parameters.getMongo().setHost(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:host"));
-        parameters.getMongo().setPort(Integer.parseInt(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:port")));
-        parameters.getMongo().setUser(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:user"));
-        parameters.getMongo().setPasswd(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:passwd"));
-        parameters.getMongo().setDb(kv.getValue(parameters.getGeneral().getTopologyID() + ":mongodb:db"));
-    }
-    
+        
     final public void readParametersFromKV()
     {
         //read from KV
             
         // general
         parameters.getGeneral().setNumOfWorkersPerCore(0); // default special value, means that there should be only one thread, irrelevant of num of processors
-        String full_object = kv.getHashValue(parameters.getGeneral().getTopologyID(), "full_object");
+        String node_object = kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "node:" + parameters.getGeneral().getComponentID());
         try
         {
-            JSONObject full_json = new JSONObject(full_object);
-            JSONArray jsonarr = full_json.getJSONArray("topologyNodes");
-            for (int i = 0; i < jsonarr.length(); i++)
-            {
-                if (jsonarr.getJSONObject(i).getString("id").equalsIgnoreCase(parameters.getGeneral().getComponentID()))
-                {
-                    parameters.getGeneral().setNumOfWorkersPerCore(Integer.parseInt(jsonarr.getJSONObject(i).getString("workerspercore")));
-                    break;
-                }
-            }
+            JSONObject node_json = new JSONObject(node_object);
+            parameters.getGeneral().setNumOfWorkersPerCore(node_json.getInt("workerspercore"));
         }
         catch (JSONException e)
         {
             log.error("JSONException while trying to read woerkerspercore parameter from KV: " + e);
         }
         
+        
+        
 
         // rabbit
-        parameters.getRabbit().setHost(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:host"));
-        parameters.getRabbit().setPort(Integer.parseInt(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:port")));
-        parameters.getRabbit().setUser(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:user"));
-        parameters.getRabbit().setPasswd(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:passwd"));
-        parameters.getRabbit().setVhost(kv.getHashValue(parameters.getGeneral().getTopologyID(), "rabbitmq:vhost"));
+        parameters.getRabbit().setHost(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:host"));
+        parameters.getRabbit().setPort(Integer.parseInt(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:port")));
+        parameters.getRabbit().setUser(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:user"));
+        parameters.getRabbit().setPasswd(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:passwd"));
+        parameters.getRabbit().setVhost(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:vhost"));
 
         // redis is already there
 
         // mongo      
-        parameters.getMongo().setHost(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:host"));
-        parameters.getMongo().setPort(Integer.parseInt(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:port")));
-        parameters.getMongo().setUser(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:user"));
-        parameters.getMongo().setPasswd(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:passwd"));
-        parameters.getMongo().setDb(kv.getHashValue(parameters.getGeneral().getTopologyID(), "mongodb:db"));
+        parameters.getMongo().setHost(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:host"));
+        parameters.getMongo().setPort(Integer.parseInt(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:port")));
+        parameters.getMongo().setUser(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:user"));
+        parameters.getMongo().setPasswd(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:passwd"));
+        parameters.getMongo().setDb(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:db"));
     }
     
     public JSONObject startWorkers(String className)

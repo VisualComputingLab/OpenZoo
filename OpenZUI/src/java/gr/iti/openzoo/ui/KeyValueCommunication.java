@@ -632,7 +632,7 @@ public class KeyValueCommunication {
         for (TopologyGraphConnection conn : connections)
         {
             sb = new StringBuilder();
-            sb.append("{'mapping':'");
+            sb.append("{'mapping':");
             sb.append(conn.getMapping());
             if (conn.getQueue_name() != null && !conn.getQueue_name().isEmpty())
             {
@@ -648,9 +648,8 @@ public class KeyValueCommunication {
             }
             if (conn.getRouting_keys() != null && !conn.getRouting_keys().isEmpty())
             {
-                sb.append(",'routing_keys':'");
-                sb.append(conn.getExchange_name());
-                sb.append("'");
+                sb.append(",'routing_keys':");
+                sb.append(conn.getRouting_keys());
             }
             sb.append("}");
             
@@ -678,13 +677,14 @@ public class KeyValueCommunication {
         if (topo.hasGraph_object())
             prop.put("graph_object", topo.getGraph_object().toString());
         
-        if (topo.hasServer_config())
-            prop.put("server_config", topo.getServer_config().toString());
+        if (topo.hasConf_object())
+            prop.put("conf_object", topo.getConf_object().toString());
         
         if (jedis != null)
         {
             try
             {
+                jedis.del("topologies:" + topo.getName());
                 jedis.hmset("topologies:" + topo.getName(), prop);
             }
             catch (redis.clients.jedis.exceptions.JedisConnectionException ex)

@@ -2,6 +2,7 @@ package gr.iti.openzoo.ui;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,8 +14,22 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -332,5 +347,97 @@ public class Utilities {
             i = i / 10;
         }
         return Math.abs(i);
+    }
+    
+    public static JSONObject readJSONFromWAR(String warPath, String jsonPath)
+    {
+        JSONObject response = null;
+        
+        try
+        {
+            ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath));
+            ZipEntry entry = zipIn.getNextEntry();
+            // iterates over entries in the zip file
+            while (entry != null)
+            {
+                //System.out.println("WAR content: " + entry.getName());
+                
+                if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(jsonPath))
+                {
+                    // extract
+                    String content = convertStreamToStringNew(zipIn);
+                    response = new JSONObject(content);
+                    zipIn.closeEntry();
+                    break;
+                }
+                
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
+            }
+            zipIn.close();
+        }
+        catch (IOException | JSONException e)
+        {
+            System.err.println("Exception at readJSONFromWAR: " + e);
+            return null;
+        }
+        
+        return response;
+    }
+    
+    private static String convertStreamToStringNew(java.io.InputStream is)
+    {
+        Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+    
+    public static JSONObject writeJSONToWAR(String warPath, String jsonPath, JSONObject jsonObj)
+    {
+        JSONObject response = null;
+        
+        Map<String, String> env = new HashMap<>(); 
+        env.put("create", "true");
+        Path path = Paths.get(warPath);
+        URI uri = URI.create("jar:" + path.toUri());
+        try (FileSystem fs = FileSystems.newFileSystem(uri, env))
+        {
+            Path nf = fs.getPath(jsonPath);
+            try (Writer writer = Files.newBufferedWriter(nf, StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
+                writer.write(jsonObj.toString(4));
+            }
+        } catch (IOException | JSONException ex) {
+            System.err.println("Got an exception in writeJSONToWAR: " + ex);
+        }
+        
+        try
+        {
+            ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath));
+            ZipEntry entry = zipIn.getNextEntry();
+            // iterates over entries in the zip file
+            while (entry != null)
+            {
+                //System.out.println("WAR content: " + entry.getName());
+                
+                if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(jsonPath))
+                {
+                    // extract
+                    String content = convertStreamToStringNew(zipIn);
+                    response = new JSONObject(content);
+                    zipIn.closeEntry();
+                    break;
+                }
+                
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
+            }
+            zipIn.close();
+        }
+        catch (IOException | JSONException e)
+        {
+            System.err.println("Exception at readJSONFromWAR: " + e);
+            return null;
+        }
+        
+        return response;
     }
 }

@@ -124,28 +124,13 @@ public class OpenZooBeholder implements Runnable {
         
         runner.interrupt();
     }
-    
-    private boolean checkKVForParameterUpdatesOld()
-    {
-        // check if flag component_id:instance_id:reset exists in KV
-        // if it exists, delete it and return true
         
-        String reset = kv.getValue(parameters.getGeneral().getTopologyID() + ":" + parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":reset", true);
-        
-        if (reset != null && reset.equalsIgnoreCase("true"))
-        {
-            return true;
-        }
-        
-        return false;
-    }
-    
     private boolean checkKVForParameterUpdates()
     {
         // check if flag component_id:instance_id:reset exists in KV
         // if it exists, delete it and return true
         
-        String reset = kv.getHashValue(parameters.getGeneral().getTopologyID(), parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":" + "reset", true);
+        String reset = kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "reset:" + parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":" + "reset", true);
         
         if (reset != null && reset.equalsIgnoreCase("true"))
         {

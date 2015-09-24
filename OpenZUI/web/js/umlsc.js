@@ -288,7 +288,7 @@ $( document ).ready(function() {
                     $('#wpc').val('');
 
                     for (var i = 0; i < warfiles.length; i++){
-                        if (warfiles[i].filename == objectId){
+                        if (warfiles[i].component_id == objectId){
                             // //get requires flieds from WAR
                             // var reqs =  warfiles[i].requires;
                             // $(".addToServiceForm").remove();
@@ -313,7 +313,7 @@ $( document ).ready(function() {
 
 
 
-                            $("#service_form").prepend('<div class="addToServiceForm"><label>Service <i>'+warfiles[i].filename+'</i> configuration</label><hr></div>');
+                            $("#service_form").prepend('<div class="addToServiceForm"><label>Service <i>'+warfiles[i].component_id+'</i> configuration</label><hr></div>');
                             $("#service_form").addClass(objectId);
 
                             //if service is already configured load its values
@@ -377,14 +377,14 @@ $( document ).ready(function() {
 
                     var outEndpoints = "";
                     sourceEndpoints.map(function(item){
-                        outEndpoints+= "<option value='" + item + "'>" + item+ "</option>";
+                        outEndpoints+= "<option value='" + item + "'>" + item.substring(item.lastIndexOf(".") + 1) + "</option>";
                     });
                     $("#outEndpointsList").html(outEndpoints);
 
                   
                     var inEndpoints = "";
                     targetEndpoints.map(function(item){
-                        inEndpoints+= "<option value='" + item + "'>" + item+ "</option>";
+                        inEndpoints+= "<option value='" + item + "'>" + item.substring(item.lastIndexOf(".") + 1) + "</option>";
                     });
 
                     $("#inEndpointsList").html(inEndpoints);

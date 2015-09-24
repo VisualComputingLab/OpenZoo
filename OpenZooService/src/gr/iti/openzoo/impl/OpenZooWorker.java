@@ -98,17 +98,11 @@ public abstract class OpenZooWorker implements Runnable {
         
         serviceParams = spv2;
     }
-    
-    public String getRequiredParameterOld(String param)
-    {
-        String key = serviceParams.getGeneral().getTopologyID() + ":" + serviceParams.getGeneral().getComponentID() + ":" + param;
-        return kv.getValue(key);
-    }
-    
+        
     // TODO: add instance id for giving  different parameters to different instances
     public String getRequiredParameter(String param)
     {
-        return kv.getHashValue(serviceParams.getGeneral().getTopologyID(), serviceParams.getGeneral().getComponentID() + ":" + param);
+        return kv.getHashValue("topologies:" + serviceParams.getGeneral().getTopologyID(), "requires:" + serviceParams.getGeneral().getComponentID() + ":" + param);
     }
     
     protected Message createEmptyMessage()

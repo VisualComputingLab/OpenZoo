@@ -221,12 +221,24 @@ public class TopologiesServlet extends HttpServlet {
                 rd.forward(request,response);
                 break;
                 
-            case "start":
+            case "deploy":
                 deployer.deployTopology(name);
+                processRequest(request, response);
+                break;
+                
+            case "undeploy":
+                deployer.undeployTopology(name);
+                processRequest(request, response);
+                break;
+                
+            case "start":
+                deployer.startTopology(name);
+                processRequest(request, response);
                 break;
                 
             case "stop":
-                deployer.undeployTopology(name);
+                deployer.stopTopology(name);
+                processRequest(request, response);
                 break;
         }
     }

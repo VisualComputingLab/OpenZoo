@@ -82,12 +82,12 @@ public class OpenZooInputConnection {
 //        }
         try
         {
-            String pattern = "(.*):(.*):(.*):" + componentId + ":" + workerId + ":" + id + ":" + instanceId;
-            String keyval = kv.getFirstHashKeyLike(topologyId, pattern);
+            String pattern = "connection:(.*):(.*):(.*):" + componentId + ":" + workerId + ":" + id + ":" + instanceId;
+            String keyval = kv.getFirstHashKeyLike("topologies:" + topologyId, pattern);
             if (keyval == null)
             {
-                pattern = "(.*):(.*):(.*):" + componentId + ":" + workerId + ":" + id;
-                keyval = kv.getFirstHashKeyLike(topologyId, pattern);
+                pattern = "connection:(.*):(.*):(.*):" + componentId + ":" + workerId + ":" + id;
+                keyval = kv.getFirstHashKeyLike("topologies:" + topologyId, pattern);
             }
             
             if (keyval == null)
@@ -96,7 +96,7 @@ public class OpenZooInputConnection {
                 return false;
             }
             
-            JSONObject queue = new JSONObject(kv.getHashValue(topologyId, keyval));
+            JSONObject queue = new JSONObject(kv.getHashValue("topologies:" + topologyId, keyval));
             queueParams = new ParametersQueue(queue);
         }
         catch (JSONException e)

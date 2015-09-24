@@ -8,7 +8,7 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class ServerResources {
+public class ServerResources implements Comparable {
 
     private static double MAX_CPU_USAGE = 0.8; // CPU usage should be less than 80 %
     private static double MAX_HEAP_USAGE = 0.8; // Heap memory usage should be less than 80 %
@@ -25,7 +25,7 @@ public class ServerResources {
 //    private long spaceTotal;            // bytes
     private double heapMemoryUsage;       // [0,1]
     private long spaceFree;            // [0,1]
-    ArrayList<String> deployedServices;
+    ArrayList<String> deployedServices = new ArrayList<>();
     
     public ServerResources(String name, JSONObject json)
     {
@@ -52,7 +52,8 @@ public class ServerResources {
     
     public void addDeployedServices(ArrayList<String> ds)
     {
-        deployedServices.addAll(ds);
+        if (ds != null)
+            deployedServices.addAll(ds);
     }
     
     public boolean isServiceDeployed(String serv)
@@ -89,5 +90,10 @@ public class ServerResources {
      */
     public double getSystemCpuLoad() {
         return systemCpuLoad;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return (int) (100 * (this.getSystemCpuLoad() - ((ServerResources) o).getSystemCpuLoad()));
     }
 }

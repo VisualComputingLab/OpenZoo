@@ -22,7 +22,6 @@ public class TopologyGraphConnection {
     private String queue_name = null;
     private String exchange_name = null;
     private ArrayList<String> routing_keys = null;
-
     
     public TopologyGraphConnection(String s_c, String s_w, String s_e, String t_c, String t_w, String t_e, int t_i, JSONObject json)
     {
@@ -39,7 +38,7 @@ public class TopologyGraphConnection {
             mapping = json.getInt("mapping");
             queue_name = json.optString("queue_name", null);
             exchange_name = json.optString("exchange_name", null);
-            JSONArray rkeys = json.getJSONArray("routing_keys");
+            JSONArray rkeys = json.optJSONArray("routing_keys");
             if (rkeys != null)
             {
                 routing_keys = new ArrayList<>();
@@ -51,7 +50,41 @@ public class TopologyGraphConnection {
         }
         catch (JSONException e)
         {
-            System.err.println("JSONException in TopologyGraphNode.constr: " + e);
+            System.err.println("JSONException in TopologyGraphConnection.constr: " + e);
+        }
+    }
+    
+    public TopologyGraphConnection(String topo_name, String transition_id, String s_c, String s_w, String s_e, String t_c, String t_w, String t_e, String mapstr, String routkeys)
+    {
+        source_component = s_c;
+        target_component = t_c;
+        source_worker = s_w;
+        target_worker = t_w;
+        source_endpoint = s_e;
+        target_endpoint = t_e;
+        
+        switch (mapstr)
+        {
+            case "conn_available":
+                mapping = 0;
+                queue_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+                break;
+                
+            case "conn_all":
+                mapping = 1;
+                exchange_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+                break;
+                
+            case "conn_route":
+                mapping = 2;
+                exchange_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+                routing_keys = new ArrayList<>();
+                String [] split = routkeys.split(",");
+                for (int k = 0; k < split.length; k++)
+                {
+                    routing_keys.add(split[k].trim());
+                }
+                break;
         }
     }
     

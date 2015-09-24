@@ -69,11 +69,11 @@ public class ProcessTopologyServlet extends HttpServlet {
             
             if (graphStr != null && !graphStr.isEmpty())
             {
-                JSONObject graph = new JSONObject(graphStr);
+                JSONObject graph_object = new JSONObject(graphStr);
             
                 // save graph object to kv
                 Topology topo = kv.getTopology(name);
-                topo.setGraph_object(graph);
+                topo.setGraph_object(graph_object);
                 kv.putTopology(topo);
             }
             

@@ -291,5 +291,10 @@ public class WarFile {
         this.description = description;
     }
 
+    @Override
+    public String toString()
+    {
+        return component_id;
+    }
 }
 

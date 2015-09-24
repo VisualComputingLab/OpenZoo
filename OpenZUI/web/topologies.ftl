@@ -224,6 +224,8 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           <button id="deleteBtn" type="submit" class="btn btn-primary">Delete</button>
           <button id="updateBtn" type="submit" class="btn btn-primary">Update</button>
+          <button id="deployBtn" type="submit" class="btn btn-primary">Deploy</button>
+          <button id="undeployBtn" type="submit" class="btn btn-primary">Undeploy</button>
           <button id="startBtn" type="submit" class="btn btn-primary">Start</button>
           <button id="stopBtn" type="submit" class="btn btn-primary">Stop</button>
         </div>
