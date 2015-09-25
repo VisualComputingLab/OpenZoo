@@ -697,9 +697,7 @@ public class KeyValueCommunication {
             }
         }
     }
-        
-    
-    
+            
     
     private void info(String s)
     {

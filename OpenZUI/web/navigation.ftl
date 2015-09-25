@@ -38,7 +38,8 @@
         <div class="collapse navbar-collapse" id="navbar-collapse2">
           <ul class="nav navbar-nav navbar-right">
             <li class="active"><a href="#">Dashboard</a></li>
-            <li><a href="#loginModal" role="button" data-toggle="modal">Login</a></li>
+            <!--<li><a href="#loginModal" role="button" data-toggle="modal">Login</a></li>-->
+            <li><a href="logout.jsp" role="button">Logout</a></li>
             <li><a href="#aboutModal" role="button" data-toggle="modal">About</a></li>
           </ul>
         </div>	
