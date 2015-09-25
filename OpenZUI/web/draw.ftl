@@ -58,9 +58,9 @@
             <div class="well">
               <form id="service_form"> 
                 <label for="instances">instances</label>
-                <input type="number" class="form-control" id="instances" name="instances">
+                <input type="number" class="form-control" id="instances" name="instances" min="1" max="1000">
                 <label for="wpc">workers per core</label>
-                <input type="number" class="form-control" id="wpc" name="wpc">
+                <input type="number" class="form-control" id="wpc" name="wpc" min="0" max="16">
                 <hr>
                 <input type="submit" id="save_service_config" class="btn btn-default" value="Save" />
               </form>
@@ -129,6 +129,7 @@
     <!-- script references -->
     <script src="./libs/jquery/jquery-1.11.3.min.js"></script>
   	<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./js/alertify.js"></script>
   	<script src="./js/scripts.js"></script>
 
     <script src="./js/joint.js"></script>
@@ -139,5 +140,15 @@
     <script src="./js/openzoo.js"></script-->
     <!--script src="./js/joint.shapes.devs.js"></script>
     <script src="./js/devs.js"></script -->
+
+    <script>
+      var logcontainer = [];
+      <#if logs??>
+        <#list logs as logline>
+          logcontainer.push("${logline}");
+        </#list>
+      </#if>
+    </script>
+
   </body>
 </html>

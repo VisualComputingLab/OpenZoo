@@ -7,7 +7,6 @@ import freemarker.template.TemplateExceptionHandler;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
-import static gr.iti.openzoo.ui.servlets.DrawTopologyServlet.cfg;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,11 +29,12 @@ public class MainServlet extends HttpServlet {
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
+    private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
     {
-        System.out.println("Calling Main init method");
+//        System.out.println("Calling Main init method");
         try
         {
             String webAppPath = getServletContext().getRealPath("/");
@@ -79,6 +79,7 @@ public class MainServlet extends HttpServlet {
         
         ArrayList<Topology> allTopos = kv.getTopologies();
         root.put("topologies", allTopos);
+        root.put("logs", logs);
         
 //        String name = request.getParameter("topo-name");
 //        root.put("topology_name", name);
@@ -108,6 +109,7 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -123,6 +125,7 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -135,4 +138,19 @@ public class MainServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    private void inf(String s)
+    {
+        logs.add("INFO:" + s);
+    }
+    
+    private void err(String s)
+    {
+        logs.add("ERROR:" + s);
+    }
+    
+    private void wrn(String s)
+    {
+        logs.add("WARN:" + s);
+    }
 }

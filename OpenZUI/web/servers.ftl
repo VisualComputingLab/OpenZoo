@@ -76,19 +76,21 @@
             </tr>
           </thead>
           <tbody>
-            <#assign row=1>
-            <#list servers as server>
-              <tr onclick="detailsServer('${server.name}');">
-                <td>${row}</td>
-                <td>${server.name}</td>
-                <td>${server.address}</td>
-                <td>${server.port?string.computer}</td>
-                <td>${server.user}</td>
-                <td>${server.passwd}</td>
-                <td><i class="${server.status} fa fa-check-circle fa-1x"></i></td>
-              </tr>
-              <#assign row = row + 1>
-            </#list>
+            <#if servers??>
+              <#assign row=1>
+              <#list servers as server>
+                <tr onclick="detailsServer('${server.name}');">
+                  <td>${row}</td>
+                  <td>${server.name}</td>
+                  <td>${server.address}</td>
+                  <td>${server.port?string.computer}</td>
+                  <td>${server.user}</td>
+                  <td>${server.passwd}</td>
+                  <td><i class="${server.status} fa fa-check-circle fa-1x"></i></td>
+                </tr>
+                <#assign row = row + 1>
+              </#list>
+            </#if>
           </tbody>
         </table>
       </div>
@@ -198,6 +200,17 @@
 	<!-- script references -->
 		<script src="./libs/jquery/jquery-1.11.3.min.js"></script>
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
+
+    <script>
+      var logcontainer = [];
+      <#if logs??>
+        <#list logs as logline>
+          logcontainer.push("${logline}");
+        </#list>
+      </#if>
+    </script>
+
 	</body>
 </html>

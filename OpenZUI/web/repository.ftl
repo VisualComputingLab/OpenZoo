@@ -99,21 +99,23 @@
             </tr>
           </thead>
           <tbody>
-            <#assign row=1>
-            <#list warfiles as warfile>
-              <tr onclick="detailsWarfile('${warfile.component_id}');">
-                <td>${row}</td>
-                <td>${warfile.component_id}</td>
-                <!-- <td>${warfile.name}</td> -->
-                <!-- <td>${warfile.service_path}</td> -->
-                <td>${warfile.description}</td>
-                <td>${warfile.filename}</td>
-                <!-- <td>${warfile.folder}</td> -->
-                <td>${warfile.version}</td>
-                <td><i class="${warfile.status} fa fa-check-circle fa-1x"></i></td>
-              </tr>
-              <#assign row = row + 1>
-            </#list>
+            <#if warfiles??>
+              <#assign row=1>
+              <#list warfiles as warfile>
+                <tr onclick="detailsWarfile('${warfile.component_id}');">
+                  <td>${row}</td>
+                  <td>${warfile.component_id}</td>
+                  <!-- <td>${warfile.name}</td> -->
+                  <!-- <td>${warfile.service_path}</td> -->
+                  <td>${warfile.description}</td>
+                  <td>${warfile.filename}</td>
+                  <!-- <td>${warfile.folder}</td> -->
+                  <td>${warfile.version}</td>
+                  <td><i class="${warfile.status} fa fa-check-circle fa-1x"></i></td>
+                </tr>
+                <#assign row = row + 1>
+              </#list>
+            </#if>
           </tbody>
         </table>
       </div>
@@ -230,6 +232,17 @@
 	<!-- script references -->
 		<script src="./libs/jquery/jquery-1.11.3.min.js"></script>
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
+
+    <script>
+      var logcontainer = [];
+      <#if logs??>
+        <#list logs as logline>
+          logcontainer.push("${logline}");
+        </#list>
+      </#if>
+    </script>
+
 	</body>
 </html>

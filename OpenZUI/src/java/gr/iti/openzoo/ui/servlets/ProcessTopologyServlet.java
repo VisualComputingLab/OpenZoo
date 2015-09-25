@@ -65,7 +65,7 @@ public class ProcessTopologyServlet extends HttpServlet {
             String name = request.getParameter("topo-name");
             String graphStr = request.getParameter("topo-graph");
             
-            System.out.println("ProcessTopologyServlet received: " + name + " " + graphStr);
+//            System.out.println("ProcessTopologyServlet received: " + name + " " + graphStr);
             
             if (graphStr != null && !graphStr.isEmpty())
             {
@@ -82,7 +82,7 @@ public class ProcessTopologyServlet extends HttpServlet {
         } 
         catch (JSONException ex) 
         {
-            Logger.getLogger(ProcessTopologyServlet.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("JSONException in doPost: " + ex);
         }
     }
 

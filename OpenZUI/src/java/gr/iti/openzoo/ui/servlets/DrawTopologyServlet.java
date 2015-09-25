@@ -5,9 +5,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
-import gr.iti.openzoo.ui.WarFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,6 +28,7 @@ public class DrawTopologyServlet extends HttpServlet {
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
+    private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
@@ -82,6 +81,7 @@ public class DrawTopologyServlet extends HttpServlet {
         String name = request.getParameter("topo-name");
                 
         root.put("topology_name", name);
+        root.put("logs", logs);
         
         response.setContentType("text/html;charset=UTF-8");
         
@@ -108,6 +108,7 @@ public class DrawTopologyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -123,7 +124,7 @@ public class DrawTopologyServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -136,4 +137,19 @@ public class DrawTopologyServlet extends HttpServlet {
     public String getServletInfo() {
         return "Draw Topology interface";
     }// </editor-fold>
+
+    private void inf(String s)
+    {
+        logs.add("INFO:" + s);
+    }
+    
+    private void err(String s)
+    {
+        logs.add("ERROR:" + s);
+    }
+    
+    private void wrn(String s)
+    {
+        logs.add("WARN:" + s);
+    }
 }

@@ -31,15 +31,16 @@ public class ServersServlet extends HttpServlet {
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
     private Deployer deployer;
+    private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
     {
-        System.out.println("Calling Servers init method");
+//        System.out.println("Calling Servers init method");
         try
         {
             String webAppPath = getServletContext().getRealPath("/");
-            System.out.println("Web app path is " + webAppPath);
+//            System.out.println("Web app path is " + webAppPath);
             
             JSONObject properties = util.getJSONFromFile(webAppPath + "/config.json");
             try 
@@ -82,7 +83,7 @@ public class ServersServlet extends HttpServlet {
         
         // Fill data model from redis
         ArrayList<Server> allServers = kv.getServers();
-        System.out.println("num of servers in redis: " + allServers.size());
+//        System.out.println("num of servers in redis: " + allServers.size());
         
         for (Server srv : allServers)
         {
@@ -90,6 +91,7 @@ public class ServersServlet extends HttpServlet {
                 kv.putServer(srv);
         }
         root.put("servers", allServers);
+        root.put("logs", logs);
         
         response.setContentType("text/html;charset=UTF-8");
         
@@ -116,6 +118,7 @@ public class ServersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -132,22 +135,40 @@ public class ServersServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        logs.clear();
+        
         String action = request.getParameter("action");
         String name = request.getParameter("srv-name");
         
-        System.out.println("POST Servers: action = " + action + ", name = " + name);
+//        System.out.println("POST Servers: action = " + action + ", name = " + name);
         
         if (action.equalsIgnoreCase("delete") && name != null)
         {
             Server srv = kv.getServer(name, true);
             
-            if (srv.isActive())
+            if (srv == null)
+            {
+                err("There was an error in the Key-Value repository, server could not be removed from the cluster");
+            }
+            else if (srv.isActive())
             {
                 JSONObject outjson = deployer.undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/ServerStatistics");
 
-                System.out.println("---------- UNDEPLOY --------------");
-                System.out.println("Undeployment output = " + outjson.toString());
-                System.out.println("---------- UNDEPLOY END --------------");
+                if (outjson == null)
+                    err("There was an error during undeployment of the statistics service, please check the server logs.");
+                else
+                {
+                    switch (outjson.optString("status")) {
+                        case "success":
+                            inf("Server was removed from the cluster");
+                            break;
+                        case "failure":
+                            err("Server was removed from the cluster, but there was an error during undeployment of the statistics service");
+                            break;
+                        default:
+                            wrn("Server was removed from the cluster, but undeployment of the statistics service reported: " + outjson);
+                    }
+                }
             }
             
             processRequest(request, response);
@@ -164,6 +185,7 @@ public class ServersServlet extends HttpServlet {
         catch (NumberFormatException e)
         {
             System.err.println("Wrong format for port number: " + e);
+            err("Wrong format for port number");
         }
         
         String user = request.getParameter("tmc-user");
@@ -176,15 +198,45 @@ public class ServersServlet extends HttpServlet {
         // add or update new server to redis
         kv.putServer(srv);
         
-        if (action.equalsIgnoreCase("create") && srv.isActive())
+        if (action.equalsIgnoreCase("create"))
         {
-            // deploy ServerStatistics war on new server
-            String warfilepath = getServletContext().getRealPath("/") + "ServerStatistics.war";
-            JSONObject outjson = deployer.deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerStatistics");
+            if (srv.isActive())
+            {
+                // deploy ServerStatistics war on new server
+                String warfilepath = getServletContext().getRealPath("/") + "ServerStatistics.war";
+                JSONObject outjson = deployer.deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerStatistics");
 
-            System.out.println("---------- DEPLOY --------------");
-            System.out.println("Deployment output = " + outjson.toString());
-            System.out.println("---------- DEPLOY END --------------");
+                if (outjson == null)
+                        err("There was an error during deployment of the statistics service, please check the server logs.");
+                else
+                {
+                    switch (outjson.optString("status")) {
+                        case "success":
+                            inf("Server was added to the cluster");
+                            break;
+                        case "failure":
+                            err("Server was added to the cluster, but there was an error during deployment of the statistics service");
+                            break;
+                        default:
+                            wrn("Server was added to the cluster, but deployment of the statistics service reported: " + outjson);
+                    }
+                }
+            }
+            else
+            {
+                err("Server was added to the cluster, but it does not seems to respond");
+            }
+        }
+        else if (action.equalsIgnoreCase("update"))
+        {
+            if (srv.isActive())
+            {
+                inf("Server parameters were updated");
+            }
+            else
+            {
+                err("Server parameters were updated, but the server does not seem to respond");
+            }
         }
                 
         processRequest(request, response);
@@ -201,4 +253,19 @@ public class ServersServlet extends HttpServlet {
     public String getServletInfo() {
         return "Servers interface";
     }// </editor-fold>
+
+    private void inf(String s)
+    {
+        logs.add("INFO:" + s);
+    }
+    
+    private void err(String s)
+    {
+        logs.add("ERROR:" + s);
+    }
+    
+    private void wrn(String s)
+    {
+        logs.add("WARN:" + s);
+    }
 }

@@ -10,6 +10,15 @@ $(document).ready(function(){/* jQuery toggle layout */
             $(this).addClass('on');
         }
     });
+
+    for(var i = 0; i < logcontainer.length; i++){
+        var log = logcontainer[i];
+        if (log.indexOf("INFO:") === 0)
+            alertify.success(log.substring(log.indexOf(":") + 1));
+        else if (log.indexOf("ERROR:") === 0)
+            alertify.error(log.substring(log.indexOf(":") + 1));
+        else alertify.log(log.substring(log.indexOf(":") + 1));
+    }
 });
 
 

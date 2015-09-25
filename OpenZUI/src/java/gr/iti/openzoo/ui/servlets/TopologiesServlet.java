@@ -32,6 +32,7 @@ public class TopologiesServlet extends HttpServlet {
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
     private Deployer deployer;
+    private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
@@ -85,7 +86,7 @@ public class TopologiesServlet extends HttpServlet {
         
         // Fill data model from redis
         ArrayList<Topology> allTopologies = kv.getTopologies();
-        System.out.println("num of topologies in redis: " + allTopologies.size());
+//        System.out.println("num of topologies in redis: " + allTopologies.size());
         
 //        for (Topology tpl : allTopologies)
 //        {
@@ -93,6 +94,7 @@ public class TopologiesServlet extends HttpServlet {
 //                kv.putTopology(tpl);
 //        }
         root.put("topologies", allTopologies);
+        root.put("logs", logs);
         
         response.setContentType("text/html;charset=UTF-8");
         
@@ -119,6 +121,7 @@ public class TopologiesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -135,10 +138,12 @@ public class TopologiesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        logs.clear();
+        
         String action = request.getParameter("action");        
         String name = request.getParameter("topo-name");
                 
-        System.out.println("POST Topologies: action = " + action + ", name = " + name);
+//        System.out.println("POST Topologies: action = " + action + ", name = " + name);
         
         String descr = request.getParameter("topo-descr");
         
@@ -151,6 +156,9 @@ public class TopologiesServlet extends HttpServlet {
         catch (NumberFormatException e)
         {
             System.err.println("Wrong format for port number: " + e);
+            err("Wrong format for rabbit port number");
+            processRequest(request, response);
+            return;
         }
         String rabbit_user = request.getParameter("topo-rabbit-user");
         String rabbit_pass = request.getParameter("topo-rabbit-pass");
@@ -165,6 +173,9 @@ public class TopologiesServlet extends HttpServlet {
         catch (NumberFormatException e)
         {
             System.err.println("Wrong format for port number: " + e);
+            err("Wrong format for mongo port number");
+            processRequest(request, response);
+            return;
         }
         String mongo_user = request.getParameter("topo-mongo-user");
         String mongo_pass = request.getParameter("topo-mongo-pass");
@@ -177,7 +188,12 @@ public class TopologiesServlet extends HttpServlet {
             case "delete":
                 if (name != null)
                 {
-                    kv.getTopology(name, true);
+                    top = kv.getTopology(name, true);
+                    
+                    if (top == null)
+                    {
+                        err("There was an error in the Key-Value repository, topology could not be removed");
+                    }
             
                     processRequest(request, response);
                 }
@@ -222,22 +238,22 @@ public class TopologiesServlet extends HttpServlet {
                 break;
                 
             case "deploy":
-                deployer.deployTopology(name);
+                logs.addAll(deployer.deployTopology(name));
                 processRequest(request, response);
                 break;
                 
             case "undeploy":
-                deployer.undeployTopology(name);
+                logs.addAll(deployer.undeployTopology(name));
                 processRequest(request, response);
                 break;
                 
             case "start":
-                deployer.startTopology(name);
+                logs.addAll(deployer.startTopology(name));
                 processRequest(request, response);
                 break;
                 
             case "stop":
-                deployer.stopTopology(name);
+                logs.addAll(deployer.stopTopology(name));
                 processRequest(request, response);
                 break;
         }
@@ -252,4 +268,19 @@ public class TopologiesServlet extends HttpServlet {
     public String getServletInfo() {
         return "Topologies interface";
     }// </editor-fold>
+
+    private void inf(String s)
+    {
+        logs.add("INFO:" + s);
+    }
+    
+    private void err(String s)
+    {
+        logs.add("ERROR:" + s);
+    }
+    
+    private void wrn(String s)
+    {
+        logs.add("WARN:" + s);
+    }
 }

@@ -49,8 +49,10 @@ public class Deployer {
         }
     }
     
-    public boolean deployTopology(String topo_name)
+    public ArrayList<String> deployTopology(String topo_name)
     {
+        ArrayList<String> logs = new ArrayList<>();
+        
         // get topology and servers from kv
         Topology topo = kv.getTopology(topo_name);
         ArrayList<Server> servers = kv.getServers();
@@ -90,7 +92,8 @@ public class Deployer {
         catch (IOException | JSONException e)
         {
             System.err.println("Exception at deployTopology: " + e);
-            return false;
+            logs.add("ERROR:" + "Exception at deployTopology: " + e);
+            return logs;
         }
         
         server2resources = MapUtil.sortByValueAscending( server2resources );
@@ -138,6 +141,7 @@ public class Deployer {
                 catch (JSONException ex)
                 {
                     System.err.println("JSONException while creating triple: " + ex);
+                    logs.add("ERROR:" + "JSONException while creating triple: " + ex);
                 }
 //                System.out.println("Triple added");
                 assigned++;
@@ -145,11 +149,13 @@ public class Deployer {
             if (assigned == 0)
             {
                 System.err.println("There are no servers for deploying service " + nod.getName() + ", aborting...");
-                return false;
+                logs.add("ERROR:" + "There are no servers for deploying service " + nod.getName() + ", aborting...");
+                return logs;
             }
             else if (assigned < instances)
             {
                 System.out.println("There are not enough servers for deploying " + instances + " instances of service " + nod.getName() + ". Instance number is set to " + assigned);
+                logs.add("WARN:" + "There are not enough servers for deploying " + instances + " instances of service " + nod.getName() + ". Instance number is set to " + assigned);
                 nod.setInstances(instances);
             }
         }
@@ -163,7 +169,7 @@ public class Deployer {
         
         for (Triple triplo : triples)
         {
-            System.out.println(triplo.toString());
+//            System.out.println(triplo.toString());
             
             servername = (String) triplo.getLeft();
             war = (WarFile) triplo.getMiddle();
@@ -201,7 +207,8 @@ public class Deployer {
             catch (IOException | JSONException e)
             {
                 System.out.println("Exception during writing to config.json: " + e);
-                return false;
+                logs.add("ERROR:" + "Exception during writing to config.json: " + e);
+                return logs;
             }
                         
             
@@ -220,13 +227,15 @@ public class Deployer {
                 else
                 {
                     System.err.println("Service deployment failed with: " + outjson.getString("message"));
+                    logs.add("ERROR:" + "Service deployment failed with: " + outjson.getString("message"));
                     continue;
                 }
             }
             catch (JSONException e)
             {
                 System.out.println("Exception during updating conf_object: " + e);
-                return false;
+                logs.add("ERROR:" + "Exception during updating conf_object: " + e);
+                return logs;
             }
         }      
                 
@@ -237,33 +246,33 @@ public class Deployer {
         // update topo.getGraph_object()
         kv.putTopology(topo);
                 
-        return true;
+        return logs;
     }
     
-    public JSONObject startTopology(String topo_name)
+    public ArrayList<String> startTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "start");
     }
     
-    public JSONObject stopTopology(String topo_name)
+    public ArrayList<String> stopTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "stop");
     }
     
-    public JSONObject statusTopology(String topo_name)
+    public ArrayList<String> statusTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "status");
     }
     
-    public JSONObject resetTopology(String topo_name)
+    public ArrayList<String> resetTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "reset");
     }
     
-    public JSONObject callTopologyServices(String topo_name, String command)
+    public ArrayList<String> callTopologyServices(String topo_name, String command)
     {
-        JSONObject response = new JSONObject();
-        
+        ArrayList<String> logs = new ArrayList<>();
+                
         // get topology json from kv
         Topology topo = kv.getTopology(topo_name);
                 
@@ -297,7 +306,8 @@ public class Deployer {
                     if (output.has("error"))
                     {
                         System.err.println("Calling " + command + " on service " + service_id + " on server " + server_id + " failed with output: " + output.toString(4));
-                        response.put(service_id + "_" + server_id, output);
+                        logs.add("ERROR:" + "Calling " + command + " on service " + service_id + " on server " + server_id + " failed with output: " + output.toString(4));
+//                        response.put(service_id + "_" + server_id, output);
 //                        return null;
                         
                     }
@@ -313,7 +323,8 @@ public class Deployer {
                                 server_json.put("status", "installed");
                                 break;
                         }
-                        response.put(service_id + "_" + server_id, output);
+//                        response.put(service_id + "_" + server_id, output);
+                        logs.add("INFO:" + "Service " + service_id + " on server " + server_id + ": " + command);
                     }
                 }
             }
@@ -321,6 +332,7 @@ public class Deployer {
         catch (JSONException | IOException ex)
         {
             System.err.println("Exception in callTopologyServices: " + ex);
+            logs.add("ERROR:" + "Exception in callTopologyServices: " + ex);
         }
         
         // save configuration to the topology
@@ -329,11 +341,13 @@ public class Deployer {
         // save topology to the kv
         kv.putTopology(topo);
                 
-        return response;
+        return logs;
     }
         
-    public boolean undeployTopology(String topo_name)
+    public ArrayList<String> undeployTopology(String topo_name)
     {        
+        ArrayList<String> logs = new ArrayList<>();
+        
         // get topology and servers from kv
         Topology topo = kv.getTopology(topo_name);
         JSONObject conf_object = topo.getConf_object();
@@ -379,6 +393,7 @@ public class Deployer {
                         else
                         {
                             System.err.println("Service undeployment failed with: " + outjson.getString("message"));
+                            logs.add("ERROR:" + "Service undeployment failed with: " + outjson.getString("message"));
                             continue;
                         }
                     }
@@ -408,7 +423,8 @@ public class Deployer {
             catch (JSONException ex)
             {
                 System.err.println("JSONException in undeployTopology: " + ex);
-                return false;
+                logs.add("ERROR:" + "JSONException in undeployTopology: " + ex);
+                return logs;
             }
          
         
@@ -418,7 +434,7 @@ public class Deployer {
         // save topology to the kv
         kv.putTopology(topo);
                 
-        return true;
+        return logs;
     }
     
     public JSONObject deployService(String httpserverandport, String servercredentials, String warfilepath, String webservicepath)

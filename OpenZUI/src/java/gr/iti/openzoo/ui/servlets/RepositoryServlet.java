@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gr.iti.openzoo.ui.servlets;
 
 import freemarker.template.Configuration;
@@ -40,15 +36,16 @@ public class RepositoryServlet extends HttpServlet {
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
     private static String localRepository = null;
+    private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
     {
-        System.out.println("Calling Repository init method");
+//        System.out.println("Calling Repository init method");
         try
         {
             String webAppPath = getServletContext().getRealPath("/");
-            System.out.println("Web app path is " + webAppPath);
+//            System.out.println("Web app path is " + webAppPath);
             
             JSONObject properties = util.getJSONFromFile(webAppPath + "/config.json");
             try 
@@ -93,16 +90,20 @@ public class RepositoryServlet extends HttpServlet {
         
         // Fill data model from redis
         RepositoryParameters repo = kv.getRepositoryParameters();
-        ArrayList<WarFile> allWarfiles = kv.getWarFiles();
-        System.out.println("num of war files in redis: " + allWarfiles.size());
-                
-        //System.out.println(repo.toString());
+        if (repo == null)
+        {
+            err("There was an error in the Key-Value repository, Repository Parameters could not be retrieved.");
+        }
+        else root.put("ftp", repo);
         
-//        if (repo.available())
-//            kv.putServer(srv);
-
-        root.put("ftp", repo);
-        root.put("warfiles", allWarfiles);
+        ArrayList<WarFile> allWarfiles = kv.getWarFiles();    
+        if (allWarfiles == null)
+        {
+            err("There was an error in the Key-Value repository, War files list could not be retrieved.");
+        }
+        else root.put("warfiles", allWarfiles);
+        
+        root.put("logs", logs);
         
         response.setContentType("text/html;charset=UTF-8");
         
@@ -129,6 +130,7 @@ public class RepositoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -145,16 +147,18 @@ public class RepositoryServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        logs.clear();
+        
         //System.out.println(request);
         
         String action = request.getParameter("action");
         
-        System.out.println("POST Repository: action = " + action);
+//        System.out.println("POST Repository: action = " + action);
         
         switch (action)
         {
             case "updateRepo":
-                System.out.println("Updating repo params");
+//                System.out.println("Updating repo params");
                 String host = request.getParameter("ftp-host");
                 int port = 21;
                 try
@@ -164,6 +168,7 @@ public class RepositoryServlet extends HttpServlet {
                 catch (NumberFormatException e)
                 {
                     System.err.println("Wrong format for port number: " + e);
+                    err("Wrong format for port number");
                 }
 
                 String user = request.getParameter("ftp-user");
@@ -179,7 +184,7 @@ public class RepositoryServlet extends HttpServlet {
                 break;
                 
             case "uploadFile":
-                System.out.println("Uploading war file");
+//                System.out.println("Uploading war file");
                 
                 Part filePart = request.getPart("fileToUpload");
                 String fileName = getFileName(filePart);
@@ -189,11 +194,13 @@ public class RepositoryServlet extends HttpServlet {
                     File f = new File(localRepository + "/" + fileName);
                     Files.copy(filePart.getInputStream(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     System.out.println("Downloaded file at: " + f.getAbsolutePath());
+                    inf("WAR file uploaded");
                     JSONObject config = Utilities.readJSONFromWAR(f.getAbsolutePath(), "config.json");
                     
                     if (config == null)
                     {
                         System.err.println("War file does not contain a config.json, or config.json is not in json format");
+                        err("War file does not contain a config.json, or config.json is not in json format");
                     }
                     else
                     {
@@ -205,11 +212,12 @@ public class RepositoryServlet extends HttpServlet {
                 
             case "delete":
                 String warcompid = request.getParameter("war-compoid");
-                kv.getWarFile(warcompid, true);
+                WarFile w = kv.getWarFile(warcompid, true);
+                if (w == null)
+                    err("There was an error in the Key-Value repository, could not be remove WAR file.");
+                else inf("WAR file removed");
                 break;
         }
-        
-        
         
         processRequest(request, response);
     }
@@ -238,4 +246,19 @@ public class RepositoryServlet extends HttpServlet {
     public String getServletInfo() {
         return "Repository interface";
     }// </editor-fold>
+    
+    private void inf(String s)
+    {
+        logs.add("INFO:" + s);
+    }
+    
+    private void err(String s)
+    {
+        logs.add("ERROR:" + s);
+    }
+    
+    private void wrn(String s)
+    {
+        logs.add("WARN:" + s);
+    }
 }

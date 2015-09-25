@@ -42,37 +42,17 @@
       <hr>
 
       <div class="row">
-        <!-- <div class="col-md-12">
-          <h2>Running Topologies</h2>
-          <select id="topologyDropdown" name="topologyDropdown" class="selectpicker" title='Select a topology'>
-            <#list topologies as topo>
-            <option>${topo.name}</option>
-            </#list>
-          </select>
-        </div> -->
-        
-        <!-- <div class="col-md-4 col-sm-6">
-          <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Statistics</h4></div>
-            <div class="panel-body">
-              <img src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=70" class="img-circle pull-right"> <a href="#">Guidance and Tools</a>
-              <div class="clearfix"></div>
-              <hr>
-              <p>Per topology statistics: <a href="Servers">CPU</a>, Memory, Disc space.</p>
-              <h5><a href="Servers">More on this</a></h5>
-            </div>
-          </div> 
-        </div> -->
-
         <div class="col-md-12 col-sm-6">
           <div class="panel panel-default">
             <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Topology Monitor</h4></div>
             <div class="panel-body">
               Please select topology:
               <select id="topologyDropdown" name="topologyDropdown" class="selectpicker" title='Select a topology'>
-                <#list topologies as topo>
-                <option>${topo.name}</option>
-                </#list>
+                <#if topologies??>
+                  <#list topologies as topo>
+                  <option>${topo.name}</option>
+                  </#list>
+                </#if>
               </select>
               <hr>
               Server statistics
@@ -153,24 +133,8 @@ With component filter and time constrains</textarea>
 
       <hr>
 
-      <div class="row">
-        <!-- <div class="col-md-12"><h2>User Interface Logs</h2></div> -->
-        <div class="col-md-12 col-sm-6">
-          <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Logs</h4></div>
-            <div class="panel-body">
-              <hr>
-              <div class="well well-sm">
-                <textarea style="width:100%" rows="10" id="uiLogTextArea" >The GUI logs appear here
-One after the other
-Updated continuously
-Format: Time Message
-With time constrains</textarea>
-              </div>
-            </div>
-          </div> 
-        </div>
-      </div>
+<!--       <input type="hidden" id="uiLogTextArea">
+</input> -->
 
 
       <div class="clearfix"></div>
@@ -188,11 +152,20 @@ With time constrains</textarea>
 
     <#include "login-about.ftl">
 
-
-
 	<!-- script references -->
 		<script src="./libs/jquery/jquery-1.11.3.min.js"></script>
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
+
+    <script>
+      var logcontainer = [];
+      <#if logs??>
+        <#list logs as logline>
+          logcontainer.push("${logline}");
+        </#list>
+      </#if>
+    </script>
+
 	</body>
 </html>
