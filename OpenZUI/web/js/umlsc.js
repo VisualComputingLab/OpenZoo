@@ -284,8 +284,8 @@ $( document ).ready(function() {
                     //else close all forms and clean their fields to reload them/
                     $('#service_manager').hide();
                     $('#connection_manager').hide();
-                    $('#instances').val('');
-                    $('#wpc').val('');
+                    $('#instances').val('1');
+                    $('#wpc').val('0');
 
                     for (var i = 0; i < warfiles.length; i++){
                         if (warfiles[i].component_id == objectId){
