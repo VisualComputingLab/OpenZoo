@@ -58,11 +58,9 @@
             <div class="well">
               <form id="service_form"> 
                 <label for="instances">instances</label>
-                <input type="number" class="form-control" id="instances" name="instances" min="1" max="1000">
+                <input type="number" class="form-control" id="instances" name="instances" value="1" min="1" max="1000">
                 <label for="wpc">workers per core</label>
-                <input type="number" class="form-control" id="wpc" name="wpc" min="0" max="16">
-                <hr>
-                <input type="submit" id="save_service_config" class="btn btn-default" value="Save" />
+                <input type="number" class="form-control" id="wpc" name="wpc"  value="0" min="0" max="16">
               </form>
             </div>
           </div>
@@ -88,7 +86,6 @@
                     <input type="text" class="form-control" id="routing" name="routing">
                   </div>
                 </div>
-                <input type="submit" id="save_conn_config" class="btn btn-default" value="Save" />
               </form>
             </div>
           </div>

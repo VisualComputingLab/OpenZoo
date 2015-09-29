@@ -447,26 +447,12 @@ $( document ).ready(function() {
 
     });
         
-    $("#service_form, #connection_form" ).submit(function(e){
-
-        e.preventDefault();
-        //var res = str.split(",");
-
-        //var mygraph = graph.toJSON();
+    $("#service_form, #connection_form" ).focusout(function(e){
         //in order the element has been previously saced filter by the opposite predicate:
         graphConf = $.grep(graphConf, function(e){ return e.objectId != objectId; });
 
-        var mysrv ={}
         var srvConf = $( this ).serializeArray();
         graphConf.push({objectId:objectId, conf:srvConf})
-
-        //console.log(JSON.stringify(graphConf));
-        //add require fields to graph
-
-        //add conn fields to json
-
-        $('#service_manager').hide();
-        $('#connection_manager').hide();
     });
 
 
