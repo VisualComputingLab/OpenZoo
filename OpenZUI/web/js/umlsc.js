@@ -186,7 +186,7 @@ $(document).ready(function() {
                 return;
             }
 
-            if ((sourceId == "transition-source") && (targetId == "transition-target")) {
+            else if ((sourceId == "transition-source") && (targetId == "transition-target")) {
                 return;
             }
             else if (sourceId == targetId) {
