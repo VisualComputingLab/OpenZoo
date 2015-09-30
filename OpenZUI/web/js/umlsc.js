@@ -450,7 +450,13 @@ $(document).ready(function() {
         }
     }
     );
+    
+    //on remove links / nodes update graphConf
+    graph.on('remove', function(cell){
+            graphConf = $.grep(graphConf, function(e){ return e.objectId != cell.id; });
+     })
 
+    
     //Add Service
     $("#openzooServiceSelectBtn").on('click', function() {
 
