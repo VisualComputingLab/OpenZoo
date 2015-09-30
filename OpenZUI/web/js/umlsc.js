@@ -82,6 +82,77 @@ function adjustVertices(graph, cell) {
 }
 ;
 
+function connection_manager_reload(sourceId, targetId, insertedElement, objectId) {
+    //else close all forms and clean their fields to reload them
+    $('#service_manager').hide();
+    $('#connection_manager').hide();
+    $(".addToConnectionForm").remove();
+    $("#connection_form").removeClass();
+    $("#inEndpointsList").empty();
+    $("#outEndpointsList").empty();
+
+    $('#conn_mapping').val('conn_available').change();
+    $('#routing_field').hide();
+    $('#routing').val('');
+
+
+
+    $("#connection_form").prepend('<div class="addToConnectionForm"><label>Connection <i>' + sourceId + '</i> to <i>' + targetId + '</i> configuration</label><hr></div>');
+    $("#connection_form").addClass(objectId);
+
+
+    var s = localStorage[sourceId];
+    var sf = JSON.parse(s);
+    var sourceEndpoints = sf.out_ep
+
+
+    var t = localStorage[targetId];
+    var tf = JSON.parse(t);
+
+    var targetEndpoints = tf.in_ep;
+
+
+    var outEndpoints = "";
+    sourceEndpoints.map(function(item) {
+        outEndpoints += "<option value='" + item + "'>" + item + "</option>";
+    });
+    $("#outEndpointsList").html(outEndpoints);
+
+
+    var inEndpoints = "";
+    targetEndpoints.map(function(item) {
+        inEndpoints += "<option value='" + item + "'>" + item + "</option>";
+    });
+
+    $("#inEndpointsList").html(inEndpoints);
+
+    //if service is already configured load its values
+    if (insertedElement.length > 0) {
+        var $selects = $('#connection_form select');
+        $selects.each(function() {
+            var inp = this.name
+            var lmnt = $.grep(insertedElement[0].conf, function(e) {
+                return e.name == inp
+            });
+
+            $(this).val(lmnt[0].value);
+
+            if (lmnt[0].value == "conn_route") {
+
+                var lmnt = $.grep(insertedElement[0].conf, function(e) {
+                    return e.name == "routing"
+                });
+                $('#routing').val(lmnt[0].value);
+                $('#routing_field').show();
+
+            }
+        })
+    }
+
+    $('#connection_manager').show(200);
+}
+
+
 var graph;
 var paper;
 
@@ -172,91 +243,105 @@ $(document).ready(function() {
 
 
     graph.on('change:source change:target', function(cell) {
+        //console.log('change');
+
+        $('#connection_manager').hide();
 
         // console.log(cell);
         if (("id" in cell.attributes.source) && ("id" in cell.attributes.target)) {
             //console.log(cell);
             objectId = cell.id;
+            // get object from graphConf and remove it
+            //insertedElement = $.grep(graphConf, function(e){ return e.objectId == objectId; });
+            // remove it
+            graphConf = $.grep(graphConf, function(e) {
+                return e.objectId != objectId;
+            });
+            //empty the element holder
+            insertedElement = [];
 
             var sourceId = cell.attributes.source.id;
             var targetId = cell.attributes.target.id;
 
             if (sourceId == "undefined" || targetId == "undefined") {
+
                 console.log("...");
                 return;
-            }
 
-            else if ((sourceId == "transition-source") && (targetId == "transition-target")) {
+            }
+            else if (((sourceId == "transition-source") && (targetId == "transition-target")) || ((targetId == "transition-source") && (sourceId == "transition-target"))){
                 return;
             }
             else if (sourceId == targetId) {
-                alert("no self links allowed")
 
+                alert("no self links allowed")
                 cell.remove();
+
             }
-            else if ((sourceId == "transition-source") && (targetId !== "transition-target") /*&& targetEndpoints.length<0*/) {
+            else if (((sourceId == "transition-source") || (sourceId == "transition-target")) && (targetId !== "transition-target")) {
                 //console.log("target only" + targetId)
 
                 var t = localStorage[targetId];
                 var tf = JSON.parse(t);
-                if (tf.hasOwnProperty('in_ep')) {
-                    if (tf.in_ep.length <= 0) {
-                        alert("no target endpoints defined");
-                        cell.remove();
-                    }
+
+                if (tf.hasOwnProperty('in_ep') && tf.in_ep.length > 0) {
+
+                    //connection_manager_reload(sourceId, targetId);
+
                 }
                 else {
+                    //alert(" case 0 no target endpoints defined")
                     cell.remove();
                 }
-
                 //console.log(tf.in_ep);
 
-            } else if ((targetId == "transition-target") && (sourceId !== "transition-source")/*&& sourceEndpoints.length<0*/) {
-
+            } else if (((targetId == "transition-target") || (targetId == "transition-source")) && (sourceId !== "transition-source")) {
                 //console.log("source only" + sourceId)
 
                 var s = localStorage[sourceId];
                 var sf = JSON.parse(s);
 
-                if (sf.hasOwnProperty('out_ep')) {
-                    if (sf.out_ep.length <= 0) {
-                        alert("no target endpoints defined");
+                if (sf.hasOwnProperty('out_ep') && sf.out_ep.length > 0) {
 
-                        cell.remove();
-                    }
+                    //connection_manager_reload(sourceId, targetId);
                 }
+
                 else {
+                    //alert(" case 1 no source endpoints defined")
                     cell.remove();
                 }
 
                 //console.log(sf.out_ep);
 
             } else {
-
                 //console.log("both" + targetId + sourceId )
                 var t = localStorage[targetId];
                 var tf = JSON.parse(t);
 
-                if (tf.hasOwnProperty('in_ep')) {
-                    if (tf.in_ep.length <= 0) {
-                        alert("no target endpoints defined");
-                        cell.remove();
-                    }
-                }
-                else {
-                    cell.remove();
-                }
-
                 var s = localStorage[sourceId];
                 var sf = JSON.parse(s);
 
-                if (sf.hasOwnProperty('out_ep')) {
-                    if (sf.out_ep.length <= 0) {
-                        alert("no target endpoints defined");
+                if (tf.hasOwnProperty('in_ep') && sf.hasOwnProperty('out_ep')) {
+
+                    if (tf.in_ep.length <= 0) {
+
+                        //alert(" case 2 no target endpoints defined")
                         cell.remove();
+
+                    }
+                    else if (sf.out_ep.length <= 0) {
+
+                        //alert(" case 2 no source endpoints defined")
+                        cell.remove();
+
+                    }
+                    else {
+
+                        connection_manager_reload(sourceId, targetId, insertedElement, objectId);
                     }
                 }
                 else {
+
                     cell.remove();
                 }
             }
@@ -352,76 +437,14 @@ $(document).ready(function() {
                 var sourceId = cellView.model.attributes.source.id;
                 var targetId = cellView.model.attributes.target.id;
 
-                if ((sourceId == "transition-source") || (targetId == "transition-target")) {
+                if ((sourceId == "transition-source") || (targetId == "transition-target") || (targetId == "transition-source") || (sourceId == "transition-target")) {
                     $('#service_manager').hide();
                 }
                 else if ($("#connection_form").hasClass(objectId) && $("#connection_manager").is(":visible") == true) {
                     //if connection_manager form for this service is open do nothing... 
                 }
                 else {
-                    //else close all forms and clean their fields to reload them
-                    $('#service_manager').hide();
-                    $('#connection_manager').hide();
-                    $(".addToConnectionForm").remove();
-                    $("#connection_form").removeClass();
-                    $("#inEndpointsList").empty();
-                    $("#outEndpointsList").empty();
-
-                    $('#conn_mapping').val('conn_available').change();
-                    $('#routing_field').hide();
-                    $('#routing').val('');
-
-
-
-                    $("#connection_form").prepend('<div class="addToConnectionForm"><label><strong>' + sourceId + '</strong><span> --> </span><strong>' + targetId + '</strong></label><hr></div>');
-                    $("#connection_form").addClass(objectId);
-
-
-                    var s = localStorage[sourceId];
-                    var sf = JSON.parse(s);
-                    var sourceEndpoints = sf.out_ep;
-
-                    var t = localStorage[targetId];
-                    var tf = JSON.parse(t);
-
-                    var targetEndpoints = tf.in_ep;
-
-                    var outEndpoints = "";
-                    sourceEndpoints.map(function(item) {
-                        outEndpoints += "<option value='" + item + "'>" + item.substring(item.lastIndexOf(".") + 1) + "</option>";
-                    });
-                    $("#outEndpointsList").html(outEndpoints);
-
-
-                    var inEndpoints = "";
-                    targetEndpoints.map(function(item) {
-                        inEndpoints += "<option value='" + item + "'>" + item.substring(item.lastIndexOf(".") + 1) + "</option>";
-                    });
-
-                    $("#inEndpointsList").html(inEndpoints);
-
-                    //if service is already configured load its values
-                    if (insertedElement.length > 0) {
-                        var $selects = $('#connection_form select');
-                        $selects.each(function() {
-                            var inp = this.name
-                            var lmnt = $.grep(insertedElement[0].conf, function(e) {
-                                return e.name == inp;
-                            });
-
-                            $(this).val(lmnt[0].value);
-
-                            if (lmnt[0].value == "conn_route") {
-                                var lmnt = $.grep(insertedElement[0].conf, function(e) {
-                                    return e.name == "routing";
-                                });
-                                $('#routing').val(lmnt[0].value);
-                                $('#routing_field').show();
-                            }
-                        });
-                    }
-
-                    $('#connection_manager').show(200);
+                    connection_manager_reload(sourceId, targetId, insertedElement, objectId);
                 }
                 break;
         }
