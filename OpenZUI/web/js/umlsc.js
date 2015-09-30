@@ -112,14 +112,14 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
     var targetEndpoints = tf.in_ep;
 
 
-    var outEndpoints = "";
+    var outEndpoints = "<option value='blank' disabled selected></option>";
     sourceEndpoints.map(function(item) {
         outEndpoints += "<option value='" + item + "'>" + item + "</option>";
     });
     $("#outEndpointsList").html(outEndpoints);
 
 
-    var inEndpoints = "";
+    var inEndpoints = "<option value='blank' disabled selected></option>";
     targetEndpoints.map(function(item) {
         inEndpoints += "<option value='" + item + "'>" + item + "</option>";
     });
@@ -222,9 +222,6 @@ $(document).ready(function() {
     });
 
 
-
-    var lastAction = false;
-
     var myAdjustVertices = _.partial(adjustVertices, graph);
 
     // adjust vertices when a cell is removed or its source/target was changed
@@ -233,13 +230,18 @@ $(document).ready(function() {
     graph.on('remove', function(cell) {
         objectId = cell.id;
 
+        graphConf = $.grep(graphConf, function(e) {
+            return e.objectId != objectId;
+        });
+
         if ($("#service_form").hasClass(objectId)) {
             $('#service_manager').hide();
         }
         else if ($("#connection_form").hasClass(objectId)) {
             $('#connection_manager').hide();
+
         }
-    });
+    })
 
 
     graph.on('change:source change:target', function(cell) {
@@ -269,7 +271,7 @@ $(document).ready(function() {
                 return;
 
             }
-            else if (((sourceId == "transition-source") && (targetId == "transition-target")) || ((targetId == "transition-source") && (sourceId == "transition-target"))){
+            else if (((sourceId == "transition-source") && (targetId == "transition-target")) || ((targetId == "transition-source") && (sourceId == "transition-target"))) {
                 return;
             }
             else if (sourceId == targetId) {
@@ -450,13 +452,7 @@ $(document).ready(function() {
         }
     }
     );
-    
-    //on remove links / nodes update graphConf
-    graph.on('remove', function(cell){
-            graphConf = $.grep(graphConf, function(e){ return e.objectId != cell.id; });
-     })
 
-    
     //Add Service
     $("#openzooServiceSelectBtn").on('click', function() {
 
@@ -508,13 +504,14 @@ $(document).ready(function() {
         }
     });
 
-
+    var dirty = true;
     $("#submitTopoBtn").on('click', function() {
 
-        //var submitGraph = graph.toJSON();
+        if (graphConf.length == (graph.attributes.cells.models.length -2)){
+          dirty = false;
+        }
 
-        var graphComplete = {graph: graph, graphConfiguration: graphConf};
-        //console.log(graphComplete);
+        var graphComplete = {graph:graph, graphConfiguration:graphConf, fully_configured:dirty};
         localStorage.setItem("graphComplete", JSON.stringify(graphComplete));
         $("#topo-graph").val(JSON.stringify(graphComplete));
         $("#topoSubmitForm").submit();

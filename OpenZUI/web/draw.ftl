@@ -77,8 +77,9 @@
                   </select>
                   <label for="conn_mapping">connection type </label>
                   <select class="form-control" id="conn_mapping" name="conn_mapping">
+                    <option value="blank" disabled selected></option>
                     <option value="conn_all">All</option>
-                    <option value="conn_available" selected>Available</option>
+                    <option value="conn_available">Available</option>
                     <option value="conn_route">Route</option>
                   </select>
                   <div id="routing_field">
