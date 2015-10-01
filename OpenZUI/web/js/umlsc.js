@@ -416,8 +416,8 @@ $(document).ready(function() {
 
                             //if service is already configured load its values
                             if (insertedElement.length > 0) {
-                                var $inputs = $('#service_form :input');
-                                $inputs.each(function() {
+                                var inputs = $('#service_form :input');
+                                inputs.each(function() {
                                     if (this.type !== "submit") {
                                         var inp = this.name;
                                         var lmnt = $.grep(insertedElement[0].conf, function(e) {
