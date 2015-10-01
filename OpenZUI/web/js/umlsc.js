@@ -161,7 +161,11 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
                 return e.name == inp
             });
 
-            $(this).val(lmnt[0].value);
+            if (lmnt[0].value == "undefined") {
+                $(this).val("null");
+            } else {
+                $(this).val(lmnt[0].value);
+            }
 
             if (lmnt[0].value == "conn_route") {
 
@@ -422,7 +426,7 @@ $(document).ready(function() {
         insertedElement = $.grep(graphConf, function(e) {
             return e.objectId == objectId;
         });
-        
+
 
         switch (objectType) {
             case 'uml.State':
@@ -441,16 +445,6 @@ $(document).ready(function() {
 
                     for (var i = 0; i < warfiles.length; i++) {
                         if (warfiles[i].component_id == objectId) {
-                            // //get requires flieds from WAR
-                            // var reqs =  warfiles[i].requires;
-                            // $(".addToServiceForm").remove();
-                            // $("#service_form").removeClass();
-
-                            // for(var y = 0; y < reqs.length; y++){
-                            //     //console.log(reqs[y]);
-                            //     $("#service_form").prepend('<div class="addToServiceForm"><label for="'+reqs[y]+'">'+reqs[y]+'</label><input type="text" class="form-control" id="'+reqs[y]+'" name="'+reqs[y]+'"></div>');
-                            // }
-
 
                             //get requires flieds from WAR
                             if (warfiles[i].hasOwnProperty('requires')) {
@@ -462,11 +456,9 @@ $(document).ready(function() {
                                 }
                             }
 
-
-
                             $("#service_form").prepend('<div class="addToServiceForm"><label>Service <i>' + warfiles[i].component_id + '</i> configuration</label><hr></div>');
                             $("#service_form").addClass(objectId);
-                            
+
                             //console.log(insertedElement[0]);
                             //if service is already configured load its values
                             if (insertedElement.length > 0) {
@@ -475,13 +467,12 @@ $(document).ready(function() {
                                 inputs.each(function() {
                                     var inp = this.name;
                                     var lmnt = $.grep(insertedElement[0].conf, function(e) {
-                                        //console.log(e.value)
-                                        return e.name == inp;
+                                        return e.name == inp
                                     });
-                                    if (lmnt.length < 0) {
-                                        this.value = "null";
+                                    if (lmnt[0].value == "undefined") {
+                                        $(this).val("null");
                                     } else {
-                                        this.value = lmnt[0].value;
+                                        $(this).val(lmnt[0].value);
                                     }
                                 });
                             }
@@ -542,14 +533,16 @@ $(document).ready(function() {
     });
 
     $("#service_form, #connection_form").focusout(function(e) {
-
-        objectId = $(this).attr('class');
+        e.preventDefault();
+        //objectId = $(this).attr('class');
+        
         //in order the element has been previously saved, filter by the opposite predicate:
         graphConf = $.grep(graphConf, function(e) {
             return e.objectId != objectId;
         });
 
         var srvConf = $(this).serializeArray();
+        //console.log(objectId + " " + srvConf);
         graphConf.push({objectId: objectId, conf: srvConf});
     });
 
