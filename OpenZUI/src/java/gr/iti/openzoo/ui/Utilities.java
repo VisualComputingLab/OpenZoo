@@ -45,8 +45,6 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.Http11AprProtocol;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http11.Http11Protocol;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -57,8 +55,6 @@ import org.codehaus.jettison.json.JSONObject;
  * @author Dimitris Samaras <dimitris.samaras@iti.gr>
  */
 public class Utilities {
-
-    private static final Logger log = LogManager.getLogger(Utilities.class.getName());
 
     /**
      * Method callGET
@@ -92,15 +88,15 @@ public class Utilities {
         } catch (IOException e) {
             int codeMe = getFirstDigit(code);
             if (codeMe==4) {
-                log.error("IOException during GET (Client error): " + e + ", output: " + code);
+                System.err.println("IOException during GET (Client error): " + e + ", output: " + code);
             } else if (codeMe==5) {
-                log.error("IOException during GET (Server error): " + e + ", output: " + code);
+                System.err.println("IOException during GET (Server error): " + e + ", output: " + code);
             } else if (codeMe==0) {
-                log.info("First of its kind");
+                System.out.println("First of its kind");
                 output = "zero";
             }
         }
-        log.debug("ds. CallGet code:" + code + " output: " + output + " msg: " + msg);
+        System.out.println("ds. CallGet code:" + code + " output: " + output + " msg: " + msg);
         return output;
 
     }
@@ -222,12 +218,12 @@ public class Utilities {
 
         } catch (IOException e) {
             output = "IOException during DELETE: " + e;
-            log.error(output);
+            System.err.println(output);
         }
         // Check for Response 
         if ((code != 200 || code != 201) && !("OK".equals(msg))) {
             //output = "NOT OK RESPONSE";
-            log.error("Failed : HTTP error code : " + code);
+            System.err.println("Failed : HTTP error code : " + code);
             output = Integer.toString(code);
         }
         //System.out.println(output);
@@ -241,14 +237,14 @@ public class Utilities {
         try {
             hostname = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException ex) {
-            log.error("UnknownHostException during aquiring hostname: " + ex);
+            System.err.println("UnknownHostException during aquiring hostname: " + ex);
         }
 
         if (hostname.startsWith("localhost") || hostname.startsWith("127") || hostname.startsWith("0.") || hostname.startsWith("172")) {
             try {
                 hostname = new BufferedReader(new InputStreamReader(new URL("http://agentgatech.appspot.com").openStream())).readLine();
             } catch (IOException ex) {
-                log.error("IOException during aquiring hostname: " + ex);
+                System.err.println("IOException during aquiring hostname: " + ex);
             }
         }
 
@@ -278,17 +274,17 @@ public class Utilities {
                 }
             }
         } catch (MBeanException ex) {
-            log.error("MBeanException during retrieving tomcat port server:" + ex);
+            System.err.println("MBeanException during retrieving tomcat port server:" + ex);
         } catch (AttributeNotFoundException ex) {
-            log.error("AttributeNotFoundException during retrieving tomcat port server:" + ex);
+            System.err.println("AttributeNotFoundException during retrieving tomcat port server:" + ex);
         } catch (InstanceNotFoundException ex) {
-            log.error("InstanceNotFoundException during retrieving tomcat port server:" + ex);
+            System.err.println("InstanceNotFoundException during retrieving tomcat port server:" + ex);
         } catch (ReflectionException ex) {
-            log.error("ReflectionException during retrieving tomcat port server:" + ex);
+            System.err.println("ReflectionException during retrieving tomcat port server:" + ex);
         } catch (MalformedObjectNameException ex) {
-            log.error("MalformedObjectNameException during retrieving tomcat port server:" + ex);
+            System.err.println("MalformedObjectNameException during retrieving tomcat port server:" + ex);
         } catch (NullPointerException ex) {
-            log.error("NullPointerException during retrieving tomcat port server:" + ex);
+            System.err.println("NullPointerException during retrieving tomcat port server:" + ex);
         }
 
         return sPort;
@@ -307,7 +303,7 @@ public class Utilities {
                 sb.append(aLine);
             }
         } catch (IOException e) {
-            log.error("IOException during loading properties: " + e);
+            System.err.println("IOException during loading properties: " + e);
         } finally {
             if (in != null) {
                 try {
@@ -319,7 +315,7 @@ public class Utilities {
         try {
             json = new JSONObject(sb.toString());
         } catch (JSONException e) {
-            log.error("JSONException during loading properties: " + e);
+            System.err.println("JSONException during loading properties: " + e);
         }
 
         return json;
@@ -334,11 +330,11 @@ public class Utilities {
                 fileTemp.delete();
             }
             result = "File " + pathToFile + " deleted successfully";
-            log.info(result);
+            System.out.println(result);
         } catch (Exception e) {
             // if any error occurs
             result = "ERROR while deleting file: " + pathToFile + " " + e;
-            log.error(result);
+            System.err.println(result);
         }
     }
 
