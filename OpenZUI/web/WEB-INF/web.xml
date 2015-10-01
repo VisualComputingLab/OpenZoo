@@ -29,6 +29,10 @@
         <error-code>401</error-code>
         <location>/denied.jsp</location>
     </error-page>
+    <listener>
+        <description>ServletContextListener</description>
+        <listener-class>gr.iti.openzoo.ui.ServletListener</listener-class>
+    </listener>
     <servlet>
         <servlet-name>AuthorizationServlet</servlet-name>
         <servlet-class>gr.iti.openzoo.ui.servlets.AuthorizationServlet</servlet-class>

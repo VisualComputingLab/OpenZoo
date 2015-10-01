@@ -23,26 +23,16 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class KeyValueServlet extends HttpServlet {
 
+    private Utilities util;
     private static KeyValueCommunication kv;
-    private Utilities util = new Utilities();
+    private JSONObject properties;
     
     @Override
     public void init()
     {
-//        System.out.println("Calling KeyValueServlet init method");
-        
-        String webAppPath = getServletContext().getRealPath("/");
-//        System.out.println("Web app path is " + webAppPath);
-
-        JSONObject properties = util.getJSONFromFile(webAppPath + "/config.json");
-        try 
-        {        
-            kv = new KeyValueCommunication(properties.getJSONObject("keyvalue").getString("host"), properties.getJSONObject("keyvalue").getInt("port"));
-        }
-        catch (JSONException ex) 
-        {
-            System.err.println("ERROR retrieving keyValue server: " + ex);
-        }
+        util = (Utilities) getServletContext().getAttribute("util");
+        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        properties = (JSONObject) getServletContext().getAttribute("properties");
     }
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

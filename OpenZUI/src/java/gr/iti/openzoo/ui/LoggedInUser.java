@@ -24,9 +24,7 @@ public class LoggedInUser {
         
         JSONObject properties = util.getJSONFromFile(configPath);
         try 
-        {        
-//            kv = new KeyValueCommunication(properties.getJSONObject("keyvalue").getString("host"), properties.getJSONObject("keyvalue").getInt("port"));            
-                        
+        {
             String demouser = properties.getJSONObject("demouser").getString("username");
             String demopass = properties.getJSONObject("demouser").getString("passwd");
             

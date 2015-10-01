@@ -3,7 +3,6 @@ package gr.iti.openzoo.ui.servlets;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.RepositoryParameters;
 import gr.iti.openzoo.ui.Utilities;
@@ -22,7 +21,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -32,44 +30,21 @@ import org.codehaus.jettison.json.JSONObject;
 @MultipartConfig
 public class RepositoryServlet extends HttpServlet {
 
-    protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-    private Utilities util = new Utilities();
+    protected static Configuration cfg;
+    private Utilities util;
     private static KeyValueCommunication kv;
-    private static String localRepository = null;
+    private JSONObject properties;
+    private String localRepository;
     private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
     {
-//        System.out.println("Calling Repository init method");
-        try
-        {
-            String webAppPath = getServletContext().getRealPath("/");
-//            System.out.println("Web app path is " + webAppPath);
-            
-            JSONObject properties = util.getJSONFromFile(webAppPath + "/config.json");
-            try 
-            {        
-                kv = new KeyValueCommunication(properties.getJSONObject("keyvalue").getString("host"), properties.getJSONObject("keyvalue").getInt("port"));
-                localRepository = properties.getString("localRepository");
-                File fd = new File(localRepository);
-                if (!fd.exists()) fd.mkdir();
-                System.out.println("Using " + fd.getAbsolutePath() + " as local repository");
-            }
-            catch (JSONException ex) 
-            {
-                System.err.println("ERROR retrieving keyValue server: " + ex);
-            }           
-            
-            cfg.setDirectoryForTemplateLoading(new File(webAppPath));
-            cfg.setDefaultEncoding("UTF-8");
-            //cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-        }
-        catch (IOException e)
-        {
-            System.err.println("IOexception during initializing template configuration: " + e);
-        }
+        util = (Utilities) getServletContext().getAttribute("util");
+        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        cfg = (Configuration) getServletContext().getAttribute("cfg");
+        properties = (JSONObject) getServletContext().getAttribute("properties");
+        localRepository = (String) getServletContext().getAttribute("localRepository");
     }
     
     /**

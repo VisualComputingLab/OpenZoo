@@ -3,12 +3,10 @@ package gr.iti.openzoo.ui.servlets;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -19,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -28,44 +25,23 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class TopologiesServlet extends HttpServlet {
 
-    protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-    private Utilities util = new Utilities();
+    protected static Configuration cfg;
+    private Utilities util;
     private static KeyValueCommunication kv;
+    private JSONObject properties;
     private Deployer deployer;
     private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
     {
-        System.out.println("Calling Topologies init method");
-        try
-        {
-            String webAppPath = getServletContext().getRealPath("/");
-            System.out.println("Web app path is " + webAppPath);
-            
-            JSONObject properties = util.getJSONFromFile(webAppPath + "/config.json");
-            try 
-            {        
-                kv = new KeyValueCommunication(properties.getJSONObject("keyvalue").getString("host"), properties.getJSONObject("keyvalue").getInt("port"));
-            }
-            catch (JSONException ex) 
-            {
-                System.err.println("ERROR retrieving keyValue server: " + ex);
-            }           
-            
-            deployer = new Deployer(properties);
-            
-            cfg.setDirectoryForTemplateLoading(new File(webAppPath));
-            cfg.setDefaultEncoding("UTF-8");
-            //cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-        }
-        catch (IOException e)
-        {
-            System.err.println("IOexception during initializing template configuration: " + e);
-        }
-    }
-    
+        util = (Utilities) getServletContext().getAttribute("util");
+        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        cfg = (Configuration) getServletContext().getAttribute("cfg");
+        properties = (JSONObject) getServletContext().getAttribute("properties");
+        
+        deployer = new Deployer(properties, kv);
+    }    
     
     /**
      * Processes requests for both HTTP

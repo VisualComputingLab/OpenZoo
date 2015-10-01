@@ -34,13 +34,13 @@ public class Deployer {
     private static String kv_host;
     private static Integer kv_port;
     
-    public Deployer(JSONObject properties)
+    public Deployer(JSONObject properties, KeyValueCommunication thekv)
     {
         try 
         {
             kv_host = properties.getJSONObject("keyvalue").getString("host");
             kv_port = properties.getJSONObject("keyvalue").getInt("port");
-            kv = new KeyValueCommunication(kv_host, kv_port);
+            kv = thekv;
             repo = properties.getString("localRepository");
         }
         catch (JSONException ex) 

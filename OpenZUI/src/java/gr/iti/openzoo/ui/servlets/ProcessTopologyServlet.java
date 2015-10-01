@@ -7,8 +7,6 @@ import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,38 +20,18 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class ProcessTopologyServlet extends HttpServlet {
 
-    protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-    private Utilities util = new Utilities();
+    protected static Configuration cfg;
+    private Utilities util;
     private static KeyValueCommunication kv;
+    private JSONObject properties;
     
     @Override
     public void init()
     {
-        System.out.println("Calling ProcessTopology init method");
-        try
-        {
-            String webAppPath = getServletContext().getRealPath("/");
-            System.out.println("Web app path is " + webAppPath);
-            
-            JSONObject properties = util.getJSONFromFile(webAppPath + "/config.json");
-            try 
-            {        
-                kv = new KeyValueCommunication(properties.getJSONObject("keyvalue").getString("host"), properties.getJSONObject("keyvalue").getInt("port"));
-            }
-            catch (JSONException ex) 
-            {
-                System.err.println("ERROR retrieving keyValue server: " + ex);
-            }           
-            
-            cfg.setDirectoryForTemplateLoading(new File(webAppPath));
-            cfg.setDefaultEncoding("UTF-8");
-            //cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-        }
-        catch (IOException e)
-        {
-            System.err.println("IOexception during initializing template configuration: " + e);
-        }
+        util = (Utilities) getServletContext().getAttribute("util");
+        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        cfg = (Configuration) getServletContext().getAttribute("cfg");
+        properties = (JSONObject) getServletContext().getAttribute("properties");
     }
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
