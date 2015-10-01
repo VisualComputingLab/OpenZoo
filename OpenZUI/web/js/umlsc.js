@@ -1,3 +1,30 @@
+//LOOSE VARIABLES
+
+// the graph configuration object
+var graphConf = [];
+// flag in case topology's parameters are not fully set
+var dirty = true;
+// the element object from graphConf caught on pointerdown (click)
+var insertedElement = [];
+// graphical element id that is being manipulated
+var objectId = "";
+//read warfiles 'requires' fields from localStorage
+var wf = localStorage["WAR"];
+var warfiles = JSON.parse(wf);
+//buffer variable to pass target node ID  to routing_manager in case of connection -->route
+var targetId_for_routing = "";
+// intermediate object to store routing connections configuration
+var conn_route_keys_associations = {};
+
+//attributes' object to prettify links - transitions
+var linkAttrs = {
+    'fill': 'none',
+    'stroke-linejoin': 'round',
+    'stroke-width': '2',
+    'stroke': '#4b4a67'
+}
+
+
 function adjustVertices(graph, cell) {
 
     // If the cell is a view, find its model.
@@ -83,6 +110,7 @@ function adjustVertices(graph, cell) {
 
 function connection_manager_reload(sourceId, targetId, insertedElement, objectId) {
     //else close all forms and clean their fields to reload them
+
     $('#service_manager').hide();
     $('#connection_manager').hide();
     $('#routing_manager').hide();
@@ -90,14 +118,14 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
     $("#connection_form").removeClass();
     $("#inEndpointsList").empty();
     $("#outEndpointsList").empty();
-
     $('#conn_mapping').val('conn_available').change();
     $('#routing_field').hide();
-    $('#routing').val('');
+    $('#routing_keys').val('');
 
     $("#connection_form").prepend('<div class="addToConnectionForm"><label>Connection <i>' + sourceId + '</i> to <i>' + targetId + '</i> configuration</label><hr></div>');
     $("#connection_form").addClass(objectId);
 
+    targetId_for_routing = targetId;
 
     var s = localStorage[sourceId];
     var sf = JSON.parse(s);
@@ -166,20 +194,20 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
     $('#connection_manager').show(200);
 }
 
+
 function routing_manager_reload(targetId, objectId) {
-    var instancesNum = 0;
-    $.grep(graphConf, function(e) {
-        if (e.objectId == targetId) {
-            for (z = 0; z < e.conf.length; z++) {
-                if (e.conf[z].name == "instances") {
-
-                    instancesNum = e.conf[z].value;
-                    return e.conf[z].value
-
-                }
-            }
-        }
+    //console.log(targetId + " " + objectId)
+    var instances = $.grep(graphConf, function(e) {
+        return e.objectId == targetId
     })
+
+    var instancesNum = 0;
+
+    for (i = 0; i < instances[0].conf.length; i++) {
+        if (instances[0].conf[i].name == "instances") {
+            instancesNum = instances[0].conf[i].value
+        }
+    }
 
     var optionInstances = "<option value='blank' disabled selected></option>";
     for (y = 0; y < instancesNum; y++) {
@@ -192,14 +220,12 @@ function routing_manager_reload(targetId, objectId) {
 }
 
 
-
 var graph;
 var paper;
 
 
 $(document).ready(function() {
 
-    //graphConf=[];
     fetchServicesList();
 
     $('#service_manager').hide();
@@ -209,8 +235,6 @@ $(document).ready(function() {
 
 
     graph = new joint.dia.Graph;
-
-    var graphConf = [];
 
     paper = new joint.dia.Paper({
         el: $('#paper'),
@@ -238,14 +262,6 @@ $(document).ready(function() {
     }
 
     graph.addCells(services);
-
-    var linkAttrs = {
-        'fill': 'none',
-        'stroke-linejoin': 'round',
-        'stroke-width': '2',
-        'stroke': '#4b4a67'
-    }
-
 
     var topologyName = $('#topologyName').text();
     var url = "/OpenZUI/KeyValueServlet?action=topology&name=" + topologyName;
@@ -282,6 +298,7 @@ $(document).ready(function() {
         }
         else if ($("#connection_form").hasClass(objectId)) {
             $('#connection_manager').hide();
+            $('#routing_manager').hide();
 
         }
     })
@@ -396,14 +413,6 @@ $(document).ready(function() {
 
     paper.on('cell:pointerup', myAdjustVertices);
 
-
-    //Track all clicks
-    var objectId = "";
-    var insertedElement = [];
-
-    var wf = localStorage["WAR"];
-    var warfiles = JSON.parse(wf);
-
     paper.on('cell:pointerdown', function(cellView, evt, x, y) {
 
         objectId = cellView.model.id;
@@ -413,7 +422,7 @@ $(document).ready(function() {
         insertedElement = $.grep(graphConf, function(e) {
             return e.objectId == objectId;
         });
-
+        
 
         switch (objectType) {
             case 'uml.State':
@@ -457,16 +466,21 @@ $(document).ready(function() {
 
                             $("#service_form").prepend('<div class="addToServiceForm"><label>Service <i>' + warfiles[i].component_id + '</i> configuration</label><hr></div>');
                             $("#service_form").addClass(objectId);
-
+                            
+                            //console.log(insertedElement[0]);
                             //if service is already configured load its values
                             if (insertedElement.length > 0) {
+                                //console.log("in");
                                 var inputs = $('#service_form :input');
                                 inputs.each(function() {
-                                    if (this.type !== "submit") {
-                                        var inp = this.name;
-                                        var lmnt = $.grep(insertedElement[0].conf, function(e) {
-                                            return e.name == inp;
-                                        });
+                                    var inp = this.name;
+                                    var lmnt = $.grep(insertedElement[0].conf, function(e) {
+                                        //console.log(e.value)
+                                        return e.name == inp;
+                                    });
+                                    if (lmnt.length < 0) {
+                                        this.value = "null";
+                                    } else {
                                         this.value = lmnt[0].value;
                                     }
                                 });
@@ -543,16 +557,45 @@ $(document).ready(function() {
     $("#conn_mapping").change(function() {
         if ($("#conn_mapping").val() == "conn_route") {
             //$('#routing_field').show(200);
-            $('#routing_manager').show(200);
+            //$('#routing_manager').show(200);
+            objectId = $('#connection_form').attr('class');
+            routing_manager_reload(targetId_for_routing, objectId)
         }
         else {
-            $('#routing').val('')
+            $('#routing_keys').val('')
             //$('#routing_field').hide();
             $('#routing_manager').hide();
         }
+
+    })
+
+    $("#route_mapping_instance").change(function() {
+        /*
+         if( has keys for instance set){
+         //show
+         var lmnt = $.grep(conn_route_keys_associations, function(e){
+         return e.serviceId == targetId_for_routing
+         })
+         } 
+         else{
+         //new
+         
+         $("route_mapping_keys").val('');
+         }
+         $("#route_mapping_instance").val();
+         $("route_mapping_keys").val();
+         
+         //append route_mapping_keys to  $('#routing_keys').val('') if unique in array
+         
+         */
     });
 
-    var dirty = true;
+
+    $("#routing_form").focusout(function() {
+
+
+    });
+
     $("#submitTopoBtn").on('click', function() {
 
         if (graphConf.length == (graph.attributes.cells.models.length - 2)) {
@@ -570,4 +613,12 @@ $(document).ready(function() {
         $("#topo-graph").val('');
         $("#topoSubmitForm").submit();
     });
+
+    $('#showGraphConf').on('click', function() {
+
+        //console.log(graph.attributes.cells.models.length);
+        console.log(graphConf);
+
+    })
+
 });
