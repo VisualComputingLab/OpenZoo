@@ -80,12 +80,12 @@ function adjustVertices(graph, cell) {
             });
     }
 }
-;
 
 function connection_manager_reload(sourceId, targetId, insertedElement, objectId) {
     //else close all forms and clean their fields to reload them
     $('#service_manager').hide();
     $('#connection_manager').hide();
+    $('#routing_manager').hide();
     $(".addToConnectionForm").remove();
     $("#connection_form").removeClass();
     $("#inEndpointsList").empty();
@@ -94,8 +94,6 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
     $('#conn_mapping').val('conn_available').change();
     $('#routing_field').hide();
     $('#routing').val('');
-
-
 
     $("#connection_form").prepend('<div class="addToConnectionForm"><label>Connection <i>' + sourceId + '</i> to <i>' + targetId + '</i> configuration</label><hr></div>');
     $("#connection_form").addClass(objectId);
@@ -139,11 +137,27 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 
             if (lmnt[0].value == "conn_route") {
 
-                var lmnt = $.grep(insertedElement[0].conf, function(e) {
-                    return e.name == "routing"
-                });
-                $('#routing').val(lmnt[0].value);
-                $('#routing_field').show();
+
+
+
+                // SHOW ROUTING MANAGER AND LOAD VALUES
+                routing_manager_reload(targetId, objectId);
+                /*
+                 
+                 
+                 
+                 
+                 
+                 var lmnt = $.grep(insertedElement[0].conf, function(e){ 
+                 return e.name == "routing"
+                 });
+                 $('#routing').val(lmnt[0].value);
+                 $('#routing_field').show();
+                 
+                 
+                 */
+
+
 
             }
         })
@@ -151,6 +165,32 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 
     $('#connection_manager').show(200);
 }
+
+function routing_manager_reload(targetId, objectId) {
+    var instancesNum = 0;
+    $.grep(graphConf, function(e) {
+        if (e.objectId == targetId) {
+            for (z = 0; z < e.conf.length; z++) {
+                if (e.conf[z].name == "instances") {
+
+                    instancesNum = e.conf[z].value;
+                    return e.conf[z].value
+
+                }
+            }
+        }
+    })
+
+    var optionInstances = "<option value='blank' disabled selected></option>";
+    for (y = 0; y < instancesNum; y++) {
+        optionInstances += "<option value='instance" + (y + 1) + "'>instance" + (y + 1) + "</option>";
+    }
+
+    $("#route_mapping_instance").html(optionInstances);
+    $('#routing_manager').show();
+
+}
+
 
 
 var graph;
@@ -165,6 +205,7 @@ $(document).ready(function() {
     $('#service_manager').hide();
     $('#connection_manager').hide();
     $('#routing_field').hide();
+    $('#routing_manager').hide();
 
 
     graph = new joint.dia.Graph;
@@ -194,14 +235,16 @@ $(document).ready(function() {
             position: {x: 700, y: 20},
             size: {width: 30, height: 30}
         })
-    };
+    }
+
+    graph.addCells(services);
 
     var linkAttrs = {
         'fill': 'none',
         'stroke-linejoin': 'round',
         'stroke-width': '2',
         'stroke': '#4b4a67'
-    };
+    }
 
 
     var topologyName = $('#topologyName').text();
@@ -384,6 +427,8 @@ $(document).ready(function() {
                     $('#connection_manager').hide();
                     $('#instances').val('1');
                     $('#wpc').val('0');
+                    $(".addToServiceForm").remove();
+                    $("#service_form").removeClass();
 
                     for (var i = 0; i < warfiles.length; i++) {
                         if (warfiles[i].component_id == objectId) {
@@ -397,8 +442,7 @@ $(document).ready(function() {
                             //     $("#service_form").prepend('<div class="addToServiceForm"><label for="'+reqs[y]+'">'+reqs[y]+'</label><input type="text" class="form-control" id="'+reqs[y]+'" name="'+reqs[y]+'"></div>');
                             // }
 
-                            $(".addToServiceForm").remove();
-                            $("#service_form").removeClass();
+
                             //get requires flieds from WAR
                             if (warfiles[i].hasOwnProperty('requires')) {
                                 var reqs = warfiles[i].requires;
@@ -484,7 +528,9 @@ $(document).ready(function() {
     });
 
     $("#service_form, #connection_form").focusout(function(e) {
-        //in order the element has been previously saced filter by the opposite predicate:
+
+        objectId = $(this).attr('class');
+        //in order the element has been previously saved, filter by the opposite predicate:
         graphConf = $.grep(graphConf, function(e) {
             return e.objectId != objectId;
         });
@@ -496,22 +542,24 @@ $(document).ready(function() {
 
     $("#conn_mapping").change(function() {
         if ($("#conn_mapping").val() == "conn_route") {
-            $('#routing_field').show(200);
+            //$('#routing_field').show(200);
+            $('#routing_manager').show(200);
         }
         else {
-            $('#routing').val('');
-            $('#routing_field').hide();
+            $('#routing').val('')
+            //$('#routing_field').hide();
+            $('#routing_manager').hide();
         }
     });
 
     var dirty = true;
     $("#submitTopoBtn").on('click', function() {
 
-        if (graphConf.length == (graph.attributes.cells.models.length -2)){
-          dirty = false;
+        if (graphConf.length == (graph.attributes.cells.models.length - 2)) {
+            dirty = false;
         }
 
-        var graphComplete = {graph:graph, graphConfiguration:graphConf, fully_configured:dirty};
+        var graphComplete = {graph: graph, graphConfiguration: graphConf, fully_configured: dirty};
         localStorage.setItem("graphComplete", JSON.stringify(graphComplete));
         $("#topo-graph").val(JSON.stringify(graphComplete));
         $("#topoSubmitForm").submit();

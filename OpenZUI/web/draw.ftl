@@ -48,28 +48,36 @@
       
       </div>
         
-      <div class="row">
-        <div class="col-md-9">
-          <div id="paper" class="topologyBox">
-          </div>   
-        </div>
-        <div class="col-md-3"> 
-          <div class="row" id="service_manager">
-            <div class="well">
-              <form id="service_form"> 
-                <label for="instances">instances</label>
-                <input type="number" class="form-control" id="instances" name="instances" value="1" min="1" max="1000">
-                <label for="wpc">workers per core</label>
-                <input type="number" class="form-control" id="wpc" name="wpc"  value="0" min="0" max="16">
-              </form>
-            </div>
-          </div>
+                <div class="row">
 
-          <div class="row" id="connection_manager">
-            <div class="well">
-              <form id="connection_form">
-                <div class="form-group">
-                  <label for="outEndpointsList"> source </label>
+         
+            <div class="col-md-9">
+            <div id="paper" class="topologyBox">
+            </div>   
+          	</div>
+
+            <div class="col-md-3"> 
+              <div class="row" id="service_manager">
+
+              <div class="well ">
+                  <form id="service_form"> 
+
+                  <label for="instances">instances</label>
+                  <input type="number" class="form-control" id="instances" name="instances" value="1">
+                  
+                  <label for="wpc">workers per core</label>
+                  <input type="number" class="form-control" id="wpc" name="wpc" value="0">
+
+                  </form>
+              </div>
+            </div>
+              
+              <div class="row" id="connection_manager">
+
+               <div class="well">
+                  <form id="connection_form">
+                  <div class="form-group">
+                    <label for="outEndpointsList"> source </label>
                   <select class="form-control" id="outEndpointsList" name="outEndpointsList">
                   </select>
                   <label for="inEndpointsList"> target </label>
@@ -84,14 +92,35 @@
                   </select>
                   <div id="routing_field">
                     <label for="routing">routing keys</label>
-                    <input type="text" class="form-control" id="routing" name="routing">
+                  <input type="text" class="form-control" id="routing" name="routing">
                   </div>
-                </div>
-              </form>
+
+                  </div>
+
+                  </form>
+              </div>
+             </div>
+
+             <div class="row" id="routing_manager">
+
+              <div class="well ">
+                  <form id="routing_form"> 
+
+                  <label for="instance">instance</label>
+                  <select class="form-control" id="route_mapping_instance" name="route_mapping_instance">
+                  </select>
+                  
+                  <label for="keys">keys</label>
+                  <select class="form-control" id="route_mapping_keys" name="route_mapping_keys">
+                  </select>
+
+                  </form>
+              </div>
             </div>
-          </div>
-        </div>
-      </div><!--/row-->
+
+            </div>
+          	
+          </div><!--/row-->
           	
       <div class="clearfix"></div>
               
