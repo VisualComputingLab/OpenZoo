@@ -12,6 +12,7 @@ import com.mongodb.WriteConcern;
 import com.mongodb.util.JSON;
 import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.impl.OpenZooInputConnection;
+import gr.iti.openzoo.impl.OpenZooLoggingConnection;
 import gr.iti.openzoo.impl.OpenZooWorker;
 import java.net.UnknownHostException;
 import org.codehaus.jettison.json.JSONException;
@@ -24,6 +25,7 @@ import org.codehaus.jettison.json.JSONObject;
 public class DBWorker extends OpenZooWorker {
 
     private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "ep_from");
+    private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     private Mongo mongo;
     private DBCollection col_tweets, col_msgs;
@@ -33,6 +35,7 @@ public class DBWorker extends OpenZooWorker {
         super(threadName);
         
         log.debug("-- DBWorker()");
+        logConn.debug("Created...");
     }
     
     @Override
@@ -45,10 +48,12 @@ public class DBWorker extends OpenZooWorker {
     public void run()
     {
         log.debug("-- DBWorker.run");
+        logConn.debug("Running...");
         
         if (!inConn.init())
         {
             log.error("Error by endpoint initialization");
+            logConn.error("Error by endpoint initialization");
             return;
         }
         
@@ -73,6 +78,7 @@ public class DBWorker extends OpenZooWorker {
         catch (UnknownHostException ex) 
         {
             log.error("UnknownHostException during mongodb initialization: " + ex);
+            logConn.error("UnknownHostException during mongodb initialization: " + ex);
             return;
         }
         
@@ -87,11 +93,13 @@ public class DBWorker extends OpenZooWorker {
             if (message == null)
             {
                 log.error("Received null message, aborting");
+                logConn.error("Received null message, aborting");
                 break;
             }
             else if (message.isEmpty())
             {
                 log.error("Received empty message, discarding");
+                logConn.error("Received empty message, discarding");
                 inConn.ack(message);
                 continue;
             }
@@ -111,9 +119,9 @@ public class DBWorker extends OpenZooWorker {
 
                     switch (ret)
                     {
-                        case 0: log.info("Inserted record"); break;
-                        case 1: log.info("Updated record"); break;
-                        default:log.error("Could not save tweet url");
+                        case 0: log.info("Inserted record"); logConn.info("Inserted record"); break;
+                        case 1: log.info("Updated record"); logConn.info("Updated record"); break;
+                        default:log.error("Could not save tweet url"); logConn.error("Could not save tweet url"); 
                                 success = false;
                     }
                 }
@@ -125,6 +133,7 @@ public class DBWorker extends OpenZooWorker {
             catch (JSONException e)
             {
                 log.error("JSONException during saving tweet: " + e);
+                logConn.error("JSONException during saving tweet: " + e);
             }
             
             inConn.ack(message);
@@ -133,6 +142,7 @@ public class DBWorker extends OpenZooWorker {
         mongo.close();
 
         log.info("Died!");
+        logConn.info("Died!");
     }
     
     // -1: error, 0: created, 1: updated
@@ -161,6 +171,7 @@ public class DBWorker extends OpenZooWorker {
             catch (JSONException e)
             {
                 log.error("JSONException during updating record in MongoDB: " + e);
+                logConn.error("JSONException during updating record in MongoDB: " + e);
                 
                 return -1;
             }
@@ -176,11 +187,13 @@ public class DBWorker extends OpenZooWorker {
             catch (JSONException e)
             {
                 log.error("JSONException during creating record in MongoDB: " + e);
+                logConn.error("JSONException during creating record in MongoDB: " + e);
                 return -1;
             }
             catch (MongoException e)
             {
                 log.error("MongoException during creating record in MongoDB: " + e);
+                logConn.error("MongoException during creating record in MongoDB: " + e);
                 return -1;
             }
         }
@@ -197,6 +210,7 @@ public class DBWorker extends OpenZooWorker {
         catch (MongoException e)
         {
             log.error("Message " + msg.optString("id") + " is already there");
+            logConn.error("Message " + msg.optString("id") + " is already there");
             return false;
         }
         

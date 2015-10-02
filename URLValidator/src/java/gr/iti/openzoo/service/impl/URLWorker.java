@@ -2,6 +2,7 @@ package gr.iti.openzoo.service.impl;
 
 import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.impl.OpenZooInputConnection;
+import gr.iti.openzoo.impl.OpenZooLoggingConnection;
 import gr.iti.openzoo.impl.OpenZooOutputConnection;
 import gr.iti.openzoo.impl.OpenZooWorker;
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class URLWorker extends OpenZooWorker {
 
     private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "ep_from");
     private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "ep_to");
+    private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     private SimpleDateFormat dateFormatter;
     
@@ -37,6 +39,7 @@ public class URLWorker extends OpenZooWorker {
         super(threadName);
         
         log.debug("-- URLWorker()");
+        logConn.debug("Created...");
         
         //"Mon Jan 07 12:35:06 +0000 2013"
         dateFormatter = new SimpleDateFormat("EEE MMM d HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
@@ -73,6 +76,7 @@ public class URLWorker extends OpenZooWorker {
         catch (JSONException e)
         {
             log.error("JSONException: " + e);
+            logConn.error("JSONException: " + e);
             return false;
         }
     }
@@ -81,14 +85,17 @@ public class URLWorker extends OpenZooWorker {
     public void run()
     {
         log.debug("-- URLWorker.run");
+        logConn.debug("-- URLWorker.run");
         
         if (!inConn.init() || !outConn.init())
         {
             log.error("Error by endpoint initialization");
+            logConn.error("Error by endpoint initialization");
             return;
         }
         
         log.info("Born!");
+        logConn.info("Born!");
         Message message;
         
         while (!enough) 
@@ -98,11 +105,13 @@ public class URLWorker extends OpenZooWorker {
             if (message == null)
             {
                 log.error("Received null message, aborting");
+                logConn.error("Received null message, aborting");
                 break;
             }
             else if (message.isEmpty())
             {
                 log.error("Received empty message, discarding");
+                logConn.error("Received empty message, discarding");
                 inConn.ack(message);
                 continue;
             }
@@ -119,6 +128,7 @@ public class URLWorker extends OpenZooWorker {
         }
 
         log.info("Died!");
+        logConn.info("Died!");
     }
     
     private Boolean processTweet(JSONObject jobj)
@@ -143,6 +153,7 @@ public class URLWorker extends OpenZooWorker {
             catch (ParseException ex) 
             {
                 log.error("ParseException during parsing creation date in processTweet: " + ex);
+                logConn.error("ParseException during parsing creation date in processTweet: " + ex);
                 dd = new Date();
             }
             jobj.put("date_posted", dd.getTime());
@@ -191,6 +202,7 @@ public class URLWorker extends OpenZooWorker {
                 catch (IOException ex)
                 {
                     log.error("IOException during expanding URL: " + myURL + " : " + ex);
+                    logConn.error("IOException during expanding URL: " + myURL + " : " + ex);
                 }
             }
 
@@ -210,6 +222,7 @@ public class URLWorker extends OpenZooWorker {
         catch (JSONException ex)
         {
             log.error("JSONException during processing JSON object in consumer:" + ex);
+            logConn.error("JSONException during processing JSON object in consumer:" + ex);
             return false;
         }
         
@@ -242,7 +255,10 @@ public class URLWorker extends OpenZooWorker {
       	myStream.close();
         
         if (expandedURL==null || expandedURL.length()==0)
-            System.err.println("ERROR: Expanded URL is empty!!!");
+        {
+            log.error("ERROR: Expanded URL is empty!!!");
+            logConn.error("ERROR: Expanded URL is empty!!!");
+        }
         
         return expandedURL;
     }

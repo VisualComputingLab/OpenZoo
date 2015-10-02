@@ -51,6 +51,7 @@ public abstract class OpenZooWorker implements Runnable {
         kv = new KeyValueCommunication(serviceParams.getRedis().getHost(), serviceParams.getRedis().getPort());
                 
         factory.setHost(serviceParams.getRabbit().getHost());
+        factory.setPort(serviceParams.getRabbit().getPort());
         String usr = serviceParams.getRabbit().getUser();
         String pwd = serviceParams.getRabbit().getPasswd();
         if (usr != null && !usr.isEmpty())

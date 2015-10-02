@@ -1,10 +1,11 @@
 package gr.iti.openzoo.admin;
 
-import java.util.Map;
 import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
  *
@@ -15,7 +16,7 @@ public class KeyValueCommunication {
     protected static Logger log = LogManager.getLogger(KeyValueCommunication.class.getName());
     private final static int redis_timeout = 5000;
     
-    private Jedis jedis;
+    private JedisPool pool;
     String redis_host;
     int redis_port;
     
@@ -26,58 +27,32 @@ public class KeyValueCommunication {
         
         try
         {
-            jedis = new Jedis(redis_host, redis_port, redis_timeout);
-            
+            pool = new JedisPool(new JedisPoolConfig(), redis_host, redis_port, redis_timeout);
         }
         catch (Exception ex)
         {
             log.error("Redis is not accessible: " + ex);
-            jedis = null;
+            pool = null;
         }
     }
     
     public void stop()
     {
-        jedis.disconnect();
+        if (pool != null)
+            pool.destroy();
     }
-    
-    private void restartJedis()
-    {
-        log.info("Restarting Jedis");
         
-        try
+    public String getFirstKeyLike(String key)
+    {
+        try (Jedis jedis = pool.getResource())
         {
-            jedis.disconnect();
-            jedis = new Jedis(redis_host, redis_port, redis_timeout);
+            Set<String> ss = jedis.keys(key);
+            if (!ss.isEmpty())
+                return (String) (ss.toArray()[0]);
         }
         catch (Exception ex)
         {
-            log.error("Redis could not be restarted: " + ex);
-            jedis = null;
-        }
-    }
-    
-    public String getFirstKeyLike(String key)
-    {
-        if (jedis != null)
-        {
-            try
-            {
-                Set<String> ss = jedis.keys(key);
-                if (ss.isEmpty())
-                    return null;
-                else return (String) (ss.toArray()[0]);
-            }
-            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
-            {
-                restartJedis();
-                return null;
-            }
-            catch (Exception ex)
-            {
-                log.error("Redis exception (getFirstKeyLike): " + ex);
-                return null;
-            }
+            log.error("Redis exception (getFirstKeyLike): " + ex);
         }
         
         return null;
@@ -85,31 +60,20 @@ public class KeyValueCommunication {
     
     public String getFirstHashKeyLike(String key, String pattern)
     {
-        if (jedis != null)
+        try (Jedis jedis = pool.getResource())
         {
-            try
+            Set<String> ss = jedis.hkeys(key);
+            if (!ss.isEmpty())
             {
-                Set<String> ss = jedis.hkeys(key);
-                if (ss.isEmpty())
-                    return null;
-                else
+                for (String kk : ss)
                 {
-                    for (String kk : ss)
-                    {
-                        if (kk.matches(pattern)) return kk;
-                    }
+                    if (kk.matches(pattern)) return kk;
                 }
             }
-            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
-            {
-                restartJedis();
-                return null;
-            }
-            catch (Exception ex)
-            {
-                log.error("Redis exception (getFirstHashKeyLike): " + ex);
-                return null;
-            }
+        }
+        catch (Exception ex)
+        {
+            log.error("Redis exception (getFirstHashKeyLike): " + ex);
         }
         
         return null;
@@ -122,64 +86,42 @@ public class KeyValueCommunication {
     
     public String getValue(String key, boolean delete)
     {        
-        if (jedis != null)
+        try (Jedis jedis = pool.getResource())
         {
-            try
-            {
-                String value = jedis.get(key);
-                if (delete) jedis.del(key);
-                return value;
-            }
-            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
-            {
-                restartJedis();
-                return null;
-            }
-            catch (Exception ex)
-            {
-                log.error("Redis exception (getValue): " + ex);
-                return null;
-            }
+            String value = jedis.get(key);
+            if (delete) jedis.del(key);
+            return value;
         }
-        else return null;
+        catch (Exception ex)
+        {
+            log.error("Redis exception (getValue): " + ex);
+        }
+        
+        return null;
     }
         
     public void setValue(String key, String value)
     {        
-        if (jedis != null)
+        try (Jedis jedis = pool.getResource())
         {
-            try
-            {
-                jedis.setnx(key, value);
-                //jedis.expire(key, 604800);
-            }
-            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
-            {
-                restartJedis();
-            }
-            catch (Exception ex)
-            {
-                log.error("Redis exception (setValue): " + ex);
-            }
+            jedis.setnx(key, value);
+            //jedis.expire(key, 604800);
+        }
+        catch (Exception ex)
+        {
+            log.error("Redis exception (setValue): " + ex);
         }
     }
     
     public void incrValue(String key)
     {                
-        if (jedis != null)
+        try (Jedis jedis = pool.getResource())
         {
-            try
-            {
-                jedis.incr(key);
-            }
-            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
-            {
-                restartJedis();
-            }
-            catch (Exception ex)
-            {
-                log.error("Redis is not accessible (incrValue): " + ex);
-            }
+            jedis.incr(key);
+        }
+        catch (Exception ex)
+        {
+            log.error("Redis is not accessible (incrValue): " + ex);
         }
     }
     
@@ -190,44 +132,29 @@ public class KeyValueCommunication {
     
     public String getHashValue(String key, String field, boolean delete)
     {
-        if (jedis != null)
+        try (Jedis jedis = pool.getResource())
         {
-            try
-            {
-                String value = jedis.hget(key, field);
-                if (delete) jedis.hdel(key, field);
-                return value;
-            }
-            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
-            {
-                restartJedis();
-                return null;
-            }
-            catch (Exception ex)
-            {
-                log.error("Redis exception (getHashValue): " + ex);
-                return null;
-            }
+            String value = jedis.hget(key, field);
+            if (delete) jedis.hdel(key, field);
+            return value;
         }
-        else return null;
+        catch (Exception ex)
+        {
+            log.error("Redis exception (getHashValue): " + ex);
+        }
+        
+        return null;
     }
     
     public void setHashValue(String key, String field, String value)
     {        
-        if (jedis != null)
+        try (Jedis jedis = pool.getResource())
         {
-            try
-            {
-                jedis.hsetnx(key, field, value);
-            }
-            catch (redis.clients.jedis.exceptions.JedisConnectionException ex)
-            {
-                restartJedis();
-            }
-            catch (Exception ex)
-            {
-                log.error("Redis exception (setValue): " + ex);
-            }
+            jedis.hsetnx(key, field, value);
+        }
+        catch (Exception ex)
+        {
+            log.error("Redis exception (setValue): " + ex);
         }
     }
 }
