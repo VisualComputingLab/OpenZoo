@@ -8,9 +8,11 @@ var dirty = true;
 var insertedElement = [];
 // graphical element id that is being manipulated
 var objectId = "";
-var focusObjectId = '';
+var focusObjectId = "";
+var focusTargetId_for_routing = "";
 // buffer variable to pass target node ID  to routing_manager in case of connection -->route
 var targetId_for_routing = "";
+var target_in_endpoint="";
 // intermediate object to store routing connections configuration
 var conn_route_keys_associations = {};
 
@@ -164,30 +166,18 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
                 $(this).val("null");
             } else {
                 $(this).val(lmnt[0].value);
+                
+                //GET INENDPOINT VALUE
+                target_in_endpoint = $("#inEndpointsList").val();
+                
                 if (lmnt[0].value === "conn_route") {
                     // SHOW ROUTING MANAGER AND LOAD VALUES
-                    routing_manager_reload(targetId, objectId);
+                    routing_manager_reload(targetId, objectId, target_in_endpoint);
                     /*
-                     
-                     
-                     
-                     
-                     
-                     var lmnt = $.grep(insertedElement[0].conf, function(e){ 
-                     return e.name == "routing"
-                     });
-                     $('#routing').val(lmnt[0].value);
-                     $('#routing_field').show();
-                     
-                     
+                     LOAD VALUE FOR FIRST INSTANCE!!!
                      */
-
-
-
                 }
             }
-
-
         })
     }
 
@@ -195,8 +185,14 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 }
 
 
-function routing_manager_reload(targetId, objectId) {
+function routing_manager_reload(targetId, objectId,target_in_endpoint) {
     //console.log(targetId + " " + objectId)
+    if (!target_in_endpoint || target_in_endpoint === "null" || target_in_endpoint === "undefined"){
+        alertify.error("no target endpoint selected");
+        $("#conn_mapping").val('blank');
+        $("#inEndpointsList").focus();
+    }
+    else{
     var instances = $.grep(graphConf, function(e) {
         return e.objectId == targetId
     })
@@ -221,7 +217,7 @@ function routing_manager_reload(targetId, objectId) {
 
     $("#route_mapping_instance").html(optionInstances);
     $('#routing_manager').show();
-
+    }
 }
 
 
@@ -543,9 +539,10 @@ $(document).ready(function() {
 
     });
 
-    
-    $("#service_form, #connection_form").focusin(function(e) {
+
+    $("#service_form, #connection_form, #routing_form").focusin(function(e) {
         focusObjectId = objectId;
+        focusTargetId_for_routing = targetId_for_routing;
         //console.log("focusIn   " + focusObjectId)
     });
 
@@ -575,8 +572,15 @@ $(document).ready(function() {
 
     $("#conn_mapping").change(function() {
         if ($("#conn_mapping").val() == "conn_route") {
+            if (!target_in_endpoint || target_in_endpoint === "null" || target_in_endpoint === "undefined"){
+        alertify.error("no target endpoint selected");
+        $("#conn_mapping").val('blank');
+        $("#inEndpointsList").focus();
+    }
+    else{
             objectId = $('#connection_form').attr('class');
-            routing_manager_reload(targetId_for_routing, objectId)
+            routing_manager_reload(targetId_for_routing, objectId, target_in_endpoint)
+    }
         }
         else {
             $('#routing_keys').val('')
@@ -586,21 +590,34 @@ $(document).ready(function() {
 
     })
 
+$("#inEndpointsList").change(function(){
+    //GET INENDPOINT VALUE
+    target_in_endpoint = $(this).val();
+})
+
     $("#route_mapping_instance").change(function() {
-
-        //if( has keys for instance set){
-        //show
+        // HERE SHOW
+        var num = $("#route_mapping_instance").val();
         var lmnt = $.grep(conn_route_keys_associations, function(e) {
-            return e.serviceId == targetId_for_routing
+            return e.serviceId == focusTargetId_for_routing
         })
-//         } 
-//         else{
-        //new
 
-        $("route_mapping_keys").val('');
-        // }
-        $("#route_mapping_instance").val();
-        $("route_mapping_keys").val();
+        if (typeof lmnt[0] !== "undefined") {
+            for (f = 0; f < lmnt[0].instances.length; f++) {
+                if (lmnt[0].instances.instanceNum === num) {
+                    $("#route_mapping_keys").val(lmnt[0].instances.keys)
+                }
+            }
+        }
+        else {
+
+            $("route_mapping_keys").val('');
+        }
+
+
+        console.log(focusTargetId_for_routing + " " +
+                $("#route_mapping_instance").val() + " " +
+                $("#route_mapping_keys").val())
 
         //append route_mapping_keys to  $('#routing_keys').val('') if unique in array
 
@@ -609,8 +626,13 @@ $(document).ready(function() {
 
 
     $("#routing_form").focusout(function() {
+        // HERE STORE
 
+        if (focusTargetId_for_routing == targetId_for_routing) {
+            console.log("storing")
 
+            //conn_route_keys_associations.push({serviceId: focusTargetId_for_routing, conf: routeConf});
+        }
     });
 
     $("#submitTopoBtn").on('click', function() {

@@ -111,9 +111,8 @@
                   <select class="form-control" id="route_mapping_instance" name="route_mapping_instance">
                   </select>
                   
-                  <label for="keys">keys</label>
-                  <select class="form-control" id="route_mapping_keys" name="route_mapping_keys">
-                  </select>
+                   <label for="keys">keys <i>[comma separated]</i></label>
+                  <input type="text" class="form-control" id="route_mapping_keys" name="route_mapping_keys">
 
                   </form>
               </div>
