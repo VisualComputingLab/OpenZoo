@@ -1,6 +1,7 @@
 package gr.iti.openzoo.service.impl;
 
 import gr.iti.openzoo.admin.Message;
+import gr.iti.openzoo.impl.OpenZooLoggingConnection;
 import gr.iti.openzoo.impl.OpenZooLoneWorker;
 import gr.iti.openzoo.impl.OpenZooOutputConnection;
 import org.codehaus.jettison.json.JSONArray;
@@ -23,12 +24,14 @@ import twitter4j.json.DataObjectFactory;
 public class TwitterWorker extends OpenZooLoneWorker {
 
     private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "ep_to");
+    private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     public TwitterWorker(String threadName)
     {        
         super(threadName);
         
         log.debug("-- TwitterWorker()");
+        logConn.debug("Created...");
     }
     
     @Override
@@ -56,10 +59,12 @@ public class TwitterWorker extends OpenZooLoneWorker {
     public void run()
     {
         log.debug("-- TwitterWorker.run");
+        logConn.debug("Running...");
         
         if (!outConn.init())
         {
             log.error("Error by endpoint initialization");
+            logConn.error("Error by endpoint initialization");
             return;
         }
         
@@ -76,16 +81,19 @@ public class TwitterWorker extends OpenZooLoneWorker {
         catch (JSONException e)
         {
             log.error("JSONException while reading keywords from KV: " + e);
+            logConn.error("JSONException while reading keywords from KV: " + e);
             return;
         }
         
         log.info("Read required parameters from KV: " + conKey + " " + conSec + " " + accTok + " " + accTokSec + " " + keywords);
+        logConn.info("Read required parameters from KV: " + conKey + " " + conSec + " " + accTok + " " + accTokSec + " " + keywords);
         
         Configuration config = createConfiguration(conKey, conSec, accTok, accTokSec);
         
         if (keywords.length() == 0)
         {
             log.error("No keywords given, aborting");
+            logConn.error("No keywords given, aborting");
             return;
         }
 
@@ -137,6 +145,7 @@ public class TwitterWorker extends OpenZooLoneWorker {
                 catch (JSONException ex) 
                 {
                     log.error("JSONException during sending twitter message to rabbitmq: " + ex);
+                    logConn.error("JSONException during sending twitter message to rabbitmq: " + ex);
                 } 
             }
 
@@ -146,6 +155,7 @@ public class TwitterWorker extends OpenZooLoneWorker {
             public void onTrackLimitationNotice(int numberOfLimitedStatuses)
             {
                 log.error("onTrackLimitationNotice in StatusListener: numberOfLimitedStatuses = " + numberOfLimitedStatuses);
+                logConn.error("onTrackLimitationNotice in StatusListener: numberOfLimitedStatuses = " + numberOfLimitedStatuses);
             }
             @Override
             public void onScrubGeo(long userId, long upToStatusId) {}
@@ -153,10 +163,12 @@ public class TwitterWorker extends OpenZooLoneWorker {
             public void onException(Exception ex)
             {
                 log.error("Exception in StatusListener: " + ex);
+                logConn.error("Exception in StatusListener: " + ex);
             }
         };
 
         log.info("Born!");
+        logConn.info("Born!");
         
         TwitterStream twitterStream = new TwitterStreamFactory(config).getInstance();
         twitterStream.addListener(listener);
@@ -165,6 +177,7 @@ public class TwitterWorker extends OpenZooLoneWorker {
 
         fq.track(kwordarray);
         log.info("I will listen for the following keywords: " + allkwordinastring);
+        logConn.info("I will listen for the following keywords: " + allkwordinastring);
 
         twitterStream.filter(fq);
         
@@ -178,15 +191,18 @@ public class TwitterWorker extends OpenZooLoneWorker {
             catch (InterruptedException e)
             {
                 log.info("Worker woke up");
+                logConn.info("Worker woke up");
             }
         }
         
         log.info("Cleaning up twitter stream");
+        logConn.info("Cleaning up twitter stream");
         twitterStream.cleanUp();
         twitter4j.internal.json.DataObjectFactoryUtil.clearThreadLocalMap();
         twitterStream.shutdown();
 
         log.info("Died!");
+        logConn.info("Died!");
     }
 
     @Override
