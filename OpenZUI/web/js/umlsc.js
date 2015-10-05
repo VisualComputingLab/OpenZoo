@@ -8,11 +8,16 @@ var dirty = true;
 var insertedElement = [];
 // graphical element id that is being manipulated
 var objectId = "";
+//objectId on form focus IN
 var focusObjectId = "";
-var focusTargetId_for_routing = "";
 // buffer variable to pass target node ID  to routing_manager in case of connection -->route
 var targetId_for_routing = "";
-var target_in_endpoint="";
+//targetId on form focus IN
+var focusTargetId_for_routing = "";
+var target_in_endpoint = "";
+//The routing instance selected in routing form
+var focusRouting_instance = "";
+var routing_instance = "";
 // intermediate object to store routing connections configuration
 var conn_route_keys_associations = {};
 
@@ -130,7 +135,7 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 
     var s = localStorage[sourceId];
     var sf = JSON.parse(s);
-    var sourceEndpoints = sf.out_ep
+    var sourceEndpoints = sf.out_ep;
 
 
     var t = localStorage[targetId];
@@ -166,16 +171,14 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
                 $(this).val("null");
             } else {
                 $(this).val(lmnt[0].value);
-                
+
                 //GET INENDPOINT VALUE
                 target_in_endpoint = $("#inEndpointsList").val();
-                
+
                 if (lmnt[0].value === "conn_route") {
                     // SHOW ROUTING MANAGER AND LOAD VALUES
-                    routing_manager_reload(targetId, objectId, target_in_endpoint);
-                    /*
-                     LOAD VALUE FOR FIRST INSTANCE!!!
-                     */
+                    routing_manager_reload(targetId_for_routing, target_in_endpoint);
+
                 }
             }
         })
@@ -185,41 +188,76 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 }
 
 
-function routing_manager_reload(targetId, objectId,target_in_endpoint) {
+function routing_manager_reload(targetId, target_in_endpoint) {
     //console.log(targetId + " " + objectId)
-    if (!target_in_endpoint || target_in_endpoint === "null" || target_in_endpoint === "undefined"){
+    if (!target_in_endpoint || target_in_endpoint === "null" || target_in_endpoint === "undefined") {
         alertify.error("no target endpoint selected");
         $("#conn_mapping").val('blank');
         $("#inEndpointsList").focus();
     }
-    else{
-    var instances = $.grep(graphConf, function(e) {
-        return e.objectId == targetId
-    })
+    else {
+        var instances = $.grep(graphConf, function(e) {
+            return e.objectId == targetId
+        })
 
-    var instancesNum = 0;
+        var instancesNum = 0;
 
-    if (typeof instances[0] === 'undefined') {
-        alertify.log("target instances not set");
-        instancesNum = 1;
-    } else {
-        for (i = 0; i < instances[0].conf.length; i++) {
-            if (instances[0].conf[i].name == "instances") {
-                instancesNum = instances[0].conf[i].value
+        if (typeof instances[0] === 'undefined') {
+            alertify.log("target instances not set");
+            instancesNum = 1;
+        } else {
+            focusTargetId_for_routing = targetId;
+            for (i = 0; i < instances[0].conf.length; i++) {
+                if (instances[0].conf[i].name == "instances") {
+                    instancesNum = instances[0].conf[i].value
+                }
             }
         }
-    }
 
-    var optionInstances = "<option value='blank' disabled selected></option>";
-    for (y = 0; y < instancesNum; y++) {
-        optionInstances += "<option value='instance" + (y + 1) + "'>instance" + (y + 1) + "</option>";
-    }
+        var optionInstances = "<option value='blank' disabled selected></option>";
+        for (y = 0; y < instancesNum; y++) {
+            optionInstances += "<option value='instance" + (y + 1) + "'>instance" + (y + 1) + "</option>";
+        }
 
-    $("#route_mapping_instance").html(optionInstances);
-    $('#routing_manager').show();
+        $("#route_mapping_instance").html(optionInstances);
+        
+        /*
+         LOAD VALUE FOR FIRST INSTANCE!!!
+         
+        if (not empty config ){
+            $("#route_mapping_instance").val("instance" + (y + 1));
+        }
+         */
+        show_key_vals();
+
+        $('#routing_manager').show();
     }
 }
 
+function show_key_vals() {
+    $("#route_mapping_keys").val('');
+    routing_instance = $("#route_mapping_instance").val();
+    
+    console.log("load val "+ focusTargetId_for_routing+ " " +routing_instance)
+    var lmnt = $.grep(conn_route_keys_associations, function(e) {
+        return e.serviceId == focusTargetId_for_routing
+    })
+
+    if (typeof lmnt[0] !== "undefined") {
+        for (f = 0; f < lmnt[0].instances.length; f++) {
+            if (lmnt[0].instances[f].instance === routing_instance) {
+                $("#route_mapping_keys").val(lmnt[0].instances[f].keys);
+            }
+        }
+    }
+}
+
+function update_service_routing_keys(targetId, keys){
+    /*
+     * 
+     * parse string, insert to array if unique, update array in graphConf
+     */
+}
 
 var graph;
 var paper;
@@ -546,7 +584,7 @@ $(document).ready(function() {
         //console.log("focusIn   " + focusObjectId)
     });
 
-    $("#service_form, #connection_form").focusout(function(e) {
+    $("#service_form, #connection_form").focusout(function() {
         //console.log("focusOut   " + objectId)
         //e.preventDefault();
         if (objectId === focusObjectId) {
@@ -572,15 +610,15 @@ $(document).ready(function() {
 
     $("#conn_mapping").change(function() {
         if ($("#conn_mapping").val() == "conn_route") {
-            if (!target_in_endpoint || target_in_endpoint === "null" || target_in_endpoint === "undefined"){
-        alertify.error("no target endpoint selected");
-        $("#conn_mapping").val('blank');
-        $("#inEndpointsList").focus();
-    }
-    else{
-            objectId = $('#connection_form').attr('class');
-            routing_manager_reload(targetId_for_routing, objectId, target_in_endpoint)
-    }
+            if (!target_in_endpoint || target_in_endpoint === "null" || target_in_endpoint === "undefined") {
+                alertify.error("no target endpoint selected");
+                $("#conn_mapping").val('blank');
+                $("#inEndpointsList").focus();
+            }
+            else {
+                objectId = $('#connection_form').attr('class');
+                routing_manager_reload(targetId_for_routing, target_in_endpoint)
+            }
         }
         else {
             $('#routing_keys').val('')
@@ -590,34 +628,29 @@ $(document).ready(function() {
 
     })
 
-$("#inEndpointsList").change(function(){
-    //GET INENDPOINT VALUE
-    target_in_endpoint = $(this).val();
-})
+    $("#inEndpointsList").change(function() {
+        if ($("#routing_manager").is(":visible") == true) {
+
+            /*If while configuring routing connection parameters target ep is changed, instance and routing keys parameters will not be saved properly*/
+            alertify.error("Target endpoint cannot be changed on routing configuration. Change connection type to restart routing process.");
+            $(this).val(target_in_endpoint);
+
+        } else {
+            //GET INENDPOINT VALUE
+            target_in_endpoint = $(this).val();
+        }
+    })
 
     $("#route_mapping_instance").change(function() {
-        // HERE SHOW
-        var num = $("#route_mapping_instance").val();
-        var lmnt = $.grep(conn_route_keys_associations, function(e) {
-            return e.serviceId == focusTargetId_for_routing
-        })
+        console.log("change");
+        show_key_vals();
 
-        if (typeof lmnt[0] !== "undefined") {
-            for (f = 0; f < lmnt[0].instances.length; f++) {
-                if (lmnt[0].instances.instanceNum === num) {
-                    $("#route_mapping_keys").val(lmnt[0].instances.keys)
-                }
-            }
-        }
-        else {
+        /*
+         console.log(focusTargetId_for_routing + " " +
+         $("#route_mapping_instance").val() + " " +
+         $("#route_mapping_keys").val())
+         */
 
-            $("route_mapping_keys").val('');
-        }
-
-
-        console.log(focusTargetId_for_routing + " " +
-                $("#route_mapping_instance").val() + " " +
-                $("#route_mapping_keys").val())
 
         //append route_mapping_keys to  $('#routing_keys').val('') if unique in array
 
@@ -625,15 +658,52 @@ $("#inEndpointsList").change(function(){
     });
 
 
-    $("#routing_form").focusout(function() {
-        // HERE STORE
+    $("#route_mapping_keys").focusout(function() {
 
-        if (focusTargetId_for_routing == targetId_for_routing) {
-            console.log("storing")
+        var kvlmnt_instances_el = [];
+        var kvlmnt_el = [];
 
-            //conn_route_keys_associations.push({serviceId: focusTargetId_for_routing, conf: routeConf});
+        if (focusTargetId_for_routing === targetId_for_routing) {
+            console.log("storing");
+
+            //look for service
+            var kvlmnt = $.grep(conn_route_keys_associations, function(e) {
+                return e.serviceId === focusTargetId_for_routing
+            });
+
+            if (typeof kvlmnt[0] !== 'undefined') {
+                //delete old values for instance
+                var kvlmnt_instances = $.grep(kvlmnt[0].instances, function(e) {
+                    return e.instance !== routing_instance
+                });
+ 
+                if (typeof kvlmnt_instances[0] !== "undefined"){
+                    kvlmnt_instances_el=kvlmnt_instances;
+                }
+            }
+
+            var keys = $("#route_mapping_keys").val();
+
+            //write new value for instance
+            kvlmnt_instances_el.push({instance: routing_instance, endpoint: target_in_endpoint, keys: keys});
+
+            //delete old serivce
+            kvlmnt = $.grep(conn_route_keys_associations, function(e) {
+                return e.serviceId !== focusTargetId_for_routing
+            });
+            if (typeof kvlmnt[0] !== "undefined"){
+                kvlmnt_el=kvlmnt;
+            }
+            //write new service
+            kvlmnt_el.push({serviceId: focusTargetId_for_routing, instances: kvlmnt_instances_el});
+
+            //update final object
+            conn_route_keys_associations = kvlmnt_el;
+                        
+            update_service_routing_keys(focusTargetId_for_routing, keys);
         }
     });
+
 
     $("#submitTopoBtn").on('click', function() {
 
