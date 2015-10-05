@@ -8,15 +8,13 @@ var dirty = true;
 var insertedElement = [];
 // graphical element id that is being manipulated
 var objectId = "";
-//read warfiles 'requires' fields from localStorage
-var wf = localStorage["WAR"];
-var warfiles = JSON.parse(wf);
-//buffer variable to pass target node ID  to routing_manager in case of connection -->route
+var focusObjectId = '';
+// buffer variable to pass target node ID  to routing_manager in case of connection -->route
 var targetId_for_routing = "";
 // intermediate object to store routing connections configuration
 var conn_route_keys_associations = {};
 
-//attributes' object to prettify links - transitions
+// attributes' object to prettify links - transitions
 var linkAttrs = {
     'fill': 'none',
     'stroke-linejoin': 'round',
@@ -113,6 +111,7 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 
     $('#service_manager').hide();
     $('#connection_manager').hide();
+    $('#routing_field').hide();
     $('#routing_manager').hide();
     $(".addToConnectionForm").remove();
     $("#connection_form").removeClass();
@@ -140,58 +139,55 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 
     var outEndpoints = "<option value='blank' disabled selected></option>";
     sourceEndpoints.map(function(item) {
-        outEndpoints += "<option value='" + item + "'>" + item + "</option>";
+        outEndpoints += "<option value='" + item + "'>" + item.substring(item.lastIndexOf(".") + 1) + "</option>";
     });
     $("#outEndpointsList").html(outEndpoints);
 
 
     var inEndpoints = "<option value='blank' disabled selected></option>";
     targetEndpoints.map(function(item) {
-        inEndpoints += "<option value='" + item + "'>" + item + "</option>";
+        inEndpoints += "<option value='" + item + "'>" + item.substring(item.lastIndexOf(".") + 1) + "</option>";
     });
 
     $("#inEndpointsList").html(inEndpoints);
 
     //if service is already configured load its values
     if (insertedElement.length > 0) {
-        var $selects = $('#connection_form select');
-        $selects.each(function() {
+        var selects = $('#connection_form select');
+        selects.each(function() {
             var inp = this.name
             var lmnt = $.grep(insertedElement[0].conf, function(e) {
                 return e.name == inp
             });
 
-            if (lmnt[0].value == "undefined") {
+            if (typeof lmnt[0] === 'undefined') {
                 $(this).val("null");
             } else {
                 $(this).val(lmnt[0].value);
+                if (lmnt[0].value === "conn_route") {
+                    // SHOW ROUTING MANAGER AND LOAD VALUES
+                    routing_manager_reload(targetId, objectId);
+                    /*
+                     
+                     
+                     
+                     
+                     
+                     var lmnt = $.grep(insertedElement[0].conf, function(e){ 
+                     return e.name == "routing"
+                     });
+                     $('#routing').val(lmnt[0].value);
+                     $('#routing_field').show();
+                     
+                     
+                     */
+
+
+
+                }
             }
 
-            if (lmnt[0].value == "conn_route") {
 
-
-
-
-                // SHOW ROUTING MANAGER AND LOAD VALUES
-                routing_manager_reload(targetId, objectId);
-                /*
-                 
-                 
-                 
-                 
-                 
-                 var lmnt = $.grep(insertedElement[0].conf, function(e){ 
-                 return e.name == "routing"
-                 });
-                 $('#routing').val(lmnt[0].value);
-                 $('#routing_field').show();
-                 
-                 
-                 */
-
-
-
-            }
         })
     }
 
@@ -207,9 +203,14 @@ function routing_manager_reload(targetId, objectId) {
 
     var instancesNum = 0;
 
-    for (i = 0; i < instances[0].conf.length; i++) {
-        if (instances[0].conf[i].name == "instances") {
-            instancesNum = instances[0].conf[i].value
+    if (typeof instances[0] === 'undefined') {
+        alertify.log("target instances not set");
+        instancesNum = 1;
+    } else {
+        for (i = 0; i < instances[0].conf.length; i++) {
+            if (instances[0].conf[i].name == "instances") {
+                instancesNum = instances[0].conf[i].value
+            }
         }
     }
 
@@ -231,6 +232,10 @@ var paper;
 $(document).ready(function() {
 
     fetchServicesList();
+
+    // read warfiles 'requires' fields from localStorage -- They have to have been fetched first
+    var wf = localStorage["WAR"];
+    var warfiles = JSON.parse(wf);
 
     $('#service_manager').hide();
     $('#connection_manager').hide();
@@ -272,7 +277,7 @@ $(document).ready(function() {
 
     $.getJSON(url, function(result) {
         if ("graph_object" in result["response"]) {
-            console.log(result);
+            //console.log(result);
             var graphcomplete = result["response"]["graph_object"];
             graph.fromJSON(graphcomplete.graph);
             //graph = graphcomplete.graph;
@@ -302,7 +307,9 @@ $(document).ready(function() {
         }
         else if ($("#connection_form").hasClass(objectId)) {
             $('#connection_manager').hide();
+            $('#routing_field').hide();
             $('#routing_manager').hide();
+
 
         }
     })
@@ -312,6 +319,8 @@ $(document).ready(function() {
         //console.log('change');
 
         $('#connection_manager').hide();
+        $('#routing_field').hide();
+        $('#routing_manager').hide();
 
         // console.log(cell);
         if (("id" in cell.attributes.source) && ("id" in cell.attributes.target)) {
@@ -329,9 +338,9 @@ $(document).ready(function() {
             var sourceId = cell.attributes.source.id;
             var targetId = cell.attributes.target.id;
 
-            if (sourceId == "undefined" || targetId == "undefined") {
+            if (sourceId === "undefined" || targetId === "undefined") {
 
-                console.log("...");
+                //console.log("...");
                 return;
 
             }
@@ -340,7 +349,7 @@ $(document).ready(function() {
             }
             else if (sourceId == targetId) {
 
-                alert("no self links allowed")
+                alertify.error("no self links allowed")
                 cell.remove();
 
             }
@@ -356,7 +365,7 @@ $(document).ready(function() {
 
                 }
                 else {
-                    //alert(" case 0 no target endpoints defined")
+                    alertify.error("no target endpoints defined")
                     cell.remove();
                 }
                 //console.log(tf.in_ep);
@@ -373,7 +382,7 @@ $(document).ready(function() {
                 }
 
                 else {
-                    //alert(" case 1 no source endpoints defined")
+                    alertify.error("no source endpoints defined")
                     cell.remove();
                 }
 
@@ -391,13 +400,13 @@ $(document).ready(function() {
 
                     if (tf.in_ep.length <= 0) {
 
-                        //alert(" case 2 no target endpoints defined")
+                        alertify.error("no target endpoints defined")
                         cell.remove();
 
                     }
                     else if (sf.out_ep.length <= 0) {
 
-                        //alert(" case 2 no source endpoints defined")
+                        alertify.error("no source endpoints defined")
                         cell.remove();
 
                     }
@@ -438,6 +447,8 @@ $(document).ready(function() {
                     //else close all forms and clean their fields to reload them/
                     $('#service_manager').hide();
                     $('#connection_manager').hide();
+                    $('#routing_field').hide();
+                    $('#routing_manager').hide();
                     $('#instances').val('1');
                     $('#wpc').val('0');
                     $(".addToServiceForm").remove();
@@ -469,7 +480,7 @@ $(document).ready(function() {
                                     var lmnt = $.grep(insertedElement[0].conf, function(e) {
                                         return e.name == inp
                                     });
-                                    if (lmnt[0].value == "undefined") {
+                                    if (typeof lmnt[0] === "undefined") {
                                         $(this).val("null");
                                     } else {
                                         $(this).val(lmnt[0].value);
@@ -521,7 +532,7 @@ $(document).ready(function() {
         //console.log(services);
     });
 
-    //Add Link
+
     $("#addLinkBtn").on('click', function() {
 
         var transitons = [
@@ -532,25 +543,38 @@ $(document).ready(function() {
 
     });
 
-    $("#service_form, #connection_form").focusout(function(e) {
-        e.preventDefault();
-        //objectId = $(this).attr('class');
-        
-        //in order the element has been previously saved, filter by the opposite predicate:
-        graphConf = $.grep(graphConf, function(e) {
-            return e.objectId != objectId;
-        });
+    
+    $("#service_form, #connection_form").focusin(function(e) {
+        focusObjectId = objectId;
+        //console.log("focusIn   " + focusObjectId)
+    });
 
-        var srvConf = $(this).serializeArray();
-        //console.log(objectId + " " + srvConf);
-        graphConf.push({objectId: objectId, conf: srvConf});
+    $("#service_form, #connection_form").focusout(function(e) {
+        //console.log("focusOut   " + objectId)
+        //e.preventDefault();
+        if (objectId === focusObjectId) {
+            var srvConf = "";
+            //objectId = $(this).attr('class');
+
+            //in order the element has been previously saved, filter by the opposite predicate:
+            graphConf = $.grep(graphConf, function(e) {
+                return e.objectId != focusObjectId;
+            });
+
+            srvConf = $(this).serializeArray();
+            //console.log(objectId);
+            //console.log(srvConf);
+            graphConf.push({objectId: focusObjectId, conf: srvConf});
+        }
+        /*
+         * if i don't move out from the field the value is not passed to srvConf on focus out.
+         * FORCE READ ALL VALUES FROM FORM?
+         */
     });
 
 
     $("#conn_mapping").change(function() {
         if ($("#conn_mapping").val() == "conn_route") {
-            //$('#routing_field').show(200);
-            //$('#routing_manager').show(200);
             objectId = $('#connection_form').attr('class');
             routing_manager_reload(targetId_for_routing, objectId)
         }
@@ -563,24 +587,24 @@ $(document).ready(function() {
     })
 
     $("#route_mapping_instance").change(function() {
-        /*
-         if( has keys for instance set){
-         //show
-         var lmnt = $.grep(conn_route_keys_associations, function(e){
-         return e.serviceId == targetId_for_routing
-         })
-         } 
-         else{
-         //new
-         
-         $("route_mapping_keys").val('');
-         }
-         $("#route_mapping_instance").val();
-         $("route_mapping_keys").val();
-         
-         //append route_mapping_keys to  $('#routing_keys').val('') if unique in array
-         
-         */
+
+        //if( has keys for instance set){
+        //show
+        var lmnt = $.grep(conn_route_keys_associations, function(e) {
+            return e.serviceId == targetId_for_routing
+        })
+//         } 
+//         else{
+        //new
+
+        $("route_mapping_keys").val('');
+        // }
+        $("#route_mapping_instance").val();
+        $("route_mapping_keys").val();
+
+        //append route_mapping_keys to  $('#routing_keys').val('') if unique in array
+
+
     });
 
 
