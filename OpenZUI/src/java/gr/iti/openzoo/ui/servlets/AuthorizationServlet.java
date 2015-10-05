@@ -33,6 +33,9 @@ public class AuthorizationServlet extends HttpServlet {
         ServletContext context = request.getServletContext();
         String configPath = context.getRealPath("/config.json");
         
+        // setting inactive interval (time until session is invalidated) from 30 min to 1h
+        request.getSession().setMaxInactiveInterval(3600);
+        
         LoggedInUser myBean = new LoggedInUser(email, passwd, configPath);
         request.getSession().setAttribute("userBean", myBean);
         

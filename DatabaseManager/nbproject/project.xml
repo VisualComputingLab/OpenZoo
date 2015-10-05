@@ -36,11 +36,11 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jedis-2.6.2.jar}</file>
+                    <file>${file.reference.rabbitmq-client.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.rabbitmq-client.jar}</file>
+                    <file>${file.reference.jedis-2.7.3.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">

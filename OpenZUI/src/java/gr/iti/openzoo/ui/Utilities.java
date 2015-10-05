@@ -96,7 +96,7 @@ public class Utilities {
                 output = "zero";
             }
         }
-        System.out.println("ds. CallGet code:" + code + " output: " + output + " msg: " + msg);
+//        System.out.println("ds. CallGet code:" + code + " output: " + output + " msg: " + msg);
         return output;
 
     }
