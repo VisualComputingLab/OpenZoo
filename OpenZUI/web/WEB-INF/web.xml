@@ -19,6 +19,10 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>MemberLoginFilter</filter-name>
+        <url-pattern>/Topologies</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>MemberLoginFilter</filter-name>
         <url-pattern>/DrawTopology</url-pattern>
     </filter-mapping>
     <filter-mapping>
