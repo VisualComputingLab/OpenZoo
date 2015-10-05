@@ -20,6 +20,8 @@ public class OpenZooLoggingConnection {
        
     protected static Logger log = LogManager.getLogger(OpenZooLoggingConnection.class.getName());
     
+    private static int RABBITMQ_MESSAGE_TTL = 5000;
+    
     private static SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd yyyy zzz HH:mm:ss.SSS");
     
     private Channel channel;
@@ -47,7 +49,7 @@ public class OpenZooLoggingConnection {
         try
         {
             Map<String, Object> args = new HashMap<>();
-            args.put("x-message-ttl", 5000);
+            args.put("x-message-ttl", RABBITMQ_MESSAGE_TTL);
             channel.queueDeclare(queue_name, true, false, false, args);
         }
         catch (IOException e)
