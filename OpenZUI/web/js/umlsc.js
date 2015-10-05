@@ -1,4 +1,3 @@
-//LOOSE VARIABLES
 
 // the graph configuration object
 var graphConf = [];
@@ -18,8 +17,7 @@ var target_in_endpoint = "";
 //The routing instance selected in routing form
 var focusRouting_instance = "";
 var routing_instance = "";
-// intermediate object to store routing connections configuration
-var conn_route_keys_associations = {};
+var keys_old="";
 
 // attributes' object to prettify links - transitions
 var linkAttrs = {
@@ -172,11 +170,9 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
             } else {
                 $(this).val(lmnt[0].value);
 
-                //GET INENDPOINT VALUE
                 target_in_endpoint = $("#inEndpointsList").val();
 
                 if (lmnt[0].value === "conn_route") {
-                    // SHOW ROUTING MANAGER AND LOAD VALUES
                     routing_manager_reload(targetId_for_routing, target_in_endpoint);
 
                 }
@@ -189,7 +185,6 @@ function connection_manager_reload(sourceId, targetId, insertedElement, objectId
 
 
 function routing_manager_reload(targetId, target_in_endpoint) {
-    //console.log(targetId + " " + objectId)
     if (!target_in_endpoint || target_in_endpoint === "null" || target_in_endpoint === "undefined") {
         alertify.error("no target endpoint selected");
         $("#conn_mapping").val('blank');
@@ -220,13 +215,13 @@ function routing_manager_reload(targetId, target_in_endpoint) {
         }
 
         $("#route_mapping_instance").html(optionInstances);
-        
+
         /*
          LOAD VALUE FOR FIRST INSTANCE!!!
          
-        if (not empty config ){
-            $("#route_mapping_instance").val("instance" + (y + 1));
-        }
+         if (not empty config ){
+         $("#route_mapping_instance").val("instance" + (y + 1));
+         }
          */
         show_key_vals();
 
@@ -237,14 +232,14 @@ function routing_manager_reload(targetId, target_in_endpoint) {
 function show_key_vals() {
     $("#route_mapping_keys").val('');
     routing_instance = $("#route_mapping_instance").val();
-    
-    console.log("load val "+ focusTargetId_for_routing+ " " +routing_instance)
-    var lmnt = $.grep(conn_route_keys_associations, function(e) {
-        return e.serviceId == focusTargetId_for_routing
+
+    //console.log("load val " + focusTargetId_for_routing + " " + routing_instance)
+    var lmnt = $.grep(graphConf, function(e) {
+        return e.objectId == focusTargetId_for_routing
     })
 
-    if (typeof lmnt[0] !== "undefined") {
-        for (f = 0; f < lmnt[0].instances.length; f++) {
+    if (typeof lmnt[0].instances !== "undefined") {
+        for (var f = 0; f < lmnt[0].instances.length; f++) {
             if (lmnt[0].instances[f].instance === routing_instance) {
                 $("#route_mapping_keys").val(lmnt[0].instances[f].keys);
             }
@@ -252,11 +247,47 @@ function show_key_vals() {
     }
 }
 
-function update_service_routing_keys(targetId, keys){
-    /*
-     * 
-     * parse string, insert to array if unique, update array in graphConf
-     */
+function update_service_routing_keys(objectId,keys_old, keys ) {
+    var keysarr = [];//keys.split(",");
+    $.each(keys.split(","), function(){
+            keysarr.push($.trim(this));
+    });
+    
+    var keys_oldarr = [];//keys_old.split(",");
+    $.each(keys_old.split(","), function(){
+            keys_oldarr.push($.trim(this));
+    });
+    
+    var arr = [];
+
+    var lmnt = $.grep(graphConf, function(e) {
+        return e.objectId == objectId
+    })
+    if (typeof lmnt[0] !== 'undefined') {
+        for (var f = 0; f < lmnt[0].conf.length; f++) {
+            if (lmnt[0].conf[f].name === "routing") {
+                arr = lmnt[0].conf[f].value.split(",")
+                if (arr.length <= 0) {
+                    arr = keysarr;
+                } else {
+                    arr = arrayDifference(arr,keys_oldarr);
+                    arr = arr.concat(keysarr);
+                }
+                lmnt[0].conf[f].value = arr.toString();
+            }
+        }
+    }
+}
+
+function arrayDifference(minuend, subtrahend) {
+  for (var i = 0; i < minuend.length; i++) {
+    var j = subtrahend.indexOf(minuend[i])
+    if (j != -1) {
+      minuend.splice(i, 1);
+      subtrahend.splice(j, 1);
+    }
+  }
+  return minuend;
 }
 
 var graph;
@@ -582,6 +613,7 @@ $(document).ready(function() {
         focusObjectId = objectId;
         focusTargetId_for_routing = targetId_for_routing;
         //console.log("focusIn   " + focusObjectId)
+        keys_old = $("#route_mapping_keys").val()
     });
 
     $("#service_form, #connection_form").focusout(function() {
@@ -642,65 +674,50 @@ $(document).ready(function() {
     })
 
     $("#route_mapping_instance").change(function() {
-        console.log("change");
         show_key_vals();
-
-        /*
-         console.log(focusTargetId_for_routing + " " +
-         $("#route_mapping_instance").val() + " " +
-         $("#route_mapping_keys").val())
-         */
-
-
-        //append route_mapping_keys to  $('#routing_keys').val('') if unique in array
-
-
+        keys_old = $("#route_mapping_keys").val()
     });
 
 
     $("#route_mapping_keys").focusout(function() {
 
-        var kvlmnt_instances_el = [];
-        var kvlmnt_el = [];
+        var keys_associations = {};
+        var kvlmnt_instances_tmp = [];
 
         if (focusTargetId_for_routing === targetId_for_routing) {
-            console.log("storing");
 
-            //look for service
-            var kvlmnt = $.grep(conn_route_keys_associations, function(e) {
-                return e.serviceId === focusTargetId_for_routing
+            keys_associations = $.grep(graphConf, function(e) {
+                return e.objectId === focusTargetId_for_routing
             });
 
-            if (typeof kvlmnt[0] !== 'undefined') {
+            //look for service instances
+            if (typeof keys_associations[0] !== 'undefined') {
+                var kvlmnt = keys_associations[0].instances
+            }
+
+            if (typeof kvlmnt !== 'undefined') {
                 //delete old values for instance
-                var kvlmnt_instances = $.grep(kvlmnt[0].instances, function(e) {
+                var kvlmnt_instances = $.grep(kvlmnt, function(e) {
                     return e.instance !== routing_instance
                 });
- 
-                if (typeof kvlmnt_instances[0] !== "undefined"){
-                    kvlmnt_instances_el=kvlmnt_instances;
+
+                if (typeof kvlmnt_instances[0] !== "undefined") {
+                    kvlmnt_instances_tmp = kvlmnt_instances;
                 }
             }
 
-            var keys = $("#route_mapping_keys").val();
+            var keys = $("#route_mapping_keys").val()
 
-            //write new value for instance
-            kvlmnt_instances_el.push({instance: routing_instance, endpoint: target_in_endpoint, keys: keys});
+            //write new value for instance ---> all instances here!
+            kvlmnt_instances_tmp.push({instance: routing_instance, endpoint: target_in_endpoint, keys: keys});
 
-            //delete old serivce
-            kvlmnt = $.grep(conn_route_keys_associations, function(e) {
-                return e.serviceId !== focusTargetId_for_routing
-            });
-            if (typeof kvlmnt[0] !== "undefined"){
-                kvlmnt_el=kvlmnt;
+            for (var g = 0; g < graphConf.length; g++) {
+                if (graphConf[g].objectId === focusTargetId_for_routing) {
+                    graphConf[g].instances = kvlmnt_instances_tmp
+                }
             }
-            //write new service
-            kvlmnt_el.push({serviceId: focusTargetId_for_routing, instances: kvlmnt_instances_el});
-
-            //update final object
-            conn_route_keys_associations = kvlmnt_el;
-                        
-            update_service_routing_keys(focusTargetId_for_routing, keys);
+            
+            update_service_routing_keys(focusObjectId, keys_old, keys);
         }
     });
 
@@ -722,12 +739,5 @@ $(document).ready(function() {
         $("#topo-graph").val('');
         $("#topoSubmitForm").submit();
     });
-
-    $('#showGraphConf').on('click', function() {
-
-        //console.log(graph.attributes.cells.models.length);
-        console.log(graphConf);
-
-    })
 
 });

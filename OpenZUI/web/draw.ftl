@@ -17,7 +17,6 @@
               <input type="hidden" class="form-control" name="topo-graph" id="topo-graph" >
               <div type="button" id="cancelTopoBtn" class="btn btn-default"> Close</div>
               <div type="button" id="submitTopoBtn" class="btn btn-success"><i class="fa fa-send"></i> Submit</div>
-<div type="button" id="showGraphConf" class="btn btn-success"> graphConf</div>
             </form>
           </div> 
         </div>
