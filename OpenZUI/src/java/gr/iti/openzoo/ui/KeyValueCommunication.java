@@ -427,6 +427,12 @@ public class KeyValueCommunication {
         try (Jedis jedis = pool.getResource())
         {
             Map<String, String> prop = jedis.hgetAll(key);
+            
+            if (prop.isEmpty())
+            {
+                return null;
+            }
+            
             if (delete)
             {
                 jedis.del(key);

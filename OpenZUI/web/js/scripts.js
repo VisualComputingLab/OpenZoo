@@ -19,6 +19,13 @@ $(document).ready(function(){/* jQuery toggle layout */
             alertify.error(log.substring(log.indexOf(":") + 1));
         else alertify.log(log.substring(log.indexOf(":") + 1));
     }
+
+    detailsTopologyConfiguration($('#topologyDropdown option:selected').val());
+    
+    $('#topologyDropdown').on('change', function(){
+        var selected = $('#topologyDropdown option:selected').val();
+        detailsTopologyConfiguration(selected);
+    });
 });
 
 
@@ -161,6 +168,51 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
         $('#detailsModal').modal('show');
     });
  };
+
+ function detailsTopologyConfiguration(name){
+
+    var URL = "/OpenZUI/KeyValueServlet?action=topoconf&name="+name;
+    // console.log(URL);
+    $.getJSON(URL, function(result){
+
+        // $("#topologyStatus").val(result.response.status);
+        document.getElementById("topologyStatus").innerHTML = result.response.status;
+
+        var tBody = $('#serverTableTbody');
+        var server_id;
+
+        console.log(result);
+
+        if (result['response']['servers'] != null)
+        {
+            $.each(result['response']['servers'], function(key, val){
+                var services=[];
+
+                for (var i = 0; i < val.length; i++)
+                {
+                    server_id = val.server_id;
+                    for(var x = 0; x < val.services.length; x++)
+                    {
+                        services.push(val.services[i].service_id + ":" + val.services[i].service_status);
+                    }
+                }
+
+                tBody.append('<tr><td>' + server_id + '</td><td>' + services.toString() + '</td></tr>');
+            });
+        }
+    });
+ };
+
+ // function topologyLogging(name, level){
+
+ //    var URL = "/OpenZUI/ServiceLogServlet?topo="+name+"&level="+level;
+ //    $.getJSON(URL, function(result){
+
+ //        // write logs into textarea control
+ //        $("#serviceLogTextArea").val(result.response.description);
+ //        // 
+ //    });
+ // };
 
  function detailsService(name){
             

@@ -54,6 +54,7 @@
                   </#list>
                 </#if>
               </select>
+              Status:<div id="topologyStatus"></div>
               <hr>
               Server statistics
 
@@ -61,31 +62,30 @@
                 <table class="table table-condensed table-hover">
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>CPU Usage</th>
-                      <th>Memory Usage</th>
-                      <th>Disc Usage</th>
+                      <th>Server ID</th>
+                      <th>Service List</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
+                  <tbody id="serverTableTbody">
+                    <!-- <tr>
                       <td>name</td>
                       <td>bar1</td>
                       <td>bar2</td>
                       <td>bar3</td>
-                    </tr>
+                    </tr> -->
                   </tbody>
                 </table>
               </div>
 
               <hr>
               Service logs
+              <select id="logLevelDropdown" name="logLevelDropdown" class="selectpicker" title='Select minimum logging level'>
+                <option>DEBUG</option>
+                <option>INFO</option>
+                <option>ERROR</option>
+              </select>
               <div class="well well-sm">
-                <textarea style="width:100%" rows="10" id="serviceLogTextArea">Service logs appear here
-One after the other
-Updated periodically
-Format: Component Time Message
-With component filter and time constrains</textarea>
+                <textarea style="width:100%" rows="10" id="serviceLogTextArea">LogLevel Component Time Message</textarea>
               </div>
             </div>
           </div> 

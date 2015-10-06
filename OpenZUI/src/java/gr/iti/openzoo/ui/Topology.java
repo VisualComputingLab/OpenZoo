@@ -613,4 +613,121 @@ public class Topology {
         
         return Status.DESIGNED;
     }
+    
+    public JSONObject getServerStatus()
+    {        
+        JSONObject response = new JSONObject();
+        
+        try
+        {
+            response.put("name", this.name);    // topology name
+            
+            if (graph_object == null || graph_object.length() == 0)
+            {
+                return response.put("status", Status.CREATED);  // topology overall status
+            }
+
+            if (conf_object == null || conf_object.length() == 0)
+            {
+                return response.put("status", Status.DESIGNED); // topology overall status
+            }
+            
+            Map<String, HashMap<String, String>> map_servers2services = new HashMap<>();
+            HashMap<String, String> val_server;
+
+            int num_void = 0;
+            int num_installed = 0;
+            int num_running = 0;
+        
+            Iterator it_service = conf_object.keys();
+            String service_id, server_id;
+            JSONObject service_json, server_json;
+            
+            try
+            {
+                while (it_service.hasNext())
+                {
+                    service_id = (String) it_service.next();
+                    service_json = conf_object.getJSONObject(service_id);
+                    Iterator it_server = service_json.keys();
+                    while (it_server.hasNext())
+                    {
+                        server_id = (String) it_server.next();
+                        server_json = service_json.getJSONObject(server_id);
+
+                        val_server = map_servers2services.get(server_id);
+                        if (val_server == null)
+                        {
+                            val_server = new HashMap<>();
+                            map_servers2services.put(server_id, val_server);
+                        }
+
+                        val_server.put(service_id, server_json.getString("status"));
+
+                        switch (server_json.getString("status"))
+                        {
+                            case "void": num_void++; break;
+                            case "installed": num_installed++; break;
+                            case "running": num_running++; break;
+                        }
+                    }
+                }
+                
+                JSONArray servers = new JSONArray();
+                JSONArray serviceList;
+                JSONObject server, service;
+                
+                for (String key_server : map_servers2services.keySet())
+                {
+                    val_server = map_servers2services.get(key_server);
+                    server = new JSONObject();
+                    server.put("server_id", key_server);
+                    
+                    serviceList = new JSONArray();
+                    
+                    for (String key_service : val_server.keySet())
+                    {
+                        service = new JSONObject();
+                        service.put("service_id", key_service);
+                        service.put("service_status", val_server.get(key_service));
+                        serviceList.put(service);
+                    }
+                    
+                    server.put("services", serviceList);
+                    
+                    servers.put(server);
+                }
+                
+                response.put("servers", servers);
+            }
+            catch (JSONException ex)
+            {
+                System.err.println("JSONException while parsing conf_object in getServerStatus: " + ex);
+                return response.put("status", Status.SEMIDEPLOYED);
+            }
+            
+            if (num_running > 0)
+            {
+                if (num_void > 0 || num_installed > 0) return response.put("status", Status.SEMISTARTED);
+                else return response.put("status", Status.STARTED);
+            }
+            else
+            {
+                if (num_installed > 0)
+                {
+                    if (num_void > 0) return response.put("status", Status.SEMIDEPLOYED);
+                    else return response.put("status", Status.DEPLOYED);
+                }
+            }
+
+            return response.put("status", Status.DESIGNED);
+        }
+        catch (JSONException ex)
+        {
+            System.err.println("JSONException in getServerStatus: " + ex);
+            return null;
+        }
+        
+        
+    }
 }

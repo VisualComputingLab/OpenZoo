@@ -127,6 +127,27 @@ public class KeyValueServlet extends HttpServlet {
                     if (repo != null)
                         json.put("response", repo.toJSON());
                     break;
+                    
+                case "topoconf":
+
+                    if (name == null || name.equalsIgnoreCase("all"))
+                    {
+                        ArrayList<Topology> allTopologies = kv.getTopologies();
+                        if (allTopologies != null)
+                        {
+                            JSONArray jarr = new JSONArray();
+                            for (Topology topo : allTopologies)
+                                jarr.put(topo.getServerStatus());
+                            json.put("response", jarr);
+                        }
+                    }
+                    else
+                    {
+                        Topology topo = kv.getTopology(name);
+                        if (topo != null)
+                            json.put("response", topo.getServerStatus());
+                    }
+                    break;
             }
         }
         catch (JSONException e)

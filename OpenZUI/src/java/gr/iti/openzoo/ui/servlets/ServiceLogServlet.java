@@ -27,7 +27,7 @@ import org.codehaus.jettison.json.JSONObject;
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
 public class ServiceLogServlet extends HttpServlet {
-
+    
     private static int RABBITMQ_DELIVERY_TIMEOUT = 1000;    // msec
     private static int RABBITMQ_DEFAULT_NUM_MESSAGES = 100;
     
@@ -63,7 +63,8 @@ public class ServiceLogServlet extends HttpServlet {
             throws ServletException, IOException {
         
         String toponame = request.getParameter("topo");
-        String level = request.getParameter("level");
+        String s_level = request.getParameter("level");
+        if (s_level == null) s_level = "DEBUG";
         String queuename = toponame + "_logging";
         
         JSONObject json = new JSONObject();
@@ -108,8 +109,13 @@ public class ServiceLogServlet extends HttpServlet {
                     
                     message = new JSONObject(new String(delivery.getBody()));
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-                    if (level == null || level.equalsIgnoreCase(message.getString("type")))
-                        logs.put(message);
+                    
+                    switch (s_level)
+                    {
+                        case "ERROR": if (message.getString("type").equalsIgnoreCase("info")) break;
+                        case "INFO": if (message.getString("type").equalsIgnoreCase("debug")) break;
+                        case "DEBUG": logs.put(message);
+                    }
                 }
                 
                 json.put("response", logs);
