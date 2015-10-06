@@ -17,7 +17,7 @@ var target_in_endpoint = "";
 //The routing instance selected in routing form
 var focusRouting_instance = "";
 var routing_instance = "";
-var keys_old="";
+var keys_old = "";
 
 // attributes' object to prettify links - transitions
 var linkAttrs = {
@@ -216,13 +216,23 @@ function routing_manager_reload(targetId, target_in_endpoint) {
 
         $("#route_mapping_instance").html(optionInstances);
 
-        /*
-         LOAD VALUE FOR FIRST INSTANCE!!!
-         
-         if (not empty config ){
-         $("#route_mapping_instance").val("instance" + (y + 1));
-         }
-         */
+        var lmnt = $.grep(graphConf, function(e) {
+            return e.objectId == objectId
+        })
+
+        if (typeof lmnt[0] !== 'undefined') {
+            for (var f = 0; f < lmnt[0].conf.length; f++) {
+                if (lmnt[0].conf[f].name === "routing") {
+                    arr = lmnt[0].conf[f].value
+                    if (arr.length > 0) {
+                        $("#route_mapping_instance").val('instance1');
+                    }else{
+                        $("#route_mapping_keys").val('');
+                    }
+                }
+            }
+        }
+
         show_key_vals();
 
         $('#routing_manager').show();
@@ -230,7 +240,7 @@ function routing_manager_reload(targetId, target_in_endpoint) {
 }
 
 function show_key_vals() {
-    $("#route_mapping_keys").val('');
+    //$("#route_mapping_keys").val('');
     routing_instance = $("#route_mapping_instance").val();
 
     //console.log("load val " + focusTargetId_for_routing + " " + routing_instance)
@@ -247,17 +257,18 @@ function show_key_vals() {
     }
 }
 
-function update_service_routing_keys(objectId,keys_old, keys ) {
+function update_service_routing_keys(objectId, keys_old, keys) {
+
     var keysarr = [];//keys.split(",");
-    $.each(keys.split(","), function(){
-            keysarr.push($.trim(this));
+    $.each(keys.split(","), function() {
+        keysarr.push($.trim(this));
     });
-    
+
     var keys_oldarr = [];//keys_old.split(",");
-    $.each(keys_old.split(","), function(){
-            keys_oldarr.push($.trim(this));
+    $.each(keys_old.split(","), function() {
+        keys_oldarr.push($.trim(this));
     });
-    
+
     var arr = [];
 
     var lmnt = $.grep(graphConf, function(e) {
@@ -270,9 +281,10 @@ function update_service_routing_keys(objectId,keys_old, keys ) {
                 if (arr.length <= 0) {
                     arr = keysarr;
                 } else {
-                    arr = arrayDifference(arr,keys_oldarr);
+                    arr = arrayDifference(arr, keys_oldarr);
                     arr = arr.concat(keysarr);
                 }
+
                 lmnt[0].conf[f].value = arr.toString();
             }
         }
@@ -280,14 +292,14 @@ function update_service_routing_keys(objectId,keys_old, keys ) {
 }
 
 function arrayDifference(minuend, subtrahend) {
-  for (var i = 0; i < minuend.length; i++) {
-    var j = subtrahend.indexOf(minuend[i])
-    if (j != -1) {
-      minuend.splice(i, 1);
-      subtrahend.splice(j, 1);
+
+    for (var i = 0; i < subtrahend.length; i++) {
+        var j = minuend.lastIndexOf(subtrahend[i])
+        if (j != -1) {
+            minuend.splice(j, 1);
+        }
     }
-  }
-  return minuend;
+    return minuend;
 }
 
 var graph;
@@ -674,8 +686,10 @@ $(document).ready(function() {
     })
 
     $("#route_mapping_instance").change(function() {
-        show_key_vals();
+        
         keys_old = $("#route_mapping_keys").val()
+        $("#route_mapping_keys").val('')
+        show_key_vals();
     });
 
 
@@ -716,7 +730,7 @@ $(document).ready(function() {
                     graphConf[g].instances = kvlmnt_instances_tmp
                 }
             }
-            
+
             update_service_routing_keys(focusObjectId, keys_old, keys);
         }
     });
