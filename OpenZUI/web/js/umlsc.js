@@ -200,14 +200,14 @@ function routing_manager_reload(targetId, target_in_endpoint) {
         if (typeof instances[0] === 'undefined') {
             alertify.log("target instances not set");
             instancesNum = 1;
-        } else {
-            focusTargetId_for_routing = targetId;
-            for (i = 0; i < instances[0].conf.length; i++) {
-                if (instances[0].conf[i].name == "instances") {
-                    instancesNum = instances[0].conf[i].value
-                }
+        }
+        focusTargetId_for_routing = targetId;
+        for (i = 0; i < instances[0].conf.length; i++) {
+            if (instances[0].conf[i].name == "instances") {
+                instancesNum = instances[0].conf[i].value
             }
         }
+
 
         var optionInstances = "<option value='blank' disabled selected></option>";
         for (y = 0; y < instancesNum; y++) {
@@ -226,7 +226,7 @@ function routing_manager_reload(targetId, target_in_endpoint) {
                     arr = lmnt[0].conf[f].value
                     if (arr.length > 0) {
                         $("#route_mapping_instance").val('instance1');
-                    }else{
+                    } else {
                         $("#route_mapping_keys").val('');
                     }
                 }
@@ -686,7 +686,7 @@ $(document).ready(function() {
     })
 
     $("#route_mapping_instance").change(function() {
-        
+
         keys_old = $("#route_mapping_keys").val()
         $("#route_mapping_keys").val('')
         show_key_vals();
