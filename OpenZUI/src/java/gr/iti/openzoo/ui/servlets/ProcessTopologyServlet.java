@@ -1,11 +1,9 @@
 package gr.iti.openzoo.ui.servlets;
 
 import freemarker.template.Configuration;
-import freemarker.template.TemplateExceptionHandler;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
-import java.io.File;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
