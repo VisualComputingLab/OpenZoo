@@ -27,7 +27,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.management.AttributeNotFoundException;
@@ -143,22 +142,18 @@ public class Utilities {
         connection.setRequestProperty("Content-Type", "application/json");
         //connection.setRequestProperty("Content-Length",  String.valueOf(postData.length()));
         connection.setRequestProperty("Content-Length", String.valueOf(data.length()));
-        // Write data
-        OutputStream os = connection.getOutputStream();
-        //os.write(postData.getBytes());
-        os.write(data.getBytes());
-        // Read response
-        StringBuilder responseSB = new StringBuilder();
-        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-        String line;
-        while ((line = br.readLine()) != null) {
-            responseSB.append(line);
+        
+        StringBuilder responseSB;
+        try (OutputStream os = connection.getOutputStream()) {
+            os.write(data.getBytes());
+            responseSB = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    responseSB.append(line);
+                }
+            }
         }
-
-        // Close streams
-        br.close();
-        os.close();
 
         return responseSB.toString();
     }
@@ -322,7 +317,7 @@ public class Utilities {
     }
 
     public void deleteFile(String pathToFile) {
-        String result = null;
+        String result;
         try {
             //Delete if tempFile exists
             File fileTemp = new File(pathToFile);
@@ -349,15 +344,13 @@ public class Utilities {
     {
         JSONObject response = null;
         
-        try
-        {
-            ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath));
+        try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath))) {
             ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
             while (entry != null)
             {
                 //System.out.println("WAR content: " + entry.getName());
-                
+
                 if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(jsonPath))
                 {
                     // extract
@@ -366,11 +359,10 @@ public class Utilities {
                     zipIn.closeEntry();
                     break;
                 }
-                
+
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();
             }
-            zipIn.close();
         }
         catch (IOException | JSONException e)
         {
@@ -405,15 +397,13 @@ public class Utilities {
             System.err.println("Got an exception in writeJSONToWAR: " + ex);
         }
         
-        try
-        {
-            ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath));
+        try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(warPath))) {
             ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
             while (entry != null)
             {
                 //System.out.println("WAR content: " + entry.getName());
-                
+
                 if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(jsonPath))
                 {
                     // extract
@@ -422,11 +412,10 @@ public class Utilities {
                     zipIn.closeEntry();
                     break;
                 }
-                
+
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();
             }
-            zipIn.close();
         }
         catch (IOException | JSONException e)
         {
