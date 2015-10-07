@@ -513,9 +513,12 @@ public class Topology {
                         }
                         
                         i2k = inst2keys.get(id);
-                        for (int j = 0; j < i2k.length(); j++)
+                        if (i2k != null)
                         {
-                            
+                            for (int j = 0; j < i2k.length(); j++)
+                            {
+
+                            }
                         }
                         
                         conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, mapstr, routkeys);
