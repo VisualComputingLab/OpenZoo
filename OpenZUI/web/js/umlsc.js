@@ -691,7 +691,8 @@ $(document).ready(function() {
     });
 
 
-    $("#route_mapping_keys").focusout(function() {
+    //$("#route_mapping_keys").focusout(function() {
+        $("#route_mapping_keys").bind('input propertychange change paste keyup', function(){
 
         var keys_associations = {};
         var kvlmnt_instances_tmp = [];
