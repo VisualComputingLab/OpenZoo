@@ -1,4 +1,4 @@
-
+var warfiles ={};
 // the graph configuration object
 var graphConf = [];
 // flag in case topology's parameters are not fully set
@@ -309,13 +309,16 @@ var paper;
 
 
 $(document).ready(function() {
-
-    fetchServicesList();
-
+    
+    
+    fetchServicesList(load());
+    
+    function load(){
     // read warfiles 'requires' fields from localStorage -- They have to have been fetched first
     var wf = localStorage["WAR"];
-    var warfiles = JSON.parse(wf);
-
+    warfiles = JSON.parse(wf);
+    }
+    
     $('#service_manager').hide();
     $('#connection_manager').hide();
     $('#routing_field').hide();
@@ -626,16 +629,15 @@ $(document).ready(function() {
     $("#service_form, #connection_form, #routing_form").focusin(function(e) {
         focusObjectId = objectId;
         focusTargetId_for_routing = targetId_for_routing;
-        //console.log("focusIn   " + focusObjectId)
         keys_old = $("#route_mapping_keys").val()
     });
 
-    $("#service_form, #connection_form").focusout(function() {
-        //console.log("focusOut   " + objectId)
+    //$("#service_form, #connection_form").focusout(function() {
+        $("#service_form, #connection_form").bind('input propertychange change paste keyup', function(){
+
         //e.preventDefault();
         if (objectId === focusObjectId) {
             var srvConf = "";
-            //objectId = $(this).attr('class');
 
             //in order the element has been previously saved, filter by the opposite predicate:
             graphConf = $.grep(graphConf, function(e) {
@@ -643,14 +645,8 @@ $(document).ready(function() {
             });
 
             srvConf = $(this).serializeArray();
-            //console.log(objectId);
-            //console.log(srvConf);
             graphConf.push({objectId: focusObjectId, conf: srvConf});
         }
-        /*
-         * if i don't move out from the field the value is not passed to srvConf on focus out.
-         * FORCE READ ALL VALUES FROM FORM?
-         */
     });
 
 
