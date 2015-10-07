@@ -419,8 +419,9 @@ public class Topology {
         TopologyGraphNode nod;
         TopologyGraphConnection conn;
         HashMap<String, JSONArray> config = new HashMap<>();
+        HashMap<String, JSONArray> inst2keys = new HashMap<>();
         String id;
-        JSONArray conf;
+        JSONArray conf, i2k;
         JSONObject property;
         
         try
@@ -431,6 +432,10 @@ public class Topology {
             {
                 JSONObject objs = graphConfiguration.getJSONObject(i);
                 config.put(objs.getString("objectId"), objs.getJSONArray("conf"));
+                if (objs.has("instances"))
+                {
+                    inst2keys.put(objs.getString("objectId"), objs.getJSONArray("instances"));
+                }
             }
             
             // then read nodes and connections and fill in the configuration information
@@ -466,7 +471,7 @@ public class Topology {
                                 default:
                                     nod.addRequirement(property.getString("name"), property.getString("value"));
                             }
-                        }                        
+                        }
                         this.addNode(nod);
                         break;
                         
@@ -505,6 +510,12 @@ public class Topology {
                                     routkeys = value;
                                     break;
                             }
+                        }
+                        
+                        i2k = inst2keys.get(id);
+                        for (int j = 0; j < i2k.length(); j++)
+                        {
+                            
                         }
                         
                         conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, mapstr, routkeys);

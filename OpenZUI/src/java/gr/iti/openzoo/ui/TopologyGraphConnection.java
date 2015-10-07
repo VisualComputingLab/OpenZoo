@@ -1,6 +1,6 @@
 package gr.iti.openzoo.ui;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -21,7 +21,7 @@ public class TopologyGraphConnection {
     private int mapping = 0;
     private String queue_name = null;
     private String exchange_name = null;
-    private ArrayList<String> routing_keys = null;
+    private HashSet<String> routing_keys = null;
     
     public TopologyGraphConnection(String s_c, String s_w, String s_e, String t_c, String t_w, String t_e, int t_i, JSONObject json)
     {
@@ -41,7 +41,7 @@ public class TopologyGraphConnection {
             JSONArray rkeys = json.optJSONArray("routing_keys");
             if (rkeys != null)
             {
-                routing_keys = new ArrayList<>();
+                routing_keys = new HashSet<>();
                 for (int i = 0; i < rkeys.length(); i++)
                 {
                     routing_keys.add(rkeys.getString(i));
@@ -78,7 +78,7 @@ public class TopologyGraphConnection {
             case "conn_route":
                 mapping = 2;
                 exchange_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
-                routing_keys = new ArrayList<>();
+                routing_keys = new HashSet<>();
                 String [] split = routkeys.split(",");
                 for (int k = 0; k < split.length; k++)
                 {
@@ -219,14 +219,14 @@ public class TopologyGraphConnection {
     /**
      * @return the routing_keys
      */
-    public ArrayList<String> getRouting_keys() {
+    public HashSet<String> getRouting_keys() {
         return routing_keys;
     }
 
     /**
      * @param routing_keys the routing_keys to set
      */
-    public void setRouting_keys(ArrayList<String> routing_keys) {
+    public void setRouting_keys(HashSet<String> routing_keys) {
         this.routing_keys = routing_keys;
     }
 }
