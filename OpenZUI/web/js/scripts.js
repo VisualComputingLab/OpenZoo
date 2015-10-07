@@ -19,13 +19,6 @@ $(document).ready(function(){/* jQuery toggle layout */
             alertify.error(log.substring(log.indexOf(":") + 1));
         else alertify.log(log.substring(log.indexOf(":") + 1));
     }
-
-    detailsTopologyConfiguration($('#topologyDropdown option:selected').val());
-    
-    $('#topologyDropdown').on('change', function(){
-        var selected = $('#topologyDropdown option:selected').val();
-        detailsTopologyConfiguration(selected);
-    });
 });
 
 

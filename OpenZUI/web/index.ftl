@@ -157,6 +157,7 @@
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
+    <script src="./js/mainpage.js"></script>
 
     <script>
       var logcontainer = [];
