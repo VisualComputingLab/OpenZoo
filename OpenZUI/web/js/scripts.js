@@ -162,7 +162,6 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
     });
  };
 
-
  function detailsService(name){
             
     
