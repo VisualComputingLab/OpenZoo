@@ -35,7 +35,6 @@ public class DBWorker extends OpenZooWorker {
         super(threadName);
         
         log.debug("-- DBWorker()");
-        logConn.debug("Created...");
     }
     
     @Override

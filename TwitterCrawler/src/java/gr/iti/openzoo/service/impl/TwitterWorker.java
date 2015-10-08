@@ -31,7 +31,6 @@ public class TwitterWorker extends OpenZooLoneWorker {
         super(threadName);
         
         log.debug("-- TwitterWorker()");
-        logConn.debug("Created...");
     }
     
     @Override

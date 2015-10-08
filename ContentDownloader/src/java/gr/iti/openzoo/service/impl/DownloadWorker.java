@@ -22,7 +22,6 @@ public class DownloadWorker extends OpenZooWorker {
         super(threadName);
         
         log.debug("-- DownloadWorker()");
-        logConn.debug("Created...");
     }
     
     @Override

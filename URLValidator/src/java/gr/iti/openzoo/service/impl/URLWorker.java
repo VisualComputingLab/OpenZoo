@@ -39,7 +39,6 @@ public class URLWorker extends OpenZooWorker {
         super(threadName);
         
         log.debug("-- URLWorker()");
-        logConn.debug("Created...");
         
         //"Mon Jan 07 12:35:06 +0000 2013"
         dateFormatter = new SimpleDateFormat("EEE MMM d HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
