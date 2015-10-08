@@ -112,14 +112,13 @@ function connection_manager_reload(sourceId, targetId, theObj, objectId) {
     //else close all forms and clean their fields to reload them
     $('#service_manager').hide();
     $('#connection_manager').hide();
-    $('#routing_field').hide();
+    //$('#routing_field').hide();
     $('#routing_manager').hide();
     $(".addToConnectionForm").remove();
     $("#connection_form").removeClass();
     $("#inEndpointsList").empty();
     $("#outEndpointsList").empty();
     $('#conn_mapping').val('conn_available').change();
-    $('#routing_field').hide();
     $('#routing_keys').val('');
 
     $("#connection_form").prepend('<div class="addToConnectionForm"><label>Connection <i>' + sourceId + '</i> to <i>' + targetId + '</i> configuration</label><hr></div>');
@@ -187,6 +186,8 @@ function routing_manager_reload(targetId, connId, target_in_endpoint) {
         $("#inEndpointsList").focus();
     }
     else {
+        //console.log("routing_manager_reload" + " " + connId);
+
         var instances = $.grep(graphConf, function(e) {
             return e.objectId == targetId
         })
@@ -207,7 +208,7 @@ function routing_manager_reload(targetId, connId, target_in_endpoint) {
 
             var optionInstances = "<option value='blank' disabled selected></option>";
             for (y = 0; y < instancesNum; y++) {
-                optionInstances += "<option value='instance" + (y + 1) + "'>instance" + (y + 1) + "</option>";
+                optionInstances += "<option value='" + y + "'>instance " + y  + "</option>";
             }
 
             $("#route_mapping_instance").html(optionInstances);
@@ -216,17 +217,12 @@ function routing_manager_reload(targetId, connId, target_in_endpoint) {
                 return e.objectId == connId
             })
 
-            if (typeof lmnt[0] !== 'undefined') {
-                for (var f = 0; f < lmnt[0].conf.length; f++) {
-                    if (lmnt[0].conf[f].name === "routing") {
-                        arr = lmnt[0].conf[f].value
-                        if (arr.length > 0) {
-                            $("#route_mapping_instance").val('instance1');
-                        } else {
-                            $("#route_mapping_keys").val('');
-                        }
-                    }
-                }
+            if (typeof lmnt[0].instances !== 'undefined') {
+                $("#route_mapping_instance").val(lmnt[0].instances[0].instance);
+
+            }
+            else {
+                $("#route_mapping_keys").val('');
             }
 
             show_key_vals();
@@ -239,6 +235,7 @@ function routing_manager_reload(targetId, connId, target_in_endpoint) {
 }
 
 function show_key_vals() {
+    //console.log('objectId  ' + objectId + 'focusConnId   ' + focusConnId)
     $("#route_mapping_keys").val('');
     routing_instance = $("#route_mapping_instance").val();
 
@@ -261,7 +258,6 @@ var paper;
 
 $(document).ready(function() {
 
-
     fetchServicesList(load());
 
     function load() {
@@ -272,7 +268,7 @@ $(document).ready(function() {
 
     $('#service_manager').hide();
     $('#connection_manager').hide();
-    $('#routing_field').hide();
+    //$('#routing_field').hide();
     $('#routing_manager').hide();
 
 
@@ -340,24 +336,21 @@ $(document).ready(function() {
         }
         else if ($("#connection_form").hasClass(objectId)) {
             $('#connection_manager').hide();
-            $('#routing_field').hide();
+            //$('#routing_field').hide();
             $('#routing_manager').hide();
 
 
         }
     })
 
-
     graph.on('change:source change:target', function(cell) {
-        //console.log('change');
 
         $('#connection_manager').hide();
-        $('#routing_field').hide();
+        //$('#routing_field').hide();
         $('#routing_manager').hide();
 
         // console.log(cell);
         if (("id" in cell.attributes.source) && ("id" in cell.attributes.target)) {
-            //console.log(cell);
             objectId = cell.id;
 
             graphConf = $.grep(graphConf, function(e) {
@@ -460,9 +453,9 @@ $(document).ready(function() {
     paper.on('cell:pointerdown', function(cellView, evt, x, y) {
 
         objectId = cellView.model.id;
+        focusObjectId = "";
         var objectType = cellView.model.attributes.type
         //console.log('cell view ' + objectId + ' a ' +  objectType + ' was clicked'); 
-        //console.log(cellView.model);
 
         theObj = $.grep(graphConf, function(e) {
             return e.objectId == objectId;
@@ -479,7 +472,7 @@ $(document).ready(function() {
                     //else close all forms and clean their fields to reload them/
                     $('#service_manager').hide();
                     $('#connection_manager').hide();
-                    $('#routing_field').hide();
+                    //$('#routing_field').hide();
                     $('#routing_manager').hide();
                     $('#instances').val('1');
                     $('#wpc').val('0');
@@ -560,9 +553,6 @@ $(document).ready(function() {
         });
         services[serviceName] = srv;
         graph.addCell(srv);
-
-        //console.log("openzooServiceSelectBtn:click " );
-        //console.log(services);
     });
 
 
@@ -583,23 +573,25 @@ $(document).ready(function() {
         keys_old = $("#route_mapping_keys").val()
     });
 
+    $("#service_form, #connection_form, #routing_form").focusout(function(e) {
+        focusObjectId = "";
+    });
+
     //$("#service_form, #connection_form").focusout(function() {
     $("#service_form, #connection_form").bind('input propertychange change paste keyup', function() {
 
         //e.preventDefault();
+        //console.log('form bind' + " " + objectId)
         if (objectId === focusObjectId) {
             var srvConf = "";
 
             var lobj = $.grep(graphConf, function(e) {
                 return e.objectId === focusObjectId;
             });
-            console.log(lobj[0])
 
             srvConf = $(this).serializeArray();
 
             if (typeof lobj[0] !== 'undefined' && typeof lobj[0].instances !== 'undefined') {
-
-                console.log("case1")
 
                 obj = {objectId: focusObjectId, conf: srvConf, instances: lobj[0].instances};
 
@@ -610,7 +602,6 @@ $(document).ready(function() {
                 graphConf.push(obj);
             }
             else {
-                console.log("case2")
 
                 graphConf = $.grep(graphConf, function(e) {
                     return e.objectId != focusObjectId;
@@ -670,36 +661,36 @@ $(document).ready(function() {
         var keys_associations = {};
         var kvlmnt_instances_tmp = [];
 
-            keys_associations = $.grep(graphConf, function(e) {
-                return e.objectId === focusConnId
+        keys_associations = $.grep(graphConf, function(e) {
+            return e.objectId === focusConnId
+        });
+
+        //look for service instances
+        if (typeof keys_associations[0] !== 'undefined') {
+            var kvlmnt = keys_associations[0].instances
+        }
+
+        if (typeof kvlmnt !== 'undefined') {
+            //delete old values for instance
+            var kvlmnt_instances = $.grep(kvlmnt, function(e) {
+                return e.instance !== routing_instance
             });
 
-            //look for service instances
-            if (typeof keys_associations[0] !== 'undefined') {
-                var kvlmnt = keys_associations[0].instances
+            if (typeof kvlmnt_instances[0] !== "undefined") {
+                kvlmnt_instances_tmp = kvlmnt_instances;
             }
+        }
 
-            if (typeof kvlmnt !== 'undefined') {
-                //delete old values for instance
-                var kvlmnt_instances = $.grep(kvlmnt, function(e) {
-                    return e.instance !== routing_instance
-                });
+        var keys = $("#route_mapping_keys").val()
 
-                if (typeof kvlmnt_instances[0] !== "undefined") {
-                    kvlmnt_instances_tmp = kvlmnt_instances;
-                }
+        //write new value for instance ---> all instances here!
+        kvlmnt_instances_tmp.push({instance: routing_instance, endpoint: target_in_endpoint, keys: keys});
+
+        for (var g = 0; g < graphConf.length; g++) {
+            if (graphConf[g].objectId === focusConnId) {
+                graphConf[g].instances = kvlmnt_instances_tmp
             }
-
-            var keys = $("#route_mapping_keys").val()
-
-            //write new value for instance ---> all instances here!
-            kvlmnt_instances_tmp.push({instance: routing_instance, endpoint: target_in_endpoint, keys: keys});
-
-            for (var g = 0; g < graphConf.length; g++) {
-                if (graphConf[g].objectId === focusConnId) {
-                    graphConf[g].instances = kvlmnt_instances_tmp
-                }
-            }
+        }
     });
 
 

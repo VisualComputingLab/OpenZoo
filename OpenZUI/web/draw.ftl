@@ -90,11 +90,12 @@
                     <option value="conn_available">Available</option>
                     <option value="conn_route">Route</option>
                   </select>
+                  <!--
                   <div id="routing_field">
                     <label for="routing">routing keys</label>
                   <input type="text" class="form-control" id="routing" name="routing">
                   </div>
-
+                  -->
                   </div>
 
                   </form>

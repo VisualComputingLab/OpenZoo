@@ -169,6 +169,7 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
     });
  };
 
+
  function detailsTopologyConfiguration(name){
 
     var URL = "/OpenZUI/KeyValueServlet?action=topoconf&name="+name;
