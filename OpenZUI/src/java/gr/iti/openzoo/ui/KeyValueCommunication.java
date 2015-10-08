@@ -505,7 +505,7 @@ public class KeyValueCommunication {
             if (conn.getRouting_keys() != null && !conn.getRouting_keys().isEmpty())
             {
                 sb.append(",'routing_keys':");
-                sb.append(conn.getRouting_keys());
+                sb.append(conn.getRouting_keys_json());
             }
             sb.append("}");
             

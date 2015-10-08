@@ -44,13 +44,15 @@ public class TopologyGraphConnection {
                 routing_keys = new HashSet<>();
                 for (int i = 0; i < rkeys.length(); i++)
                 {
-                    routing_keys.add(rkeys.getString(i));
+                    if (!rkeys.isNull(i))
+                        routing_keys.add(rkeys.getString(i));
                 }
             }
         }
         catch (JSONException e)
         {
             System.err.println("JSONException in TopologyGraphConnection.constr: " + e);
+            System.err.println("json is: " + json.toString());
         }
     }
     
@@ -222,6 +224,14 @@ public class TopologyGraphConnection {
      */
     public HashSet<String> getRouting_keys() {
         return routing_keys;
+    }
+    
+    public JSONArray getRouting_keys_json() {
+        JSONArray json = new JSONArray();
+        for (String rk : routing_keys)
+            json.put(rk);
+        
+        return json;
     }
 
     /**

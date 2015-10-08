@@ -66,7 +66,7 @@
         <servlet-class>gr.iti.openzoo.ui.servlets.KeyValueServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>MainServlet</servlet-name>
+        <servlet-name>Main</servlet-name>
         <servlet-class>gr.iti.openzoo.ui.servlets.MainServlet</servlet-class>
     </servlet>
     <servlet>
@@ -102,12 +102,12 @@
         <url-pattern>/KeyValueServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>MainServlet</servlet-name>
+        <servlet-name>Main</servlet-name>
         <url-pattern>/Main</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ServiceLogServlet</servlet-name>
-        <url-pattern>/ServiceLog</url-pattern>
+        <url-pattern>/ServiceLogServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

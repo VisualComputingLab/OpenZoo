@@ -105,7 +105,11 @@ public class ServiceLogServlet extends HttpServlet {
                 {
                     delivery = qconsumer.nextDelivery(RABBITMQ_DELIVERY_TIMEOUT);
                     
-                    if (delivery == null) break; // queue is probably empty
+                    if (delivery == null)
+                    {
+                        System.out.println("queue is probably empty");
+                        break;
+                    }
                     
                     message = new JSONObject(new String(delivery.getBody()));
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -117,6 +121,8 @@ public class ServiceLogServlet extends HttpServlet {
                         case "DEBUG": logs.put(message);
                     }
                 }
+                
+                connection.close();
                 
                 json.put("response", logs);
             }
