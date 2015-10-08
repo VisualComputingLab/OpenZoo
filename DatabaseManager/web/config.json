@@ -13,7 +13,7 @@
             "endpoints":
             [
                 {
-                    "endpoint_id": "ep_from",
+                    "endpoint_id": "db_input",
                     "type": "in"
                 }
             ]

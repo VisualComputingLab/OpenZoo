@@ -70,17 +70,20 @@ public class TopologyGraphConnection {
         {
             case "conn_available":
                 mapping = 0;
-                queue_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+//                queue_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+                queue_name = topo_name + "_" + target_component + "_" + target_worker + "_" + target_endpoint;
                 break;
                 
             case "conn_all":
                 mapping = 1;
-                exchange_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+//                exchange_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+                exchange_name = topo_name + "_" + target_component + "_" + target_worker + "_" + target_endpoint;
                 break;
                 
             case "conn_route":
                 mapping = 2;
-                exchange_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+//                exchange_name = topo_name + "_" + source_component + "_" + target_component + "_" + transition_id;
+                exchange_name = topo_name + "_" + target_component + "_" + target_worker + "_" + target_endpoint;
                 routing_keys = new HashSet<>();
                 String [] split = routkeys.split(",");
                 for (int k = 0; k < split.length; k++)

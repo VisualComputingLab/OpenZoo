@@ -13,7 +13,7 @@ import com.mongodb.util.JSON;
 import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.impl.OpenZooInputConnection;
 import gr.iti.openzoo.impl.OpenZooLoggingConnection;
-import gr.iti.openzoo.impl.OpenZooWorker;
+import gr.iti.openzoo.impl.OpenZooLoneWorker;
 import java.net.UnknownHostException;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -22,9 +22,9 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class DBWorker extends OpenZooWorker {
+public class DBWorker extends OpenZooLoneWorker {
 
-    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "ep_from");
+    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "db_input");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     private Mongo mongo;
@@ -116,22 +116,26 @@ public class DBWorker extends OpenZooWorker {
             try
             {
                 success = true;
-                for (int i = 0; i < pld.getJSONArray("images").length(); i++)
+                
+                if (pld.has("images"))
                 {
-                    json = new JSONObject();
-                    json.put("url", pld.getJSONArray("images").get(i));
-                    json.put("date_posted", pld.getLong("date_posted"));
-                    int ret = saveTweetUrl(json);
-
-                    switch (ret)
+                    for (int i = 0; i < pld.getJSONArray("images").length(); i++)
                     {
-                        case 0: log.info("Inserted record"); logConn.info("Inserted record"); break;
-                        case 1: log.info("Updated record"); logConn.info("Updated record"); break;
-                        default:log.error("Could not save tweet url"); logConn.error("Could not save tweet url"); 
-                                success = false;
+                        json = new JSONObject();
+                        json.put("url", pld.getJSONArray("images").get(i));
+                        json.put("date_posted", pld.getLong("date_posted"));
+                        int ret = saveTweetUrl(json);
+
+                        switch (ret)
+                        {
+                            case 0: log.debug("Inserted record"); logConn.debug("Inserted record"); break;
+                            case 1: log.debug("Updated record"); logConn.debug("Updated record"); break;
+                            default:log.error("Could not save tweet url"); logConn.error("Could not save tweet url"); 
+                                    success = false;
+                        }
                     }
                 }
-                
+                                
                 message.setSuccess(success);
                 message.setProcessingEnd();
                 saveMessage(message.getMessageJSON());
@@ -221,5 +225,10 @@ public class DBWorker extends OpenZooWorker {
         }
         
         return true;
+    }
+
+    @Override
+    public String publish(JSONObject obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

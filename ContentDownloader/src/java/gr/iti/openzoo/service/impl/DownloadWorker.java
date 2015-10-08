@@ -5,6 +5,7 @@ import gr.iti.openzoo.impl.OpenZooInputConnection;
 import gr.iti.openzoo.impl.OpenZooLoggingConnection;
 import gr.iti.openzoo.impl.OpenZooOutputConnection;
 import gr.iti.openzoo.impl.OpenZooWorker;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -28,6 +29,20 @@ public class DownloadWorker extends OpenZooWorker {
     public boolean doWork(Message message) {
         
         // do nothing, just forward the message
+        
+        JSONObject pld = message.getPayload();
+        
+        try
+        {
+            pld.put("downloaded", true);
+            message.setPayload(pld);
+        }
+        catch (JSONException e)
+        {
+            log.error("JSONException: " + e);
+            logConn.error("JSONException: " + e);
+            return false;
+        }
         
         return true;
     }
