@@ -85,6 +85,13 @@ public class URLWorker extends OpenZooWorker {
     public void run()
     {
         log.debug("-- URLWorker.run");
+        
+        if (!logConn.init())
+        {
+            log.error("Error by endpoint initialization");
+            return;
+        }
+        
         logConn.debug("-- URLWorker.run");
         
         if (!inConn.init() || !outConn.init())

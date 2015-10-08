@@ -1,0 +1,26 @@
+{
+    "service":
+    {
+        "component_id": "ContentDownloader",
+        "name": "DownloaderImpl",
+        "path": "/resources/download",
+        "description": "A service for downloading content"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.DownloadWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "dl_input",
+                    "type": "in"
+                },
+                {
+                    "endpoint_id": "dl_output",
+                    "type": "out"
+                }
+            ]
+        }
+    ]
+}

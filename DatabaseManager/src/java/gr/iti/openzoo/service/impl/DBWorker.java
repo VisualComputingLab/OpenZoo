@@ -48,6 +48,13 @@ public class DBWorker extends OpenZooWorker {
     public void run()
     {
         log.debug("-- DBWorker.run");
+        
+        if (!logConn.init())
+        {
+            log.error("Error by endpoint initialization");
+            return;
+        }
+        
         logConn.debug("Running...");
         
         if (!inConn.init())

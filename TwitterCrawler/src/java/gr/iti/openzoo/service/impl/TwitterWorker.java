@@ -59,6 +59,13 @@ public class TwitterWorker extends OpenZooLoneWorker {
     public void run()
     {
         log.debug("-- TwitterWorker.run");
+        
+        if (!logConn.init())
+        {
+            log.error("Error by endpoint initialization");
+            return;
+        }
+        
         logConn.debug("Running...");
         
         if (!outConn.init())

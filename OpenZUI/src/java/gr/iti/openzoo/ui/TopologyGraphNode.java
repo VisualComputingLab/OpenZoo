@@ -14,7 +14,6 @@ public class TopologyGraphNode {
     private int instances = 1;
     private int workerspercore = 1;
     private HashMap<String, String> requirements = null;
-//    private HashMap<String, String> instance2routingkeys = null;
 
     public TopologyGraphNode(String cid, JSONObject json)
     {

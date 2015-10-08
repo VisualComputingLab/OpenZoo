@@ -419,8 +419,9 @@ public class Topology {
         TopologyGraphNode nod;
         TopologyGraphConnection conn;
         HashMap<String, JSONArray> config = new HashMap<>();
+        HashMap<String, JSONArray> objid2inst = new HashMap<>();
         String id;
-        JSONArray conf;
+        JSONArray conf, json_i2k;
         JSONObject property;
         
         try
@@ -431,6 +432,10 @@ public class Topology {
             {
                 JSONObject objs = graphConfiguration.getJSONObject(i);
                 config.put(objs.getString("objectId"), objs.getJSONArray("conf"));
+                if (objs.has("instances"))
+                {
+                    objid2inst.put(objs.getString("objectId"), objs.getJSONArray("instances"));
+                }
             }
             
             // then read nodes and connections and fill in the configuration information
@@ -466,7 +471,7 @@ public class Topology {
                                 default:
                                     nod.addRequirement(property.getString("name"), property.getString("value"));
                             }
-                        }                        
+                        }
                         this.addNode(nod);
                         break;
                         
@@ -507,8 +512,25 @@ public class Topology {
                             }
                         }
                         
-                        conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, mapstr, routkeys);
-                        this.addConnection(conn);
+                        json_i2k = objid2inst.get(id);
+                        HashMap<String, ArrayList<String>> inst2keys = null;
+                        if (mapstr.equalsIgnoreCase("conn_route") && json_i2k != null)
+                        {
+                            inst2keys = new HashMap<>();
+                            for (int j = 0; j < json_i2k.length(); j++)
+                            {
+                                String s_keys = json_i2k.getJSONObject(j).getString("keys");
+                                int target_instance = Integer.parseInt(json_i2k.getJSONObject(j).getString("instance"));
+                                if (s_keys == null || s_keys.isEmpty()) continue;
+                                conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, target_instance, mapstr, s_keys);
+                                this.addConnection(conn);
+                            }
+                        }
+                        else
+                        {                        
+                            conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, -1, mapstr, null);
+                            this.addConnection(conn);
+                        }
                         break;
                 }
             }
