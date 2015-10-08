@@ -26,7 +26,10 @@ public class DownloadWorker extends OpenZooWorker {
     
     @Override
     public boolean doWork(Message message) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        // do nothing, just forward the message
+        
+        return true;
     }
 
     @Override
