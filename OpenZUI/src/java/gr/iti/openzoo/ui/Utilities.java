@@ -3,6 +3,8 @@ package gr.iti.openzoo.ui;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,11 +26,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -424,5 +429,101 @@ public class Utilities {
         }
         
         return response;
+    }
+    
+    // http://www.avajava.com/tutorials/lessons/how-do-i-zip-a-directory-and-all-its-contents.html
+    public static boolean compressDirectory(String path)
+    {
+        File directoryToZip = new File(path);
+        List<File> fileList = new ArrayList<>();
+        
+        System.out.println("---Getting references to all files in: " + path);
+        if (!getAllFiles(directoryToZip, fileList))
+            return false;
+        
+        System.out.println("---Creating zip file");
+        if (!writeZipFile(directoryToZip, fileList))
+            return false;
+        
+        System.out.println("---Done");
+        
+        return true;
+    }
+    
+    public static boolean getAllFiles(File dir, List<File> fileList)
+    {
+        try
+        {
+            File[] files = dir.listFiles();
+            for (File file : files)
+            {
+                fileList.add(file);
+                if (file.isDirectory())
+                {
+                    System.out.println("directory:" + file.getCanonicalPath());
+                    getAllFiles(file, fileList);
+                }
+                else
+                {
+                    System.out.println("     file:" + file.getCanonicalPath());
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+        
+        return true;
+    }
+
+    public static boolean writeZipFile(File directoryToZip, List<File> fileList)
+    {
+        try (FileOutputStream fos = new FileOutputStream(directoryToZip.getName() + ".zip"); ZipOutputStream zos = new ZipOutputStream(fos))
+        {
+            for (File file : fileList)
+            {
+                if (!file.isDirectory())
+                {
+                    // we only zip files, not directories
+                    addToZip(directoryToZip, file, zos);
+                }
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+        
+        return true;
+    }
+
+    public static void addToZip(File directoryToZip, File file, ZipOutputStream zos) throws FileNotFoundException,
+                    IOException
+    {
+        try (FileInputStream fis = new FileInputStream(file))
+        {
+            String zipFilePath = file.getCanonicalPath().substring(directoryToZip.getCanonicalPath().length() + 1,
+                            file.getCanonicalPath().length());
+            System.out.println("Writing '" + zipFilePath + "' to zip file");
+            ZipEntry zipEntry = new ZipEntry(zipFilePath);
+            zos.putNextEntry(zipEntry);
+
+            byte[] bytes = new byte[1024];
+            int length;
+            while ((length = fis.read(bytes)) >= 0)
+            {
+                zos.write(bytes, 0, length);
+            }
+
+            zos.closeEntry();
+        }
     }
 }
