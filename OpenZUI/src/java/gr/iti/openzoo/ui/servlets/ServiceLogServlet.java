@@ -122,8 +122,6 @@ public class ServiceLogServlet extends HttpServlet {
                     }
                 }
                 
-                connection.close();
-                
                 json.put("response", logs);
             }
         }
@@ -141,6 +139,11 @@ public class ServiceLogServlet extends HttpServlet {
         }
         catch (ShutdownSignalException ex) 
         {
+        }
+        finally
+        {
+            if (connection != null)
+                connection.close();
         }
         
         response.setContentType("application/json");

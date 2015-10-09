@@ -23,7 +23,7 @@ import twitter4j.json.DataObjectFactory;
  */
 public class TwitterWorker extends OpenZooLoneWorker {
 
-    private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "ep_to");
+    private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "tw_output");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     public TwitterWorker(String threadName)
@@ -169,7 +169,6 @@ public class TwitterWorker extends OpenZooLoneWorker {
             public void onException(Exception ex)
             {
                 log.error("Exception in StatusListener: " + ex);
-                logConn.error("Exception in StatusListener: " + ex);
             }
         };
 

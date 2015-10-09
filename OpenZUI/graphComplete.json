@@ -1,0 +1,397 @@
+{
+    "fully_configured": false, 
+    "graph": {
+        "cells": [
+            {
+                "angle": 0, 
+                "attrs": {}, 
+                "id": "transition-source", 
+                "markup": "<g class=\"rotatable\"><g class=\"scalable\"><circle class=\"outer\"/><circle class=\"inner\"/></g></g>", 
+                "position": {
+                    "x": 600, 
+                    "y": 20
+                }, 
+                "size": {
+                    "height": 30, 
+                    "width": 30
+                }, 
+                "type": "uml.StartState", 
+                "z": 1
+            }, 
+            {
+                "angle": 0, 
+                "attrs": {}, 
+                "id": "transition-target", 
+                "markup": "<g class=\"rotatable\"><g class=\"scalable\"><circle class=\"outer\"/><circle class=\"inner\"/></g></g>", 
+                "position": {
+                    "x": 700, 
+                    "y": 20
+                }, 
+                "size": {
+                    "height": 30, 
+                    "width": 30
+                }, 
+                "type": "uml.StartState", 
+                "z": 2
+            }, 
+            {
+                "angle": 0, 
+                "attrs": {
+                    ".uml-state-events": {
+                        "text": "status: --"
+                    }, 
+                    ".uml-state-name": {
+                        "text": "DatabaseManager"
+                    }, 
+                    ".uml-state-separator": {
+                        "d": "M 0 20 L 160 20"
+                    }
+                }, 
+                "events": [
+                    "status: --"
+                ], 
+                "id": "DatabaseManager", 
+                "name": "DatabaseManager", 
+                "position": {
+                    "x": 602, 
+                    "y": 463
+                }, 
+                "size": {
+                    "height": 60, 
+                    "width": 160
+                }, 
+                "type": "uml.State", 
+                "z": 3
+            }, 
+            {
+                "angle": 0, 
+                "attrs": {
+                    ".uml-state-events": {
+                        "text": "status: --"
+                    }, 
+                    ".uml-state-name": {
+                        "text": "URLValidator"
+                    }, 
+                    ".uml-state-separator": {
+                        "d": "M 0 20 L 160 20"
+                    }
+                }, 
+                "events": [
+                    "status: --"
+                ], 
+                "id": "URLValidator", 
+                "name": "URLValidator", 
+                "position": {
+                    "x": 200, 
+                    "y": 349
+                }, 
+                "size": {
+                    "height": 60, 
+                    "width": 160
+                }, 
+                "type": "uml.State", 
+                "z": 4
+            }, 
+            {
+                "angle": 0, 
+                "attrs": {
+                    ".uml-state-events": {
+                        "text": "status: --"
+                    }, 
+                    ".uml-state-name": {
+                        "text": "TwitterCrawler"
+                    }, 
+                    ".uml-state-separator": {
+                        "d": "M 0 20 L 160 20"
+                    }
+                }, 
+                "events": [
+                    "status: --"
+                ], 
+                "id": "TwitterCrawler", 
+                "name": "TwitterCrawler", 
+                "position": {
+                    "x": 115, 
+                    "y": 79
+                }, 
+                "size": {
+                    "height": 60, 
+                    "width": 160
+                }, 
+                "type": "uml.State", 
+                "z": 5
+            }, 
+            {
+                "angle": 0, 
+                "attrs": {
+                    ".uml-state-events": {
+                        "text": "status: --"
+                    }, 
+                    ".uml-state-name": {
+                        "text": "ContentDownloader"
+                    }, 
+                    ".uml-state-separator": {
+                        "d": "M 0 20 L 160 20"
+                    }
+                }, 
+                "events": [
+                    "status: --"
+                ], 
+                "id": "ContentDownloader", 
+                "name": "ContentDownloader", 
+                "position": {
+                    "x": 473, 
+                    "y": 147
+                }, 
+                "size": {
+                    "height": 60, 
+                    "width": 160
+                }, 
+                "type": "uml.State", 
+                "z": 6
+            }, 
+            {
+                "attrs": {
+                    ".connection": {
+                        "fill": "none", 
+                        "stroke": "#4b4a67", 
+                        "stroke-linejoin": "round", 
+                        "stroke-width": "2"
+                    }
+                }, 
+                "id": "2e9cb86d-527e-4759-89e7-ba5cf2a70308", 
+                "source": {
+                    "id": "TwitterCrawler"
+                }, 
+                "target": {
+                    "id": "URLValidator"
+                }, 
+                "type": "uml.Transition", 
+                "z": 7
+            }, 
+            {
+                "attrs": {
+                    ".connection": {
+                        "fill": "none", 
+                        "stroke": "#4b4a67", 
+                        "stroke-linejoin": "round", 
+                        "stroke-width": "2"
+                    }
+                }, 
+                "id": "1feb7312-6a3d-43f6-bdeb-b722b6055066", 
+                "source": {
+                    "id": "URLValidator"
+                }, 
+                "target": {
+                    "id": "ContentDownloader"
+                }, 
+                "type": "uml.Transition", 
+                "z": 8
+            }, 
+            {
+                "attrs": {
+                    ".connection": {
+                        "fill": "none", 
+                        "stroke": "#4b4a67", 
+                        "stroke-linejoin": "round", 
+                        "stroke-width": "2"
+                    }
+                }, 
+                "id": "ed2eeafd-0acc-4be0-8453-cfc344df2236", 
+                "source": {
+                    "id": "URLValidator"
+                }, 
+                "target": {
+                    "id": "DatabaseManager"
+                }, 
+                "type": "uml.Transition", 
+                "z": 9
+            }, 
+            {
+                "attrs": {
+                    ".connection": {
+                        "fill": "none", 
+                        "stroke": "#4b4a67", 
+                        "stroke-linejoin": "round", 
+                        "stroke-width": "2"
+                    }
+                }, 
+                "id": "b05217b8-7cfa-4a2e-837d-6d4a49ced35c", 
+                "source": {
+                    "id": "ContentDownloader"
+                }, 
+                "target": {
+                    "id": "DatabaseManager"
+                }, 
+                "type": "uml.Transition", 
+                "z": 10
+            }
+        ]
+    }, 
+    "graphConfiguration": [
+        {
+            "conf": [
+                {
+                    "name": "keywords", 
+                    "value": "[\"fashion\",\"dress\"]"
+                }, 
+                {
+                    "name": "accessTokenSecret", 
+                    "value": "2uG9BckGD2ktq3qkqKLRyVj4P6uatl4aEVIBwqTOhU"
+                }, 
+                {
+                    "name": "accessToken", 
+                    "value": "16182078-bBlKbHDPhDvVIO8EVJKSow9U83CAzxufptLzUJZPt"
+                }, 
+                {
+                    "name": "consumerSecret", 
+                    "value": "JtPqX1ZAnnrnMLgBgLGJsf7aDbktVcz1l3FY3Icff9o"
+                }, 
+                {
+                    "name": "consumerKey", 
+                    "value": "SFqsVAWDOVkDC1bk1FyCAQ"
+                }, 
+                {
+                    "name": "instances", 
+                    "value": "1"
+                }, 
+                {
+                    "name": "wpc", 
+                    "value": "0"
+                }
+            ], 
+            "objectId": "TwitterCrawler"
+        }, 
+        {
+            "conf": [
+                {
+                    "name": "instances", 
+                    "value": "2"
+                }, 
+                {
+                    "name": "wpc", 
+                    "value": "1"
+                }
+            ], 
+            "objectId": "URLValidator"
+        }, 
+        {
+            "conf": [
+                {
+                    "name": "outEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.TwitterWorker:tw_output"
+                }, 
+                {
+                    "name": "inEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.URLWorker:urlval_input"
+                }, 
+                {
+                    "name": "conn_mapping", 
+                    "value": "conn_available"
+                }
+            ], 
+            "objectId": "2e9cb86d-527e-4759-89e7-ba5cf2a70308"
+        }, 
+        {
+            "conf": [
+                {
+                    "name": "instances", 
+                    "value": "2"
+                }, 
+                {
+                    "name": "wpc", 
+                    "value": "1"
+                }
+            ], 
+            "objectId": "ContentDownloader"
+        }, 
+        {
+            "conf": [
+                {
+                    "name": "outEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.URLWorker:urlval_output_dl"
+                }, 
+                {
+                    "name": "inEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.DownloadWorker:dl_input"
+                }, 
+                {
+                    "name": "conn_mapping", 
+                    "value": "conn_route"
+                }
+            ], 
+            "instances": [
+                {
+                    "endpoint": "gr.iti.openzoo.service.impl.DownloadWorker:dl_input", 
+                    "instance": "0", 
+                    "keys": "coord"
+                }, 
+                {
+                    "endpoint": "gr.iti.openzoo.service.impl.DownloadWorker:dl_input", 
+                    "instance": "1", 
+                    "keys": "nocoord"
+                }
+            ], 
+            "objectId": "1feb7312-6a3d-43f6-bdeb-b722b6055066"
+        }, 
+        {
+            "conf": [
+                {
+                    "name": "mongo_collection_messages", 
+                    "value": "openzootest_messages"
+                }, 
+                {
+                    "name": "mongo_collection_images", 
+                    "value": "openzootest_images"
+                }, 
+                {
+                    "name": "mongo_database", 
+                    "value": "vseen"
+                }, 
+                {
+                    "name": "instances", 
+                    "value": "1"
+                }, 
+                {
+                    "name": "wpc", 
+                    "value": "0"
+                }
+            ], 
+            "objectId": "DatabaseManager"
+        }, 
+        {
+            "conf": [
+                {
+                    "name": "outEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.DownloadWorker:dl_output"
+                }, 
+                {
+                    "name": "inEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.DBWorker:db_input"
+                }, 
+                {
+                    "name": "conn_mapping", 
+                    "value": "conn_available"
+                }
+            ], 
+            "objectId": "b05217b8-7cfa-4a2e-837d-6d4a49ced35c"
+        }, 
+        {
+            "conf": [
+                {
+                    "name": "outEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.URLWorker:urlval_output_db"
+                }, 
+                {
+                    "name": "inEndpointsList", 
+                    "value": "gr.iti.openzoo.service.impl.DBWorker:db_input"
+                }, 
+                {
+                    "name": "conn_mapping", 
+                    "value": "conn_available"
+                }
+            ], 
+            "objectId": "ed2eeafd-0acc-4be0-8453-cfc344df2236"
+        }
+    ]
+}

@@ -85,7 +85,7 @@
                 <option>ERROR</option>
               </select>
               <div class="well well-sm">
-                <textarea style="width:100%" rows="10" id="serviceLogTextArea">LogLevel Component Time Message</textarea>
+                <textarea style="width:100%" rows="10" id="serviceLogTextArea"></textarea>
               </div>
             </div>
           </div> 

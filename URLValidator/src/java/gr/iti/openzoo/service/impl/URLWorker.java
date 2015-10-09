@@ -28,8 +28,9 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class URLWorker extends OpenZooWorker {
 
-    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "ep_from");
-    private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "ep_to");
+    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "urlval_input");
+    private OpenZooOutputConnection outConnDl = new OpenZooOutputConnection(this, "urlval_output_dl");
+    private OpenZooOutputConnection outConnDb = new OpenZooOutputConnection(this, "urlval_output_db");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     private SimpleDateFormat dateFormatter;
@@ -62,7 +63,10 @@ public class URLWorker extends OpenZooWorker {
             {
                 JSONObject result = new JSONObject();
                 result.put("date_posted", tweet.getLong("date_posted"));
-                result.put("images", tweet.getJSONArray("images"));
+                if (tweet.has("images"))
+                    result.put("images", tweet.getJSONArray("images"));
+                if (tweet.has("coordinates") && !tweet.isNull("coordinates"))
+                    result.put("coordinates", tweet.getJSONObject("coordinates"));
                 message.setPayload(result);
                 
                 return true;
@@ -93,7 +97,7 @@ public class URLWorker extends OpenZooWorker {
         
         logConn.debug("-- URLWorker.run");
         
-        if (!inConn.init() || !outConn.init())
+        if (!inConn.init() || !outConnDl.init() || !outConnDb.init())
         {
             log.error("Error by endpoint initialization");
             logConn.error("Error by endpoint initialization");
@@ -127,7 +131,16 @@ public class URLWorker extends OpenZooWorker {
             if (success)
             {
                 message.setSuccess(success);
-                outConn.put(message);
+                
+                if (message.getPayload().has("images"))
+                {
+                    if (message.getPayload().has("coordinates"))
+                        message.setRoutingKey("coord");
+                    else message.setRoutingKey("nocoord");
+                    
+                    outConnDl.put(message);
+                }
+                else outConnDb.put(message);
             }
             
             inConn.ack(message);
@@ -212,8 +225,8 @@ public class URLWorker extends OpenZooWorker {
                 }
             }
 
-            if (imageUrls.isEmpty())
-                return false;
+//            if (imageUrls.isEmpty())
+//                return false;
 
             if (imageUrls.size() > 0)
             {
