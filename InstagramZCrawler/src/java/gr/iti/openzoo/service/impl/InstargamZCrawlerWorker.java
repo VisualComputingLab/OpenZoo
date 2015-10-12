@@ -32,6 +32,7 @@ public class InstargamZCrawlerWorker extends OpenZooWorker {
 
     private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "instagram_out");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
+    
     // LOOK OUT FOR "&" AMONG PREFIXES
     private static final String API_SITE = "https://api.instagram.com/v1";
     private static final String PREFIX_TAG = "/tags";
@@ -96,28 +97,27 @@ public class InstargamZCrawlerWorker extends OpenZooWorker {
         String refresh_interval = getRequiredParameter("refresh_interval");
         String lat = getRequiredParameter("latitude");
         String lng = getRequiredParameter("longtitude");
-
-        String stop = null;
-        int stopper = 0;
+        String topic = getRequiredParameter("keyword").trim().replaceAll(" ", "_");
+        //String stop = getRequiredParameter("max_results");
         int interval = 0;
+        int stopper = 1000000;
 
-        try {
-            stop = getRequiredParameter("max_results");
-            stopper = Integer.parseInt(stop);
-            if (stopper <= 0) {
-                err("Max result has to be between 1 and 1000000, do not use 'max_results' to get all results,");
-                return;
-            }
-        } catch (Exception e) {
-            stopper = Integer.MAX_VALUE;
-        }
+//        if (stop == "" || stop == "_" || stop == null || stop.isEmpty()) {
+//            stopper = 1000000;
+//        } else {
+//            stopper = Integer.parseInt(stop);
+//            if (stopper <= 0) {
+//                err("Max result has to be between 1 and 1000000, do not use 'max_results' to get all results,");
+//                return;
+//            }
+//        }
+        
 
         while (!enough) {
 
             try {
                 if (operation.equals(OP_COMMAND_TAG)) {
-                    String topic = getRequiredParameter("tag").replaceAll(" ", "_");
-
+                    
                     if (topic == "" || topic == "_" || topic == null || topic.isEmpty()) {
                         err("No topic given to explore, aborting");
                         return;
@@ -166,12 +166,12 @@ public class InstargamZCrawlerWorker extends OpenZooWorker {
                         }
                     }
                 } else if (operation.equals(OP_COMMAND_LOCATION)) {
-                    
+
                     URL tagsUrl = null;
                     try {
                         tagsUrl = new URL(API_LOC_SITE + PREFIX_SEARCH + "?" + PREFIX_LAT + lat + "&" + PREFIX_LNG + lng + "&" + API_CLIENT_ID + cliId);
                     } catch (MalformedURLException ex) {
-                        Logger.getLogger(InstargamZCrawlerWorker.class.getName()).log(Level.SEVERE, null, ex);
+                        err("searching for loacation --MalformedURLException " + ex);
                     }
                     String tags = callGET(tagsUrl);
                     log("Locations: " + tags);
@@ -198,7 +198,7 @@ public class InstargamZCrawlerWorker extends OpenZooWorker {
 
             if (refresh_interval == "" || refresh_interval == null || refresh_interval.isEmpty()) {
                 log("Set to run once");
-                enough=true;
+                enough = true;
             } else {
                 interval = Integer.parseInt(refresh_interval);
                 try {
@@ -302,7 +302,9 @@ public class InstargamZCrawlerWorker extends OpenZooWorker {
                 String tagMedia = callGET(tagMediaUrl);
                 JSONObject tagMediaobj = new JSONObject(tagMedia);
 
-                pageToken = tagMediaobj.getJSONObject("pagination").optString("next_max_id", "noMore");
+                //pageToken = tagMediaobj.getJSONObject("pagination").optString("next_max_id", "noMore");
+                // becaue next_max_id -->deprecated
+                pageToken = tagMediaobj.getJSONObject("pagination").optString("next_max_tag_id ", "noMore");
 
                 JSONArray tagMediaObjData = tagMediaobj.getJSONArray("data");
                 log("media response : " + tagMediaObjData.toString());

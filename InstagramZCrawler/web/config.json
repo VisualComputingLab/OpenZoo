@@ -23,8 +23,12 @@
     [
     "clientId",
     "clientSecret",
-    "keywords",
-    {"typeOfSearch":""}
+    "search_by",
+    "refresh_interval",
+    "latitude",
+    "longtitude",
+    "keyword"
+    
     
     ]
 }
