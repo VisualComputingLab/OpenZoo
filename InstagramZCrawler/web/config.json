@@ -1,0 +1,30 @@
+{
+    "service":
+    {
+        "component_id": "InstargamZCrawler",
+        "name": "InstargamZCrawlerWorkerImpl",
+        "path": "/resources/crawl",
+        "description": "A service for crawling the Twitter social network"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.InstargamZCrawlerWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "instagram_out",
+                    "type": "out"
+                }
+            ]
+        }
+    ],
+    "requires":
+    [
+    "clientId",
+    "clientSecret",
+    "keywords",
+    {"typeOfSearch":""}
+    
+    ]
+}
