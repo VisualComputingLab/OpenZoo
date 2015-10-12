@@ -1,0 +1,101 @@
+annotation.processing.enabled=true
+annotation.processing.enabled.in.editor=true
+annotation.processing.processors.list=
+annotation.processing.run.all.processors=true
+annotation.processing.source.output=${r'${build.generated.sources.dir}'}/ap-source-output
+build.classes.dir=${r'${build.web.dir}'}/WEB-INF/classes
+build.classes.excludes=**/*.java,**/*.form
+build.dir=build
+build.generated.dir=${r'${build.dir}'}/generated
+build.generated.sources.dir=${r'${build.dir}'}/generated-sources
+build.test.classes.dir=${r'${build.dir}'}/test/classes
+build.test.results.dir=${r'${build.dir}'}/test/results
+build.web.dir=${r'${build.dir}'}/web
+build.web.excludes=${r'${build.classes.excludes}'}
+client.urlPart=
+compile.jsps=false
+conf.dir=${r'${source.root}'}/conf
+debug.classpath=${r'${build.classes.dir}:${javac.classpath}'}
+debug.test.classpath=\
+    ${r'${run.test.classpath}'}
+display.browser=true
+dist.dir=dist
+dist.ear.war=${r'${dist.dir}/${war.ear.name}'}
+dist.javadoc.dir=${r'${dist.dir}'}/javadoc
+dist.war=${r'${dist.dir}/${war.name}'}
+endorsed.classpath=\
+    ${r'${libs.javaee-endorsed-api-6.0.classpath}'}
+excludes=
+file.reference.commons-codec-1.8.jar=../OpenZooService/lib/commons-codec-1.8.jar
+file.reference.commons-pool2-2.4.2.jar=../OpenZooService/lib/commons-pool2-2.4.2.jar
+file.reference.jedis-2.7.3.jar=../OpenZooService/lib/jedis-2.7.3.jar
+file.reference.log4j-api-2.0.2.jar=../OpenZooService/lib/log4j-api-2.0.2.jar
+file.reference.log4j-core-2.0.2.jar=../OpenZooService/lib/log4j-core-2.0.2.jar
+file.reference.mongo-2.9.3.jar=../OpenZooService/lib/mongo-2.9.3.jar
+file.reference.rabbitmq-client.jar=../OpenZooService/lib/rabbitmq-client.jar
+includes=**
+j2ee.compile.on.save=true
+j2ee.copy.static.files.on.save=true
+j2ee.deploy.on.save=true
+j2ee.platform=1.6-web
+j2ee.platform.classpath=${r'${j2ee.server.home}/lib/annotations-api.jar:${j2ee.server.home}/lib/catalina-ant.jar:${j2ee.server.home}/lib/catalina-ha.jar:${j2ee.server.home}/lib/catalina-tribes.jar:${j2ee.server.home}/lib/catalina.jar:${j2ee.server.home}/lib/ecj-4.2.2.jar:${j2ee.server.home}/lib/el-api.jar:${j2ee.server.home}/lib/jasper-el.jar:${j2ee.server.home}/lib/jasper.jar:${j2ee.server.home}/lib/jsp-api.jar:${j2ee.server.home}/lib/servlet-api.jar:${j2ee.server.home}/lib/tomcat-api.jar:${j2ee.server.home}/lib/tomcat-coyote.jar:${j2ee.server.home}/lib/tomcat-dbcp.jar:${j2ee.server.home}/lib/tomcat-i18n-es.jar:${j2ee.server.home}/lib/tomcat-i18n-fr.jar:${j2ee.server.home}/lib/tomcat-i18n-ja.jar:${j2ee.server.home}/lib/tomcat-jdbc.jar:${j2ee.server.home}'}/lib/tomcat-util.jar
+j2ee.server.type=Tomcat
+jar.compress=false
+javac.classpath=\
+    ${r'${libs.restapi.classpath}'}:\
+    ${r'${libs.restlib.classpath}'}:\
+    ${r'${reference.OpenZooService.jar}'}:\
+    ${r'${file.reference.commons-codec-1.8.jar}'}:\
+    ${r'${file.reference.jedis-2.7.3.jar}'}:\
+    ${r'${file.reference.log4j-api-2.0.2.jar}'}:\
+    ${r'${file.reference.log4j-core-2.0.2.jar}'}:\
+    ${r'${file.reference.mongo-2.9.3.jar}'}:\
+    ${r'${file.reference.rabbitmq-client.jar}'}:\
+    ${r'${file.reference.commons-pool2-2.4.2.jar}'}
+# Space-separated list of extra javac options
+javac.compilerargs=
+javac.debug=true
+javac.deprecation=false
+javac.processorpath=\
+    ${r'${javac.classpath}'}
+javac.source=1.7
+javac.target=1.7
+javac.test.classpath=\
+    ${r'${javac.classpath}'}:\
+    ${r'${build.classes.dir}'}
+javac.test.processorpath=\
+    ${r'${javac.test.classpath}'}
+javadoc.additionalparam=
+javadoc.author=false
+javadoc.encoding=${r'${source.encoding}'}
+javadoc.noindex=false
+javadoc.nonavbar=false
+javadoc.notree=false
+javadoc.preview=true
+javadoc.private=false
+javadoc.splitindex=true
+javadoc.use=true
+javadoc.version=false
+javadoc.windowtitle=
+lib.dir=${r'${web.docbase.dir}'}/WEB-INF/lib
+persistence.xml.dir=${r'${conf.dir}'}
+platform.active=default_platform
+project.OpenZooService=../OpenZooService
+reference.OpenZooService.jar=${r'${project.OpenZooService}'}/dist/OpenZooService.jar
+resource.dir=setup
+rest.config.type=dd
+run.test.classpath=\
+    ${r'${javac.test.classpath}'}:\
+    ${r'${build.test.classes.dir}'}
+# Space-separated list of JVM arguments used when running a class with a main method or a unit test
+# (you may also define separate properties like run-sys-prop.name=value instead of -Dname=value):
+runmain.jvmargs=
+source.encoding=UTF-8
+source.root=src
+src.dir=${r'${source.root}'}/java
+test.src.dir=test
+war.content.additional=
+war.ear.name=${r'${war.name}'}
+war.name=${ComponentID}.war
+web.docbase.dir=web
+webinf.dir=web/WEB-INF
