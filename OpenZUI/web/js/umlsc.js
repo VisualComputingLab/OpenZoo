@@ -2,7 +2,7 @@ var warfiles = {};
 // the graph configuration object
 var graphConf = [];
 // flag in case topology's parameters are not fully set
-var dirty = true;
+var notDirty = false;
 // the element object from graphConf caught on pointerdown (click)
 var theObj = [];
 // graphical element id that is being manipulated
@@ -258,13 +258,10 @@ var paper;
 
 $(document).ready(function() {
 
-    fetchServicesList(load());
-
-    function load() {
-        // read warfiles 'requires' fields from localStorage -- They have to have been fetched first
-        var wf = localStorage["WAR"];
-        warfiles = JSON.parse(wf);
-    }
+    fetchServicesList();
+  
+    var wf = localStorage["WAR"];
+    warfiles = JSON.parse(wf);
 
     $('#service_manager').hide();
     $('#connection_manager').hide();
@@ -696,11 +693,15 @@ $(document).ready(function() {
 
     $("#submitTopoBtn").on('click', function() {
 
-        if (graphConf.length == (graph.attributes.cells.models.length - 2)) {
-            dirty = false;
+        if (graphConf.length != (graph.attributes.cells.models.length - 2)) {
+            notDirty = false;
         }
+        else{
+            notDirty = true
+        }
+        
 
-        var graphComplete = {graph: graph, graphConfiguration: graphConf, fully_configured: dirty};
+        var graphComplete = {graph: graph, graphConfiguration: graphConf, fully_configured: notDirty};
         localStorage.setItem("graphComplete", JSON.stringify(graphComplete));
         $("#topo-graph").val(JSON.stringify(graphComplete));
         $("#topoSubmitForm").submit();
