@@ -439,6 +439,9 @@ public class Topology {
             }
             
             // then read nodes and connections and fill in the configuration information
+            this.nodes.clear();
+            this.connections.clear();
+            
             JSONArray cells = graph_object.getJSONObject("graph").getJSONArray("cells");
             for (int i = 0; i < cells.length(); i++)
             {
