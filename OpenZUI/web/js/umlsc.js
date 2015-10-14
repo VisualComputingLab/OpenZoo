@@ -208,7 +208,7 @@ function routing_manager_reload(targetId, connId, target_in_endpoint) {
 
             var optionInstances = "<option value='blank' disabled selected></option>";
             for (y = 0; y < instancesNum; y++) {
-                optionInstances += "<option value='" + y + "'>instance " + y  + "</option>";
+                optionInstances += "<option value='" + y + "'>instance " + y + "</option>";
             }
 
             $("#route_mapping_instance").html(optionInstances);
@@ -259,7 +259,7 @@ var paper;
 $(document).ready(function() {
 
     fetchServicesList();
-  
+
     var wf = localStorage["WAR"];
     warfiles = JSON.parse(wf);
 
@@ -695,16 +695,37 @@ $(document).ready(function() {
 
         if (graphConf.length != (graph.attributes.cells.models.length - 2)) {
             notDirty = false;
+            mArr=[];
+            gArr=[];
+            
+            alertify.error("Topology services and connections not fully configured")
+            
+            $(graph.attributes.cells.models).each(function(){
+                if (this.id !== "transition-source" && this.id !== "transition-target"){
+                    mArr.push(this.id);
+                }
+            });
+                       
+            $(graphConf).each(function(){
+                gArr.push(this.objectId);
+            })
+            
+            //differences array
+            var diff = $(mArr).not(gArr).get();
+            
+            alertify.error("Check: " + diff)
         }
-        else{
-            notDirty = true
-        }
-        
+        else {
+            notDirty = true;
 
-        var graphComplete = {graph: graph, graphConfiguration: graphConf, fully_configured: notDirty};
-        localStorage.setItem("graphComplete", JSON.stringify(graphComplete));
-        $("#topo-graph").val(JSON.stringify(graphComplete));
-        $("#topoSubmitForm").submit();
+            var graphComplete = {graph: graph, graphConfiguration: graphConf, fully_configured: notDirty};
+            localStorage.setItem("graphComplete", JSON.stringify(graphComplete));
+            $("#topo-graph").val(JSON.stringify(graphComplete));
+            $("#topoSubmitForm").submit();
+        }
+
+
+
     });
 
     $("#cancelTopoBtn").on('click', function() {
