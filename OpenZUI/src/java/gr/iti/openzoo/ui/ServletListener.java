@@ -37,7 +37,11 @@ public class ServletListener implements ServletContextListener {
             {
                 String localRepository = properties.getString("localRepository");
                 File fd = new File(localRepository);
-                if (!fd.exists()) fd.mkdir();
+                if (!fd.exists())
+                {
+                    System.out.println("Creating directory " + localRepository);
+                    fd.mkdirs();
+                }
                 sce.getServletContext().setAttribute("localRepository", localRepository);
                 System.out.println("Using " + fd.getAbsolutePath() + " as local repository");
                 

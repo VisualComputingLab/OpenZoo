@@ -15,14 +15,14 @@ build.web.excludes=${r'${build.classes.excludes}'}
 client.urlPart=
 compile.jsps=false
 conf.dir=${r'${source.root}'}/conf
-debug.classpath=${r'${build.classes.dir}:${javac.classpath}'}
+debug.classpath=${r'${build.classes.dir}'}:${r'${javac.classpath}'}
 debug.test.classpath=\
     ${r'${run.test.classpath}'}
 display.browser=true
 dist.dir=dist
-dist.ear.war=${r'${dist.dir}/${war.ear.name}'}
+dist.ear.war=${r'${dist.dir}'}/${r'${war.ear.name}'}
 dist.javadoc.dir=${r'${dist.dir}'}/javadoc
-dist.war=${r'${dist.dir}/${war.name}'}
+dist.war=${r'${dist.dir}'}/${r'${war.name}'}
 endorsed.classpath=\
     ${r'${libs.javaee-endorsed-api-6.0.classpath}'}
 excludes=
@@ -32,19 +32,19 @@ file.reference.jedis-2.7.3.jar=../OpenZooService/lib/jedis-2.7.3.jar
 file.reference.log4j-api-2.0.2.jar=../OpenZooService/lib/log4j-api-2.0.2.jar
 file.reference.log4j-core-2.0.2.jar=../OpenZooService/lib/log4j-core-2.0.2.jar
 file.reference.mongo-2.9.3.jar=../OpenZooService/lib/mongo-2.9.3.jar
-file.reference.rabbitmq-client.jar=../OpenZooService/lib/rabbitmq-client.jar
+file.reference.OpenZooService.jar=../OpenZooService/dist/OpenZooService.jarfile.reference.rabbitmq-client.jar=../OpenZooService/lib/rabbitmq-client.jar
 includes=**
 j2ee.compile.on.save=true
 j2ee.copy.static.files.on.save=true
 j2ee.deploy.on.save=true
 j2ee.platform=1.6-web
-j2ee.platform.classpath=${r'${j2ee.server.home}/lib/annotations-api.jar:${j2ee.server.home}/lib/catalina-ant.jar:${j2ee.server.home}/lib/catalina-ha.jar:${j2ee.server.home}/lib/catalina-tribes.jar:${j2ee.server.home}/lib/catalina.jar:${j2ee.server.home}/lib/ecj-4.2.2.jar:${j2ee.server.home}/lib/el-api.jar:${j2ee.server.home}/lib/jasper-el.jar:${j2ee.server.home}/lib/jasper.jar:${j2ee.server.home}/lib/jsp-api.jar:${j2ee.server.home}/lib/servlet-api.jar:${j2ee.server.home}/lib/tomcat-api.jar:${j2ee.server.home}/lib/tomcat-coyote.jar:${j2ee.server.home}/lib/tomcat-dbcp.jar:${j2ee.server.home}/lib/tomcat-i18n-es.jar:${j2ee.server.home}/lib/tomcat-i18n-fr.jar:${j2ee.server.home}/lib/tomcat-i18n-ja.jar:${j2ee.server.home}/lib/tomcat-jdbc.jar:${j2ee.server.home}'}/lib/tomcat-util.jar
+j2ee.platform.classpath=${r'${j2ee.server.home}'}/lib/annotations-api.jar:${r'${j2ee.server.home}'}/lib/catalina-ant.jar:${r'${j2ee.server.home}'}/lib/catalina-ha.jar:${r'${j2ee.server.home}'}/lib/catalina-tribes.jar:${r'${j2ee.server.home}'}/lib/catalina.jar:${r'${j2ee.server.home}'}/lib/ecj-4.2.2.jar:${r'${j2ee.server.home}'}/lib/el-api.jar:${r'${j2ee.server.home}'}/lib/jasper-el.jar:${r'${j2ee.server.home}'}/lib/jasper.jar:${r'${j2ee.server.home}'}/lib/jsp-api.jar:${r'${j2ee.server.home}'}/lib/servlet-api.jar:${r'${j2ee.server.home}'}/lib/tomcat-api.jar:${r'${j2ee.server.home}'}/lib/tomcat-coyote.jar:${r'${j2ee.server.home}'}/lib/tomcat-dbcp.jar:${r'${j2ee.server.home}'}/lib/tomcat-i18n-es.jar:${r'${j2ee.server.home}'}/lib/tomcat-i18n-fr.jar:${r'${j2ee.server.home}'}/lib/tomcat-i18n-ja.jar:${r'${j2ee.server.home}'}/lib/tomcat-jdbc.jar:${r'${j2ee.server.home}'}/lib/tomcat-util.jar
 j2ee.server.type=Tomcat
 jar.compress=false
 javac.classpath=\
     ${r'${libs.restapi.classpath}'}:\
     ${r'${libs.restlib.classpath}'}:\
-    ${r'${reference.OpenZooService.jar}'}:\
+    ${r'${file.reference.OpenZooService.jar}'}:\
     ${r'${file.reference.commons-codec-1.8.jar}'}:\
     ${r'${file.reference.jedis-2.7.3.jar}'}:\
     ${r'${file.reference.log4j-api-2.0.2.jar}'}:\
@@ -80,8 +80,6 @@ javadoc.windowtitle=
 lib.dir=${r'${web.docbase.dir}'}/WEB-INF/lib
 persistence.xml.dir=${r'${conf.dir}'}
 platform.active=default_platform
-project.OpenZooService=../OpenZooService
-reference.OpenZooService.jar=${r'${project.OpenZooService}'}/dist/OpenZooService.jar
 resource.dir=setup
 rest.config.type=dd
 run.test.classpath=\

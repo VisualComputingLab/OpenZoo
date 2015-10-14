@@ -16,10 +16,10 @@
                 {
                     "endpoint_id": "input",
                     "type": "in"
-                }<#if NumOutputs > 0>,</#if>
+                }<#if (NumOutputs > 0)>,</#if>
 </#if>
-<#if NumOutputs > 0>
- <#list 0..NumOutputs as i>
+<#if (NumOutputs > 0)>
+ <#list 1..NumOutputs as i>
                 {
                     "endpoint_id": "output_${i}",
                     "type": "out"

@@ -232,6 +232,7 @@ public class KeyValueCommunication {
         
         try (Jedis jedis = pool.getResource())
         {
+            jedis.del("servers:" + srv.getName());
             jedis.hmset("servers:" + srv.getName(), prop);
         }
         catch (Exception ex)
@@ -286,6 +287,7 @@ public class KeyValueCommunication {
         
         try (Jedis jedis = pool.getResource())
         {
+            jedis.del("repository");
             jedis.hmset("repository", prop);
         }
         catch (Exception ex)
@@ -379,6 +381,7 @@ public class KeyValueCommunication {
         
         try (Jedis jedis = pool.getResource())
         {
+            jedis.del("warfiles:" + war.getComponent_id());
             jedis.hmset("warfiles:" + war.getComponent_id(), prop);
         }
         catch (Exception ex)
