@@ -208,6 +208,7 @@ public abstract class OpenZooService {
             {
                 log.error("ReflectiveOperationException in startWorkers: " + ex);
                 response.put("error", ex);
+                ex.printStackTrace();
             } 
             catch (IllegalArgumentException ex) 
             {

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,6 +35,8 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
     private Utilities util;
     private static KeyValueCommunication kv;
     private JSONObject properties;
+    private String localRepository;
+    private String webAppPath;
     private ArrayList<String> logs = new ArrayList<>();
     private static String[] dirs = {
         "nbproject/",
@@ -56,11 +59,11 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         "web/META-INF/context.xml", 
         "web/WEB-INF/web.xml", 
         "src/conf/MANIFEST.MF", 
-        "src/java/gr/iti/openzoo/service/rest/${ServiceID}.java", 
-        "src/java/gr/iti/openzoo/service/impl/${ComponentID}CrossOriginResourceSharingFilter.java", 
-        "src/java/gr/iti/openzoo/service/impl/${ComponentID}ServletListener.java", 
-        "src/java/gr/iti/openzoo/service/impl/${ServiceID}Impl.java", 
-        "src/java/gr/iti/openzoo/service/impl/${WorkerID}Worker.java"
+        "src/java/gr/iti/openzoo/service/rest/_SERVICEID_Rest.java", 
+        "src/java/gr/iti/openzoo/service/impl/_COMPONENTID_CrossOriginResourceSharingFilter.java", 
+        "src/java/gr/iti/openzoo/service/impl/_COMPONENTID_ServletListener.java", 
+        "src/java/gr/iti/openzoo/service/impl/_SERVICEID_Impl.java", 
+        "src/java/gr/iti/openzoo/service/impl/_WORKERID_Worker.java"
     };
     
     @Override
@@ -70,6 +73,8 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
+        localRepository = (String) getServletContext().getAttribute("localRepository");
+        webAppPath = (String) getServletContext().getRealPath("/");
     }
     
     /**
@@ -154,7 +159,10 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
             }
             
         
-        processRequest(request, response);
+//        processRequest(request, response);
+        
+        // redirect to Topologies.GET
+//        response.sendRedirect("Topologies");
     }
 
     private void createJavaService(HttpServletRequest request, HttpServletResponse response) throws IOException
@@ -208,31 +216,44 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         Template tmpl;
         File dir;
         String templDir = "templates/java";
-        String baseDir = "templates/tmp/" + componentID;
-
-        dir = new File(baseDir);
+        String OZServiceDir = webAppPath + "/templates/OpenZooService";
+        String outputBaseDir = localRepository + "/templates/" + UUID.randomUUID().toString();
+        String outputComponentDir = outputBaseDir + "/" + componentID;
+        String outputOZServiceDir = outputBaseDir + "/OpenZooService";
+        String s_ZipFile = localRepository + "/templates/" + componentID + ".zip";
+        
+        dir = new File(outputComponentDir);
         if (dir.exists())
             FileUtils.deleteQuietly(dir);
         dir.mkdirs();
+        
+        dir = new File(outputOZServiceDir);
+        if (dir.exists())
+            FileUtils.deleteQuietly(dir);
+        dir.mkdirs();
+        
+        dir = new File(outputBaseDir);
+        System.out.println("Output base dir will be: " + dir.getAbsolutePath());
 
         for (int i = 0; i < dirs.length; i++)
         {
-            dir = new File(baseDir + "/" + dirs[i]);
+            dir = new File(outputComponentDir + "/" + dirs[i]);
             dir.mkdirs();
         }
 
+        // first create the component files using the templates
         for (int i = 0; i < files.length; i++)
         {
 //            filename = baseDir + "/" + files[i];
             filename = files[i];
 
+            tmpl = cfg.getTemplate(templDir + "/" + filename + ".ftl");
+            
             filename = filename.replace("_COMPONENTID_", componentID);
             filename = filename.replace("_SERVICEID_", serviceID);
             filename = filename.replace("_WORKERID_", workerID);
 
-            tmpl = cfg.getTemplate(templDir + "/" + filename + ".ftl");
-
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(baseDir + "/" + filename)))
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputComponentDir + "/" + filename)))
             {
                 tmpl.process(root, writer);
             }
@@ -242,10 +263,16 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
                 err("TemplateException during creating template for file " + filename + ": " + ex);
             }
         }
+        
+        // then copy the OpenZooService libs
+        System.out.println("Copying libs from " + new File(OZServiceDir).getAbsolutePath());
+        FileUtils.copyDirectory(new File(OZServiceDir), new File(outputOZServiceDir));
 
-        if (Utilities.compressDirectory(baseDir))
+        
+        // finally, create zip file with both directories
+        
+        if (Utilities.compressDirectory(outputBaseDir, s_ZipFile))
         {
-            String s_ZipFile = baseDir + ".zip";
             File downloadFile = new File(s_ZipFile);
             ServletContext context = request.getServletContext();
             String mimeType = context.getMimeType(s_ZipFile);
@@ -276,6 +303,10 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
             System.err.println("Directory could not be compressed");
             err("Directory could not be compressed");
         }
+        
+        dir = new File(outputBaseDir);
+        if (dir.exists())
+            FileUtils.deleteQuietly(dir);
     }
     
     /**

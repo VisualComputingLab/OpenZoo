@@ -10,6 +10,20 @@
   
 
   	<div class="col-md-4 col-sm-6">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4>Create service template</h4>
+          <form class="form-horizontal" action="Templates" method="GET">
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-success pull-right">Create</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <div class="panel panel-default">
         <div class="panel-heading">
           <h4>Upload WAR files</h4>
@@ -32,47 +46,47 @@
           </form>
         </div>
       </div>
-      <div class="well"> 
-          <form class="form-horizontal" method="POST" action="Repository">
-            <h4>Repository parameters / FTP</h4>
-            <div class="form-group">
-              <label for="ftp-host" class="col-sm-4 control-label">host</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" name="ftp-host" value="${ftp.host}">
-              </div>
+      <!-- <div class="well">
+        <form class="form-horizontal" method="POST" action="Repository">
+          <h4>Repository parameters / FTP</h4>
+          <div class="form-group">
+            <label for="ftp-host" class="col-sm-4 control-label">host</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="ftp-host" value="${ftp.host}">
             </div>
-            <div class="form-group">
-              <label for="ftp-port" class="col-sm-4 control-label">port</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" name="ftp-port" value="${ftp.port}">
-              </div>
+          </div>
+          <div class="form-group">
+            <label for="ftp-port" class="col-sm-4 control-label">port</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="ftp-port" value="${ftp.port}">
             </div>
-            <div class="form-group">
-              <label for="ftp-username" class="col-sm-4 control-label">username</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" name="ftp-user" value="${ftp.user}">
-              </div>
+          </div>
+          <div class="form-group">
+            <label for="ftp-username" class="col-sm-4 control-label">username</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="ftp-user" value="${ftp.user}">
             </div>
-            <div class="form-group">
-              <label for="ftp-pass" class="col-sm-4 control-label">password</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" name="ftp-pass" value="${ftp.passwd}">
-              </div>
+          </div>
+          <div class="form-group">
+            <label for="ftp-pass" class="col-sm-4 control-label">password</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="ftp-pass" value="${ftp.passwd}">
             </div>
-            <div class="form-group">
-              <label for="repo-path" class="col-sm-4 control-label">Repo path</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" name="ftp-path" value="${ftp.path}">
-              <input type="hidden" class="form-control" name="action" value="updateRepo">
+          </div>
+          <div class="form-group">
+            <label for="repo-path" class="col-sm-4 control-label">Repo path</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="ftp-path" value="${ftp.path}">
+            <input type="hidden" class="form-control" name="action" value="updateRepo">
+          </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="submit" class="btn btn-success pull-right">Update</button>
             </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-success pull-right">Update</button>
-              </div>
-            </div>
-          </form>
-        </div>
+          </div>
+        </form>
+      </div> -->
       
   	</div>
 

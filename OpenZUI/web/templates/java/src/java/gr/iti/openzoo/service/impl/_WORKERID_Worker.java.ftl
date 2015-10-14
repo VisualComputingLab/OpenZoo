@@ -35,8 +35,8 @@ public class ${WorkerID}Worker extends OpenZooWorker {
     private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
 </#if>
 
-<#if NumOutputs > 0>
- <#list 0..NumOutputs as i>
+<#if (NumOutputs > 0)>
+ <#list 1..NumOutputs as i>
     private OpenZooOutputConnection outConn_${i} = new OpenZooOutputConnection(this, "output_${i}");
  </#list>
 </#if>
@@ -50,11 +50,11 @@ public class ${WorkerID}Worker extends OpenZooWorker {
     private DBCollection col_msgs;
 </#if>
     
-    public ${WorkerID}(String threadName)
+    public ${WorkerID}Worker(String threadName)
     {        
         super(threadName);
         
-        log.debug("-- ${WorkerID}()");
+        log.debug("-- ${WorkerID}Worker()");
     }
     
     @Override
@@ -84,7 +84,7 @@ public class ${WorkerID}Worker extends OpenZooWorker {
     @Override
     public void run()
     {
-        log.debug("-- ${WorkerID}.run");
+        log.debug("-- ${WorkerID}Worker.run");
         
 <#if QueueLogging??>
         if (!logConn.init())
@@ -107,8 +107,8 @@ public class ${WorkerID}Worker extends OpenZooWorker {
         }
 </#if>
 
-<#if NumOutputs > 0>
- <#list 0..NumOutputs as i> 
+<#if (NumOutputs > 0)>
+ <#list 1..NumOutputs as i> 
         if (!outConn_${i}.init())
         {
             log.error("Error by output_${i} endpoint initialization");
@@ -133,8 +133,8 @@ public class ${WorkerID}Worker extends OpenZooWorker {
         try
         {
             // these could be provided over the required parameters
-            String mongo_database = "test_db";
-            String mongo_collection_messages = "messages";
+            String s_mongodb_db = "test_db";
+            String s_mongodb_col = "messages";
 
             ServerAddress serverAdr = new ServerAddress(serviceParams.getMongo().getHost(), serviceParams.getMongo().getPort());
             MongoOptions options = new MongoOptions();
@@ -142,9 +142,9 @@ public class ${WorkerID}Worker extends OpenZooWorker {
             
             mongo = new Mongo(serverAdr, options);
             mongo.setWriteConcern(WriteConcern.SAFE);
-            DB db_se = mongo.getDB(mongo_database);
+            DB db_se = mongo.getDB(s_mongodb_db);
             db_se.authenticate(serviceParams.getMongo().getUser(), serviceParams.getMongo().getPasswd().toCharArray());
-            col_msgs = db_se.getCollection(mongo_collection_messages);
+            col_msgs = db_se.getCollection(s_mongodb_col);
         }
         catch (UnknownHostException ex) 
         {
@@ -197,9 +197,9 @@ public class ${WorkerID}Worker extends OpenZooWorker {
             {
                 message.setSuccess(success);
                 
-<#if NumOutputs > 0>
+<#if (NumOutputs > 0)>
                 // send results to next component through the first output
-                outConn.put(message);
+                outConn_1.put(message);
 <#else>
                 // do something with the final message, e.g. write it to the mongo
                 message.setProcessingEnd();

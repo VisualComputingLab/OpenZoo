@@ -23,7 +23,7 @@
         <property name="rest.base.url" value="${r'${client.url}'}"/>
     </target>
     <target name="test-restbeans" depends="run-deploy,-init-display-browser,-check-trim,-trim-url,-spare-url">
-        <replace file="${r'${restbeans.test.file}" token="${base.url.token}" value="${rest.base.url}||${rest.application.path}'}"/>
+        <replace file="${r'${restbeans.test.file}'}" token="${r'${base.url.token}'}" value="${r'${rest.base.url}'}||${r'${rest.application.path}'}"/>
         <condition property="do.browse-url">
             <istrue value="${r'${display.browser}'}"/>
         </condition>

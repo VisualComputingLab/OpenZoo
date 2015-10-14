@@ -432,17 +432,17 @@ public class Utilities {
     }
     
     // http://www.avajava.com/tutorials/lessons/how-do-i-zip-a-directory-and-all-its-contents.html
-    public static boolean compressDirectory(String path)
+    public static boolean compressDirectory(String path_in, String path_out)
     {
-        File directoryToZip = new File(path);
+        File directoryToZip = new File(path_in);
         List<File> fileList = new ArrayList<>();
         
-        System.out.println("---Getting references to all files in: " + path);
+        System.out.println("---Getting references to all files in: " + path_in);
         if (!getAllFiles(directoryToZip, fileList))
             return false;
         
         System.out.println("---Creating zip file");
-        if (!writeZipFile(directoryToZip, fileList))
+        if (!writeZipFile(directoryToZip, fileList, path_out))
             return false;
         
         System.out.println("---Done");
@@ -478,9 +478,9 @@ public class Utilities {
         return true;
     }
 
-    public static boolean writeZipFile(File directoryToZip, List<File> fileList)
+    public static boolean writeZipFile(File directoryToZip, List<File> fileList, String path_out)
     {
-        try (FileOutputStream fos = new FileOutputStream(directoryToZip.getName() + ".zip"); ZipOutputStream zos = new ZipOutputStream(fos))
+        try (FileOutputStream fos = new FileOutputStream(path_out); ZipOutputStream zos = new ZipOutputStream(fos))
         {
             for (File file : fileList)
             {
