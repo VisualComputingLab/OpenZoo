@@ -4,7 +4,7 @@
         "host": "160.40.51.165",
         "port": 6379
     },
-    "localRepository": "D:/Tools/OpenZoo/Distribution/openzoo/OpenZUI/repo",
+    "localRepository": "D:/Temp",
     "demouser":
     {
         "username": "admin",
