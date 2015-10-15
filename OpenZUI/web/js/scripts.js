@@ -225,7 +225,7 @@ function fetchServicesList(){
                     }
                 }
 
-                svc={name:val.component_id, in_ep:svc_in, out_ep:svc_out}                    
+                svc={name:val.component_id, in_ep:svc_in, out_ep:svc_out, type:val.type}                    
                 //svc={ in_ep:svc_in, out_ep:svc_out}    
                 listItems+= "<option value='" + val.component_id + "'>" + val.component_id + "</option>";
                 //console.log(svc);

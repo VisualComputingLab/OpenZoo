@@ -506,6 +506,8 @@ $(document).ready(function() {
                     $('#wpc').val('0');
                     $(".addToServiceForm").remove();
                     $("#service_form").removeClass();
+                    $('#instances').attr('readonly', false);
+                    $('#wpc').attr('readonly', false);
 
                     for (var i = 0; i < warfiles.length; i++) {
                         if (warfiles[i].component_id == objectId) {
@@ -542,7 +544,14 @@ $(document).ready(function() {
                             }
                         }
                     }
+                    var localObj = JSON.parse(localStorage[objectId]);
 
+                    if (localObj.hasOwnProperty('type') && localObj.type==="broker"){
+                        $('#instances').value=1;
+                        $('#instances').attr('readonly', true);
+                        $('#wpc').value=0;
+                        $('#wpc').attr('readonly', true);
+                    }
                     $('#service_manager').show(200);
 
                 }
