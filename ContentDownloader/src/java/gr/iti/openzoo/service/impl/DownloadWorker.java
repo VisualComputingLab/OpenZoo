@@ -113,4 +113,9 @@ public class DownloadWorker extends OpenZooWorker {
         logConn.info("Died!");
     }
 
+    @Override
+    public String publish(JSONObject obj) {
+        throw new UnsupportedOperationException("Not Used.");
+    }
+
 }

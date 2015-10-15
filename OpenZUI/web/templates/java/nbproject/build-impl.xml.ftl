@@ -841,8 +841,16 @@ exists or setup the property manually. For example like this:
     <!--
                 COMPILATION SECTION
             -->
-    <target depends="init" if="no.dist.ear.dir" name="deps-module-jar" unless="no.deps"/>
-    <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps"/>
+    <target depends="init" if="no.dist.ear.dir" name="deps-module-jar" unless="no.deps">
+        <ant antfile="${r'${project.OpenZooService}'}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
+    </target>
+    <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps">
+        <ant antfile="${r'${project.OpenZooService}'}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
+    </target>
     <target depends="init, deps-module-jar, deps-ear-jar" name="deps-jar" unless="no.deps"/>
     <target depends="init,deps-jar,generate-rest-config" name="-pre-pre-compile">
         <mkdir dir="${r'${build.classes.dir}'}"/>
@@ -1403,7 +1411,9 @@ exists or setup the property manually. For example like this:
                 
                 CLEANUP SECTION
             -->
-    <target depends="init" name="deps-clean" unless="no.deps"/>
+    <target depends="init" name="deps-clean" unless="no.deps">
+        <ant antfile="${r'${project.OpenZooService}'}/build.xml" inheritall="false" target="clean"/>
+    </target>
     <target depends="init" name="do-clean">
         <condition property="build.dir.to.clean" value="${r'${build.web.dir}'}">
             <isset property="dist.ear.dir"/>

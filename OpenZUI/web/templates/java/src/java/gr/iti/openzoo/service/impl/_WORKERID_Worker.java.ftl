@@ -60,6 +60,9 @@ public class ${WorkerID}Worker extends OpenZooWorker {
     @Override
     public boolean doWork(Message message) {
         
+<#if IsBroker??>
+        throw new UnsupportedOperationException("Not Used.");
+<#else>
         // the actual message processing
         
         JSONObject pld = message.getPayload();
@@ -79,6 +82,7 @@ public class ${WorkerID}Worker extends OpenZooWorker {
         }
         
         return true;
+</#if>
     }
 
     @Override
@@ -103,7 +107,7 @@ public class ${WorkerID}Worker extends OpenZooWorker {
  <#if QueueLogging??>
             logConn.error("Error by input endpoint initialization");
  </#if>
-            return;
+            //return;
         }
 </#if>
 
@@ -115,7 +119,7 @@ public class ${WorkerID}Worker extends OpenZooWorker {
   <#if QueueLogging??>
             logConn.error("Error by output_${i} endpoint initialization");
   </#if>
-            return;
+            //return;
         }
  </#list>
 </#if>
@@ -157,7 +161,9 @@ public class ${WorkerID}Worker extends OpenZooWorker {
 </#if>
         
         log.info("Born!");
+<#if QueueLogging??>
         logConn.info("Born!");
+</#if>
         Message message;
         
         while (!enough) 
@@ -190,6 +196,11 @@ public class ${WorkerID}Worker extends OpenZooWorker {
 
 </#if>
             
+<#if IsBroker??>
+            // acknowledge message and put results into request map
+            inConn.ack(message);
+            requests.put(message.getID(), message.getPayload());
+<#else>
             // Do your processing here
             boolean success = doWork(message);
             
@@ -197,33 +208,36 @@ public class ${WorkerID}Worker extends OpenZooWorker {
             {
                 message.setSuccess(success);
                 
-<#if (NumOutputs > 0)>
+ <#if (NumOutputs > 0)>
                 // send results to next component through the first output
                 outConn_1.put(message);
-<#else>
+ <#else>
                 // do something with the final message, e.g. write it to the mongo
                 message.setProcessingEnd();
- <#if UsesMongo??>
+  <#if UsesMongo??>
                 saveMessage(message.getMessageJSON());
+  </#if>
  </#if>
-</#if>
-
             }
 
-<#if HasInput??>
+ <#if HasInput??>
             // acknowledge incomming message
             inConn.ack(message);
+ </#if>
 </#if>
         }
         
         // Do your cleaning here
-
+<#if IsBroker??>
+        requests.clear();
+</#if>
         log.info("Died!");
 <#if QueueLogging??>
         logConn.info("Died!");
 </#if>
     }
 
+<#if UsesMongo??>
     private boolean saveMessage(JSONObject msg)
     {
         try
@@ -243,6 +257,40 @@ public class ${WorkerID}Worker extends OpenZooWorker {
         }
         
         return true;
+    }
+</#if>
+
+    @Override
+    public String publish(JSONObject obj) {
+ 
+<#if IsBroker??>
+        Message message = createEmptyMessage();
+        
+        try
+        {            
+            JSONObject pld = message.getPayload();
+
+            // put the whole input json or a part of it in the payload
+            // send it to some output endpoint
+            // and put it to the request map
+            pld.put("content", obj);
+
+            message.setPayload(pld);            
+            message.setSuccess(true);
+            
+            outConn_1.put(message);
+            
+            return putRequest(message);
+        }
+        catch (JSONException ex) 
+        {
+            log.error("JSONException during publishing message: " + ex);
+        }
+        
+        return null;
+<#else>
+        throw new UnsupportedOperationException("Not Used.");
+</#if>
     }
 
 }

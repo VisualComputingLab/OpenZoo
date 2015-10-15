@@ -178,6 +178,7 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         int numOutputs = Integer.parseInt(request.getParameter("tmpl-numOutputs"));
         boolean queueLogging = request.getParameter("tmpl-queueLogging") != null;
         boolean usesMongo = request.getParameter("tmpl-usesMongo") != null;
+        boolean isBroker = request.getParameter("tmpl-workerType").equalsIgnoreCase("broker");
         HashSet<String> requiredParameters = null;
         String s_req = request.getParameter("tmpl-requiredParameters");
         if (s_req != null && !s_req.trim().isEmpty())
@@ -202,12 +203,14 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         root.put("ResourcePath", resourcePath);
         root.put("Description", description);
         if (hasInput)
-            root.put("HasInput", hasInput);
+            root.put("HasInput", true);
         root.put("NumOutputs", numOutputs);
         if (queueLogging)
-            root.put("QueueLogging", queueLogging);
+            root.put("QueueLogging", true);
         if (usesMongo)
-            root.put("UsesMongo", usesMongo);
+            root.put("UsesMongo", true);
+        if (isBroker)
+            root.put("IsBroker", true);
         if (requiredParameters != null && !requiredParameters.isEmpty())
             root.put("RequiredParameters", requiredParameters);
 
@@ -264,12 +267,15 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
             }
         }
         
-        // then copy the OpenZooService libs
-        System.out.println("Copying libs from " + new File(OZServiceDir).getAbsolutePath());
+        // then copy the OpenZooService files
+        System.out.println("Copying OpenZooService files from " + new File(OZServiceDir).getAbsolutePath());
         FileUtils.copyDirectory(new File(OZServiceDir), new File(outputOZServiceDir));
 
         
         // finally, create zip file with both directories
+        // compressDirectory, apart from compressing, also renames .jav_ to .java files
+        
+        boolean success = false;
         
         if (Utilities.compressDirectory(outputBaseDir, s_ZipFile))
         {
@@ -297,6 +303,8 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
                     outStream.write(buffer, 0, bytesRead);
                 }
             }
+            
+            success = true;
         }
         else
         {
@@ -307,6 +315,15 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         dir = new File(outputBaseDir);
         if (dir.exists())
             FileUtils.deleteQuietly(dir);
+        
+        if (success)
+        {
+            // http://www.coderanch.com/t/362152/Servlets/java/Redirect-JSP-file-download
+        }
+        else
+        {
+            response.sendRedirect("Topologies");
+        }
     }
     
     /**

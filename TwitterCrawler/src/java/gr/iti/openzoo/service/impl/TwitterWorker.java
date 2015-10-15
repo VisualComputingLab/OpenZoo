@@ -2,8 +2,8 @@ package gr.iti.openzoo.service.impl;
 
 import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.impl.OpenZooLoggingConnection;
-import gr.iti.openzoo.impl.OpenZooLoneWorker;
 import gr.iti.openzoo.impl.OpenZooOutputConnection;
+import gr.iti.openzoo.impl.OpenZooWorker;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -21,7 +21,7 @@ import twitter4j.json.DataObjectFactory;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class TwitterWorker extends OpenZooLoneWorker {
+public class TwitterWorker extends OpenZooWorker {
 
     private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "tw_output");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
@@ -32,13 +32,7 @@ public class TwitterWorker extends OpenZooLoneWorker {
         
         log.debug("-- TwitterWorker()");
     }
-    
-    @Override
-    public boolean doWork(Message message) {
         
-        return true;
-    }
-    
     private Configuration createConfiguration(String consumerKey, String consumerSecret, String accessToken, String accessTokenSecret)
     {
         ConfigurationBuilder confBuilder = new ConfigurationBuilder();		
@@ -213,5 +207,11 @@ public class TwitterWorker extends OpenZooLoneWorker {
     @Override
     public String publish(JSONObject obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public boolean doWork(Message message) {
+        
+        return true;
     }
 }

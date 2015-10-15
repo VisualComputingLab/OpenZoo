@@ -366,6 +366,7 @@ public class KeyValueCommunication {
         prop.put("folder", war.getFolder());
         prop.put("version", war.getVersion());
         prop.put("status", war.getStatus());
+        prop.put("type", war.getType());
         ArrayList<String> reqs = war.getRequires();
         String sarr = "";
         for (String ss : reqs)

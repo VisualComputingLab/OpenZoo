@@ -60,26 +60,36 @@
           </div>
           <div class="form-group">
             <label for="tmpl-hasInput" class="col-sm-4 control-label">Has input endpoint</label>
-            <div class="col-sm-8">
+            <div class="col-sm-4">
               <input type="checkbox" class="form-control" name="tmpl-hasInput" value="O" checked>
             </div>
           </div>
           <div class="form-group">
             <label for="tmpl-numOutputs" class="col-sm-4 control-label">Number of output endpoints</label>
-            <div class="col-sm-8">
+            <div class="col-sm-4">
               <input type="number" class="form-control" name="tmpl-numOutputs" min="0" max="10" value="1">
             </div>
           </div>
           <div class="form-group">
             <label for="tmpl-queueLogging" class="col-sm-4 control-label">Uses queue logging</label>
-            <div class="col-sm-8">
+            <div class="col-sm-4">
               <input type="checkbox" class="form-control" name="tmpl-queueLogging" value="O" checked >
             </div>
           </div>
           <div class="form-group">
             <label for="tmpl-usesMongo" class="col-sm-4 control-label">Uses MongoDB</label>
-            <div class="col-sm-8">
+            <div class="col-sm-4">
               <input type="checkbox" class="form-control" name="tmpl-usesMongo" value="O" >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="tmpl-workerType" class="col-sm-4 control-label">Worker type</label>
+            <div class="col-sm-2">
+              Operator <input type="radio" class="form-control" name="tmpl-workerType" value="operator" checked>
+            </div>
+              <!-- <br> -->
+            <div class="col-sm-2">
+              Broker <input type="radio" class="form-control" name="tmpl-workerType" value="broker">
             </div>
           </div>
           <div class="form-group">
