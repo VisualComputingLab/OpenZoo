@@ -10,7 +10,7 @@
   
   	<div class="col-md-12 col-sm-6">
       <div class="well"> 
-        <form class="form-horizontal" method="POST" action="Templates">
+        <form class="form-horizontal" id="template_create" method="POST" action="Templates">
           <h4>Template parameters</h4>
           <div class="form-group">
             <label for="tmpl-proglang" class="col-sm-4 control-label">Programming Language</label>
@@ -61,13 +61,13 @@
           <div class="form-group">
             <label for="tmpl-hasInput" class="col-sm-4 control-label">Has input endpoint</label>
             <div class="col-sm-4">
-              <input type="checkbox" class="form-control" name="tmpl-hasInput" value="O" checked>
+              <input type="checkbox" class="form-control" name="tmpl-hasInput" id="tmpl-hasInput" value="O" checked>
             </div>
           </div>
           <div class="form-group">
             <label for="tmpl-numOutputs" class="col-sm-4 control-label">Number of output endpoints</label>
             <div class="col-sm-4">
-              <input type="number" class="form-control" name="tmpl-numOutputs" min="0" max="10" value="1">
+              <input type="number" class="form-control" name="tmpl-numOutputs" id="tmpl-numOutputs" min="0" max="10" value="1">
             </div>
           </div>
           <div class="form-group">
@@ -85,11 +85,11 @@
           <div class="form-group">
             <label for="tmpl-workerType" class="col-sm-4 control-label">Worker type</label>
             <div class="col-sm-2">
-              Operator <input type="radio" class="form-control" name="tmpl-workerType" value="operator" checked>
+              Operator <input type="radio" class="form-control tmpl-workerType" name="tmpl-workerType" value="operator" checked>
             </div>
               <!-- <br> -->
             <div class="col-sm-2">
-              Broker <input type="radio" class="form-control" name="tmpl-workerType" value="broker">
+              Broker <input type="radio" class="form-control tmpl-workerType" name="tmpl-workerType" value="broker">
             </div>
           </div>
           <div class="form-group">
@@ -132,6 +132,7 @@
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
+                <script src="./js/templatesScripts.js"></script>
 
     <script>
       var logcontainer = [];
