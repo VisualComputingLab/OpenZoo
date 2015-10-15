@@ -53,7 +53,9 @@ function detailsTopologyConfiguration(name){
         document.getElementById("topologyStatus").innerHTML = result.response.status;
         localStorage["selectedTopologyStatus"] = result.response.status;
 
-        var tBody = $('#serverTableTbody');
+        var tbody = $('#serverTableTbody');
+        $('#serverTable tbody').empty();
+
         var server_id;
 
         //console.log(result);
@@ -70,7 +72,7 @@ function detailsTopologyConfiguration(name){
                     services.push(" " + val.services[i].service_id + ":" + val.services[i].service_status);
                 }
 
-                tBody.append('<tr><td>' + server_id + '</td><td>' + services.toString() + '</td></tr>');
+                tbody.append('<tr><td>' + server_id + '</td><td>' + services.toString() + '</td></tr>');
             });
         }
     });

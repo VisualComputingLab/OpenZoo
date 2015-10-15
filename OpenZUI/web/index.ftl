@@ -59,7 +59,7 @@
               Server statistics
 
               <div class="table-responsive">
-                <table class="table table-condensed table-hover">
+                <table class="table table-condensed table-hover" id="serverTable">
                   <thead>
                     <tr>
                       <th>Server ID</th>
