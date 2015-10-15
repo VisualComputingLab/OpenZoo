@@ -21,6 +21,7 @@ public class WarFile {
     private String folder;
     private String version;
     private String status;
+    private String type;
     private ArrayList<String> requires;
     private ArrayList<Worker> workers;
     
@@ -47,6 +48,7 @@ public class WarFile {
                     name = service.getString("name");
                     service_path = service.getString("path");
                     description = service.getString("description");
+                    type = service.optString("type", "operator");
                 }
 
                 JSONArray jarr_requires = config.optJSONArray("requires");
@@ -84,6 +86,9 @@ public class WarFile {
         folder = prop.get("folder");
         version = prop.get("version");        
         status = prop.get("status");
+        type = prop.get("type");
+        if (type == null)
+            type = "operator";
         
         requires = new ArrayList<>();
         String req = prop.get("requires");
@@ -154,6 +159,17 @@ public class WarFile {
     public void setVersion(String version) {
         this.version = version;
     }
+    
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
 
     /**
      * @return the status
@@ -194,6 +210,7 @@ public class WarFile {
             ret.put("folder", folder);
             ret.put("version", version);
             ret.put("status", status);
+            ret.put("type", type);
             
             JSONArray jarr = new JSONArray();
             for (String ss : requires)
