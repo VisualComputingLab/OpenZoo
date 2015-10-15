@@ -252,6 +252,37 @@ function show_key_vals() {
     }
 }
 
+function serializeFormToGraphConf(form, focusObjectId) {
+    var srvConf = "";
+
+    var lobj = $.grep(graphConf, function(e) {
+        return e.objectId === focusObjectId;
+    });
+
+    srvConf = form.serializeArray();
+
+    if (typeof lobj[0] !== 'undefined' && typeof lobj[0].instances !== 'undefined') {
+
+        obj = {objectId: focusObjectId, conf: srvConf, instances: lobj[0].instances};
+
+        graphConf = $.grep(graphConf, function(e) {
+            return e.objectId != focusObjectId;
+        });
+
+        graphConf.push(obj);
+    }
+    else {
+
+        graphConf = $.grep(graphConf, function(e) {
+            return e.objectId != focusObjectId;
+        });
+
+        obj = {objectId: focusObjectId, conf: srvConf};
+        graphConf.push(obj);
+    }
+
+}
+
 var graph;
 var paper;
 
@@ -567,7 +598,11 @@ $(document).ready(function() {
     $("#service_form, #connection_form, #routing_form").focusin(function(e) {
         focusObjectId = objectId;
         //focusTargetId_for_routing = targetId_for_routing;
-        keys_old = $("#route_mapping_keys").val()
+        //keys_old = $("#route_mapping_keys").val()
+
+        if ($(this).attr("id") === "service_form" && $(this).children(".addToServiceForm").length === 1) {
+            serializeFormToGraphConf($(this), focusObjectId);
+        }
     });
 
     $("#service_form, #connection_form, #routing_form").focusout(function(e) {
@@ -580,34 +615,8 @@ $(document).ready(function() {
         //e.preventDefault();
         //console.log('form bind' + " " + objectId)
         if (objectId === focusObjectId) {
-            var srvConf = "";
-
-            var lobj = $.grep(graphConf, function(e) {
-                return e.objectId === focusObjectId;
-            });
-
-            srvConf = $(this).serializeArray();
-
-            if (typeof lobj[0] !== 'undefined' && typeof lobj[0].instances !== 'undefined') {
-
-                obj = {objectId: focusObjectId, conf: srvConf, instances: lobj[0].instances};
-
-                graphConf = $.grep(graphConf, function(e) {
-                    return e.objectId != focusObjectId;
-                });
-
-                graphConf.push(obj);
-            }
-            else {
-
-                graphConf = $.grep(graphConf, function(e) {
-                    return e.objectId != focusObjectId;
-                });
-
-                obj = {objectId: focusObjectId, conf: srvConf};
-                graphConf.push(obj);
-            }
-
+            serializeFormToGraphConf($(this), focusObjectId);
+           
         }
     });
 
@@ -695,24 +704,24 @@ $(document).ready(function() {
 
         if (graphConf.length != (graph.attributes.cells.models.length - 2)) {
             notDirty = false;
-            mArr=[];
-            gArr=[];
-            
+            mArr = [];
+            gArr = [];
+
             alertify.error("Topology services and connections not fully configured")
-            
-            $(graph.attributes.cells.models).each(function(){
-                if (this.id !== "transition-source" && this.id !== "transition-target"){
+
+            $(graph.attributes.cells.models).each(function() {
+                if (this.id !== "transition-source" && this.id !== "transition-target") {
                     mArr.push(this.id);
                 }
             });
-                       
-            $(graphConf).each(function(){
+
+            $(graphConf).each(function() {
                 gArr.push(this.objectId);
             })
-            
+
             //differences array
             var diff = $(mArr).not(gArr).get();
-            
+
             alertify.error("Check: " + diff)
         }
         else {
