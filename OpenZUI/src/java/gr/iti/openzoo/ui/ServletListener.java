@@ -60,12 +60,13 @@ public class ServletListener implements ServletContextListener {
             cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
             System.out.println("Created freemarker config");
             sce.getServletContext().setAttribute("cfg", cfg);
+            
+            Utilities.changeExtension(webAppPath + "/templates/OpenZooService", ".jav_", ".java");
         }
         catch (IOException e)
         {
             System.err.println("IOexception during initializing template configuration: " + e);
-        }
-        
+        }        
     }
 
     @Override

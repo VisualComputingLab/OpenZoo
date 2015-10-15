@@ -450,8 +450,25 @@ public class Utilities {
         return true;
     }
     
-    public static boolean getAllFiles(File dir, List<File> fileList)
+    public static void changeExtension(String s_dir, String src, String dest)
     {
+        File dir = new File(s_dir);
+        File[] files = dir.listFiles();
+        String path;
+        for (File file : files)
+        {
+            path = file.getAbsolutePath();
+            if (!file.isDirectory())
+            {
+                if (path.endsWith(src))
+                    file.renameTo(new File(path.substring(0, path.lastIndexOf(src)) + dest));
+            }
+            else changeExtension(file.getAbsolutePath(), src, dest);
+        }
+    }
+    
+    public static boolean getAllFiles(File dir, List<File> fileList)
+    {        
         try
         {
             File[] files = dir.listFiles();
@@ -513,6 +530,7 @@ public class Utilities {
             String zipFilePath = file.getCanonicalPath().substring(directoryToZip.getCanonicalPath().length() + 1,
                             file.getCanonicalPath().length());
             System.out.println("Writing '" + zipFilePath + "' to zip file");
+                        
             ZipEntry zipEntry = new ZipEntry(zipFilePath);
             zos.putNextEntry(zipEntry);
 

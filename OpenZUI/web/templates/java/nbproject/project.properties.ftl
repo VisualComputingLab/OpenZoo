@@ -32,7 +32,7 @@ file.reference.jedis-2.7.3.jar=../OpenZooService/lib/jedis-2.7.3.jar
 file.reference.log4j-api-2.0.2.jar=../OpenZooService/lib/log4j-api-2.0.2.jar
 file.reference.log4j-core-2.0.2.jar=../OpenZooService/lib/log4j-core-2.0.2.jar
 file.reference.mongo-2.9.3.jar=../OpenZooService/lib/mongo-2.9.3.jar
-file.reference.OpenZooService.jar=../OpenZooService/dist/OpenZooService.jarfile.reference.rabbitmq-client.jar=../OpenZooService/lib/rabbitmq-client.jar
+file.reference.rabbitmq-client.jar=../OpenZooService/lib/rabbitmq-client.jar
 includes=**
 j2ee.compile.on.save=true
 j2ee.copy.static.files.on.save=true
@@ -44,7 +44,7 @@ jar.compress=false
 javac.classpath=\
     ${r'${libs.restapi.classpath}'}:\
     ${r'${libs.restlib.classpath}'}:\
-    ${r'${file.reference.OpenZooService.jar}'}:\
+    ${r'${reference.OpenZooService.jar}'}:\
     ${r'${file.reference.commons-codec-1.8.jar}'}:\
     ${r'${file.reference.jedis-2.7.3.jar}'}:\
     ${r'${file.reference.log4j-api-2.0.2.jar}'}:\
@@ -80,6 +80,8 @@ javadoc.windowtitle=
 lib.dir=${r'${web.docbase.dir}'}/WEB-INF/lib
 persistence.xml.dir=${r'${conf.dir}'}
 platform.active=default_platform
+project.OpenZooService=../OpenZooService
+reference.OpenZooService.jar=${r'${project.OpenZooService}'}/dist/OpenZooService.jar
 resource.dir=setup
 rest.config.type=dd
 run.test.classpath=\

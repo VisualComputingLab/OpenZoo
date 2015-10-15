@@ -2,6 +2,9 @@ package gr.iti.openzoo.service.impl;
 
 import gr.iti.openzoo.impl.OpenZooService;
 import org.codehaus.jettison.json.JSONObject;
+<#if IsBroker??>
+import gr.iti.openzoo.impl.OpenZooWorker;
+</#if>
 
 /**
  *
@@ -41,4 +44,20 @@ public class ${ServiceID}Impl extends OpenZooService {
         
         return response;
     }
-}
+
+<#if IsBroker??>
+    public JSONObject post(JSONObject content)
+    {
+        OpenZooWorker ozw = null;
+        
+        if (workerUnion.size() > 0)
+            ozw = (OpenZooWorker) workerUnion.get(0);
+        
+        if (ozw == null) return null;
+        
+        String ticket = ozw.publish(content);
+        int TIMEOUT_IN_SECS = 10;
+        
+        return ozw.getResponse(ticket, TIMEOUT_IN_SECS);
+    }
+</#if>}

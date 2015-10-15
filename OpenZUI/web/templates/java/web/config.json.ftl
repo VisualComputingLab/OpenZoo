@@ -4,7 +4,8 @@
         "component_id": "${ComponentID}",
         "name": "${ServiceID}Impl",
         "path": "/resources/${ResourcePath}",
-        "description": "${Description}"
+        "description": "${Description}"<#if IsBroker??>,
+        "type": "broker"</#if>
     },
     "workers":
     [

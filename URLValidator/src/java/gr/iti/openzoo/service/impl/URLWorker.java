@@ -281,4 +281,9 @@ public class URLWorker extends OpenZooWorker {
         
         return expandedURL;
     }
+
+    @Override
+    public String publish(JSONObject obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

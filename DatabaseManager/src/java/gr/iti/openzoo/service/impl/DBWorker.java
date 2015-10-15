@@ -13,7 +13,7 @@ import com.mongodb.util.JSON;
 import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.impl.OpenZooInputConnection;
 import gr.iti.openzoo.impl.OpenZooLoggingConnection;
-import gr.iti.openzoo.impl.OpenZooLoneWorker;
+import gr.iti.openzoo.impl.OpenZooWorker;
 import java.net.UnknownHostException;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -22,7 +22,7 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class DBWorker extends OpenZooLoneWorker {
+public class DBWorker extends OpenZooWorker {
 
     private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "db_input");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
@@ -229,6 +229,6 @@ public class DBWorker extends OpenZooLoneWorker {
 
     @Override
     public String publish(JSONObject obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
