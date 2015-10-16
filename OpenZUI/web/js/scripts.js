@@ -198,16 +198,16 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
  });
 
 
-function fetchServicesList(){
-
+function fetchServicesList(callback){
     var url = "/OpenZUI/KeyValueServlet?action=war";
 
-   $.getJSON(url,function(result){
-      
-        //console.log(result);
+  $.getJSON(url,function(result){
         var listItems= "";
         //var services =[];
+        localStorage["WAR"] = JSON.stringify(result['response']);
+        
         $.each(result['response'], function(key, val){
+            
             var svc={};
             var svc_in=[];
             var svc_out=[];
@@ -233,8 +233,10 @@ function fetchServicesList(){
             }
         });
         
-        localStorage["WAR"] = JSON.stringify(result['response']);
-        $("#openzooServiceSelect").html(listItems);                   
+        $("#openzooServiceSelect").html(listItems);   
+    }).complete(function(){
+        callback();
     });
+
 };
 

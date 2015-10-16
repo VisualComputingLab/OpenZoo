@@ -286,14 +286,16 @@ function serializeFormToGraphConf(form, focusObjectId) {
 var graph;
 var paper;
 
-
+function loadWars(){
+        var wf = localStorage["WAR"];
+        warfiles = JSON.parse(wf);
+    }
+    
+    
 $(document).ready(function() {
-
-    fetchServicesList();
-
-    var wf = localStorage["WAR"];
-    warfiles = JSON.parse(wf);
-
+    
+    fetchServicesList(loadWars);
+    
     $('#service_manager').hide();
     $('#connection_manager').hide();
     //$('#routing_field').hide();
