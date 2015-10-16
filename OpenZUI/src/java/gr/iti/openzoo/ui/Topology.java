@@ -756,6 +756,14 @@ public class Topology {
     
     public ArrayList<String> getTopologyQueues()
     {
+        // if connection has queue_name: add queue_name
+        // if connection has exchange_name: add queue_name = exchange_name + "_QUEUE_" + instanceId;
+        // if queuelogging used: add topology_id_logging
+        
+//        if ()
+        
+        ArrayList<String> queues = new ArrayList<>();
+        
         return null;
     }
 }
