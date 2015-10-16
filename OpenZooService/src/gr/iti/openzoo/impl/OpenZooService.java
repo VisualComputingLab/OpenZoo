@@ -47,7 +47,6 @@ public abstract class OpenZooService {
      * The class constructor
      * <br />
      * Retrieve values from the KV app folder about complementary services
-     * installed on the Consul
      *
      * @param jsonObject JSONObject, the Rest post call payload
      *
@@ -101,16 +100,16 @@ public abstract class OpenZooService {
         //read from KV
             
         // general
-        parameters.getGeneral().setNumOfWorkersPerCore(0); // default special value, means that there should be only one thread, irrelevant of num of processors
+        parameters.getGeneral().setNumOfThreadsPerCore(0); // default special value, means that there should be only one thread, irrelevant of num of processors
         String node_object = kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "node:" + parameters.getGeneral().getComponentID());
         try
         {
             JSONObject node_json = new JSONObject(node_object);
-            parameters.getGeneral().setNumOfWorkersPerCore(node_json.getInt("workerspercore"));
+            parameters.getGeneral().setNumOfThreadsPerCore(node_json.getInt("threadspercore"));
         }
         catch (JSONException e)
         {
-            log.error("JSONException while trying to read woerkerspercore parameter from KV: " + e);
+            log.error("JSONException while trying to read threadspercore parameter from KV: " + e);
         }
         
         
@@ -138,12 +137,12 @@ public abstract class OpenZooService {
         log.debug("-- OpenZooService.startWorkers " + className);
         
         int cores = Runtime.getRuntime().availableProcessors();
-        int numOfWorkersPerCore = parameters.getGeneral().getNumOfWorkersPerCore();
-        int numWorkers;
+        int numOfThreadsPerCore = parameters.getGeneral().getNumOfThreadsPerCore();
+        int numThreads;
         
-        if (numOfWorkersPerCore == 0)
+        if (numOfThreadsPerCore == 0)
         {
-            numWorkers = 1;
+            numThreads = 1;
         }
         else
         {
@@ -157,10 +156,10 @@ public abstract class OpenZooService {
                 log.debug("Number of cores available = " + cores);
             }
             
-            numWorkers = cores*numOfWorkersPerCore;
+            numThreads = cores*numOfThreadsPerCore;
         }
 
-        log.info("I'll start " + numWorkers + " workers");
+        log.info("I'll start " + numThreads + " threads");
 
         JSONObject response;
         
@@ -178,7 +177,7 @@ public abstract class OpenZooService {
                 String threadName;
                 int i;
 
-                for (i = 0; i < numWorkers; i++)
+                for (i = 0; i < numThreads; i++)
                 {
                     threadName = "consumer_" + i;
                     
@@ -192,8 +191,8 @@ public abstract class OpenZooService {
                     consumerArray.put(threadName);
                 }
 
-                response.put("message", "Created " + i + " workers");
-                response.put("workers", consumerArray);
+                response.put("message", "Created " + i + " threads");
+                response.put("threads", consumerArray);
             }
             catch (ReflectiveOperationException ex) 
             {
@@ -230,7 +229,7 @@ public abstract class OpenZooService {
                 ozw.stopIt();
                 i++;
             }
-            response.put("message", "Destroyed " + i + " workers");
+            response.put("message", "Destroyed " + i + " threads");
         
             workerUnion.clear();
             workerClasses.clear();
@@ -310,7 +309,7 @@ public abstract class OpenZooService {
         try
         {
             response = new JSONObject();
-            response.put("message", "" + workerUnion.size() + " workers active");
+            response.put("message", "" + workerUnion.size() + " threads active");
         }
         catch (JSONException ex) 
         {

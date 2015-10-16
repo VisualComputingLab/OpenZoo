@@ -6,7 +6,7 @@
 
 <!--main-->
 <div class="container" id="main">
-   <div class="row">
+  <div class="row">
   
 
   	<div class="col-md-4 col-sm-6">
@@ -92,51 +92,45 @@
 
     <div class="col-md-8 col-sm-6">
          
-         
-         <div class="panel panel-default">
-          <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>WAR files in repo</h4></div>
-          <div class="panel-body">
-              
-              <div class="table-responsive">
-        <table class="table table-condensed table-hover">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Comp ID</th>
-              <!-- <th>Name</th> -->
-              <!-- <th>Service Path</th> -->
-              <th>Description</th>
-              <th>Filename</th>
-              <!-- <th>Folder</th> -->
-              <th>Version</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <#if warfiles??>
-              <#assign row=1>
-              <#list warfiles as warfile>
-                <tr onclick="detailsWarfile('${warfile.component_id}');">
-                  <td>${row}</td>
-                  <td>${warfile.component_id}</td>
-                  <!-- <td>${warfile.name}</td> -->
-                  <!-- <td>${warfile.service_path}</td> -->
-                  <td>${warfile.description}</td>
-                  <td>${warfile.filename}</td>
-                  <!-- <td>${warfile.folder}</td> -->
-                  <td>${warfile.version}</td>
-                  <td><i class="${warfile.status} fa fa-check-circle fa-1x"></i></td>
+      <div class="panel panel-default">
+        <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>WAR files in repo</h4></div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="table table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Comp ID</th>
+                  <!-- <th>Name</th> -->
+                  <!-- <th>Service Path</th> -->
+                  <th>Description</th>
+                  <th>Filename</th>
+                  <th>Version</th>
+                  <th>Status</th>
                 </tr>
-                <#assign row = row + 1>
-              </#list>
-            </#if>
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                <#if warfiles??>
+                  <#assign row=1>
+                  <#list warfiles as warfile>
+                    <tr onclick="detailsWarfile('${warfile.component_id}');">
+                      <td>${row}</td>
+                      <td>${warfile.component_id}</td>
+                      <!-- <td>${warfile.name}</td> -->
+                      <!-- <td>${warfile.service_path}</td> -->
+                      <td>${warfile.description}</td>
+                      <td>${warfile.filename}</td>
+                      <td>${warfile.version}</td>
+                      <td><i class="${warfile.status} fa fa-check-circle fa-1x"></i></td>
+                    </tr>
+                    <#assign row = row + 1>
+                  </#list>
+                </#if>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-
-            </div>
-    </div>
-      
     </div>
   	
   </div><!--/row-->
@@ -209,12 +203,6 @@
             <label for="war-upd-descr" class="col-sm-4 control-label">description</label>
             <div class="col-sm-8">
               <input type="text" class="form-control" id="war-upd-descr" name="war-descr" readonly >
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="war-upd-folder" class="col-sm-4 control-label">folder</label>
-            <div class="col-sm-8">
-              <input type="text" class="form-control" id="war-upd-folder" name="war-folder" readonly >
             </div>
           </div>
           <div class="form-group">

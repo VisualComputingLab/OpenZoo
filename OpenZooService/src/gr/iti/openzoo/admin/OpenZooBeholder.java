@@ -103,7 +103,7 @@ public class OpenZooBeholder implements Runnable {
     /**
      * Method startIt
      * 
-     * Start the initialization of the web service in the Consul
+     * Start the initialization of the web service
      * 
      */
     public void startIt() {

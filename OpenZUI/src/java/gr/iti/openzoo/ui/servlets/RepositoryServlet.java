@@ -179,7 +179,7 @@ public class RepositoryServlet extends HttpServlet {
                     }
                     else
                     {
-                        WarFile w = new WarFile(fileName, localRepository, "1.0", "inactive", config);
+                        WarFile w = new WarFile(fileName, "1.0", "inactive", config);
                         kv.putWarFile(w);
                     }
                 }

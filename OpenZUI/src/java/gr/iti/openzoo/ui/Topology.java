@@ -326,7 +326,7 @@ public class Topology {
                     jobj_nod = new JSONObject();
                     jobj_nod.put("name", node.getName());
                     jobj_nod.put("instances", node.getInstances());
-                    jobj_nod.put("workerspercore", node.getWorkerspercore());
+                    jobj_nod.put("threadspercore", node.getThreadspercore());
                     jobj_nod.put("requires", node.getRequirements());
                     jarr_nodes.put(jobj_nod);
                 }
@@ -467,8 +467,8 @@ public class Topology {
                                     nod.setInstances(Integer.parseInt(property.getString("value")));
                                     break;
                                     
-                                case "wpc":
-                                    nod.setWorkerspercore(Integer.parseInt(property.getString("value")));
+                                case "tpc":
+                                    nod.setThreadspercore(Integer.parseInt(property.getString("value")));
                                     break;
                                     
                                 default:
@@ -752,7 +752,10 @@ public class Topology {
             System.err.println("JSONException in getServerStatus: " + ex);
             return null;
         }
-        
-        
+    }
+    
+    public ArrayList<String> getTopologyQueues()
+    {
+        return null;
     }
 }

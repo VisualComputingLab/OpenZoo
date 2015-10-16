@@ -13,7 +13,7 @@ public class ParametersGeneral implements java.io.Serializable {
     private String topologyID = null;
     private String componentID = null;
     private String instanceID = null;
-    private Integer numOfWorkersPerCore = 1;
+    private Integer numOfThreadsPerCore = 1;
 
     /**
      * @return the name
@@ -105,17 +105,17 @@ public class ParametersGeneral implements java.io.Serializable {
     }
 
     /**
-     * @return the numOfWorkersPerCore
+     * @return the numOfThreadsPerCore
      */
-    public Integer getNumOfWorkersPerCore() {
-        return numOfWorkersPerCore;
+    public Integer getNumOfThreadsPerCore() {
+        return numOfThreadsPerCore;
     }
 
     /**
-     * @param numOfWorkersPerCore the numOfInstancesPerCore to set
+     * @param numOfThreadsPerCore the numOfThreadsPerCore to set
      */
-    public void setNumOfWorkersPerCore(Integer numOfWorkersPerCore) {
-        this.numOfWorkersPerCore = numOfWorkersPerCore;
+    public void setNumOfThreadsPerCore(Integer numOfThreadsPerCore) {
+        this.numOfThreadsPerCore = numOfThreadsPerCore;
     }
     
     @Override
@@ -129,7 +129,7 @@ public class ParametersGeneral implements java.io.Serializable {
         out += "Path: " + path + "\n";
         out += "Description: " + description + "\n";
         out += "Real path: " + realPath + "\n";
-        out += "Num of workers per core: " + numOfWorkersPerCore + "\n\n";
+        out += "Num of threads per core: " + numOfThreadsPerCore + "\n\n";
         
         return out;
     }

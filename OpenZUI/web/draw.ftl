@@ -65,8 +65,8 @@
                   <label for="instances">instances</label>
                   <input type="number" class="form-control" id="instances" name="instances" value="1">
                   
-                  <label for="wpc">workers per core</label>
-                  <input type="number" class="form-control" id="wpc" name="wpc" value="0">
+                  <label for="tpc">threads per core</label>
+                  <input type="number" class="form-control" id="tpc" name="tpc" value="0">
 
                   </form>
               </div>
