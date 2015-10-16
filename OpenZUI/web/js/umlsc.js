@@ -515,7 +515,7 @@ $(document).ready(function() {
                         if (warfiles[i].component_id == objectId) {
 
                             //get requires flieds from WAR
-                            if (warfiles[i].hasOwnProperty('requires')) {
+                            if (warfiles[i].hasOwnProperty('requires') && warfiles[i]['requires'].length > 0) {
                                 var reqs = warfiles[i].requires;
                                 for (var y = 0; y < reqs.length; y++) {
                                     //console.log(reqs[y]);
@@ -544,6 +544,10 @@ $(document).ready(function() {
                                     }
                                 });
                             }
+                                                       
+                          if (warfiles[i].hasOwnProperty('requires') === false || warfiles[i]['requires'].length === 0) {
+                              serializeFormToGraphConf($("#service_form"), objectId);
+                          }   
                         }
                     }
                     var localObj = JSON.parse(localStorage[objectId]);
@@ -608,12 +612,11 @@ $(document).ready(function() {
 
     $("#service_form, #connection_form, #routing_form").focusin(function(e) {
         focusObjectId = objectId;
-        //focusTargetId_for_routing = targetId_for_routing;
-        //keys_old = $("#route_mapping_keys").val()
 
-        if ($(this).attr("id") === "service_form" && $(this).children(".addToServiceForm").length === 1) {
-            serializeFormToGraphConf($(this), focusObjectId);
-        }
+//        if ($(this).attr("id") === "service_form" && $(this).children(".addToServiceForm").length === 1) {
+//            serializeFormToGraphConf($(this), focusObjectId);
+//        }
+        
     });
 
     $("#service_form, #connection_form, #routing_form").focusout(function(e) {
