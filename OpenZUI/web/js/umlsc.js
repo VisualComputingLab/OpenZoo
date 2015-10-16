@@ -289,11 +289,13 @@ var paper;
 
 $(document).ready(function() {
 
-    fetchServicesList();
+    fetchServicesList(cb);
 
-    var wf = localStorage["WAR"];
-    warfiles = JSON.parse(wf);
-
+    var cb =  function load(){
+        var wf = localStorage["WAR"];
+        warfiles = JSON.parse(wf);
+    }
+    
     $('#service_manager').hide();
     $('#connection_manager').hide();
     //$('#routing_field').hide();

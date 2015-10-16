@@ -199,7 +199,7 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
  });
 
 
-function fetchServicesList(){
+function fetchServicesList(cb){
 
     var url = "/OpenZUI/KeyValueServlet?action=war";
 
@@ -237,5 +237,7 @@ function fetchServicesList(){
         localStorage["WAR"] = JSON.stringify(result['response']);
         $("#openzooServiceSelect").html(listItems);                   
     });
+    
+    cb;
 };
 
