@@ -42,6 +42,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.xml.bind.DatatypeConverter;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
@@ -101,6 +102,67 @@ public class Utilities {
             }
         }
 //        System.out.println("ds. CallGet code:" + code + " output: " + output + " msg: " + msg);
+        return output;
+
+    }
+    
+    public String callGETAuthorized(URL url, String usr, String pass) {
+        String output = null;
+        int code = 0;
+        String msg = null;
+        String servercredentials = usr + ":" + pass;
+
+        try {
+            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+            httpCon.setDoOutput(true);
+            httpCon.setRequestMethod("GET");
+            output = convertStreamToString(httpCon.getInputStream());
+            code = httpCon.getResponseCode();
+            msg = httpCon.getResponseMessage();
+
+        } catch (IOException e) {
+            int codeMe = getFirstDigit(code);
+            if (codeMe==4) {
+                System.err.println("IOException during GET (Client error): " + e + ", output: " + code);
+            } else if (codeMe==5) {
+                System.err.println("IOException during GET (Server error): " + e + ", output: " + code);
+            } else if (codeMe==0) {
+                System.out.println("First of its kind");
+                output = "zero";
+            }
+        }
+
+        return output;
+
+    }
+    
+    public String callDELETEAuthorized(URL url, String usr, String pass) {
+        String output = null;
+        int code = 0;
+        String msg = null;
+        String servercredentials = usr + ":" + pass;
+
+        try {
+            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+            httpCon.setDoOutput(true);
+            httpCon.setRequestMethod("DELETE");
+            output = convertStreamToString(httpCon.getInputStream());
+            code = httpCon.getResponseCode();
+            msg = httpCon.getResponseMessage();
+        } catch (IOException e) {
+            int codeMe = getFirstDigit(code);
+            if (codeMe==4) {
+                System.err.println("IOException during DELETE (Client error): " + e + ", output: " + code);
+            } else if (codeMe==5) {
+                System.err.println("IOException during DELETE (Server error): " + e + ", output: " + code);
+            } else if (codeMe==0) {
+                System.out.println("First of its kind");
+                output = "zero";
+            }
+        }
+        
         return output;
 
     }

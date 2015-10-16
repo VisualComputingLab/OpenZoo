@@ -44,7 +44,7 @@ public class ProcessTopologyServlet extends HttpServlet {
             System.out.println("ProcessTopologyServlet received: " + name + " " + graphStr);
             
             if (graphStr != null && !graphStr.isEmpty())
-            {
+            {                
                 JSONObject graph_object = new JSONObject(graphStr);
             
                 // save graph object to kv

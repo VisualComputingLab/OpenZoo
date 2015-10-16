@@ -144,11 +144,14 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         
         String proglang = request.getParameter("tmpl-proglang");
         
+        boolean success = false;
+        
         if (proglang != null)
+        {
             switch (proglang)
             {
                 case "Java":
-                    createJavaService(request, response);
+                    success = createJavaService(request, response);
                     break;
                 case "C++":
                     err("C++ is not supported yet");
@@ -157,7 +160,17 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
                     err("Python is not supported yet");
                     break;
             }
-            
+        }
+        
+        if (success)
+        {
+            // cannot redirect, since data sent
+            // maybe somehow http://www.coderanch.com/t/362152/Servlets/java/Redirect-JSP-file-download
+        }
+        else
+        {
+            response.sendRedirect("Topologies");
+        }
         
 //        processRequest(request, response);
         
@@ -165,8 +178,10 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
 //        response.sendRedirect("Topologies");
     }
 
-    private void createJavaService(HttpServletRequest request, HttpServletResponse response) throws IOException
+    private boolean createJavaService(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
+        boolean success = false;
+        
         String author = request.getParameter("tmpl-author");
         String componentID = request.getParameter("tmpl-componentID");
         String serviceID = request.getParameter("tmpl-serviceID");
@@ -274,9 +289,7 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         
         // finally, create zip file with both directories
         // compressDirectory, apart from compressing, also renames .jav_ to .java files
-        
-        boolean success = false;
-        
+                
         if (Utilities.compressDirectory(outputBaseDir, s_ZipFile))
         {
             File downloadFile = new File(s_ZipFile);
@@ -316,14 +329,7 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         if (dir.exists())
             FileUtils.deleteQuietly(dir);
         
-        if (success)
-        {
-            // http://www.coderanch.com/t/362152/Servlets/java/Redirect-JSP-file-download
-        }
-        else
-        {
-            response.sendRedirect("Topologies");
-        }
+        return success;
     }
     
     /**

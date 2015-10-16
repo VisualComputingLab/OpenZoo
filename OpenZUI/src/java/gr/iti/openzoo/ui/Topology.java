@@ -1,5 +1,7 @@
 package gr.iti.openzoo.ui;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -760,10 +762,56 @@ public class Topology {
         // if connection has exchange_name: add queue_name = exchange_name + "_QUEUE_" + instanceId;
         // if queuelogging used: add topology_id_logging
         
-//        if ()
+        ArrayList<String> queues = null;
         
-        ArrayList<String> queues = new ArrayList<>();
+        // Call GET http://rabbit_host:15672/api/queues/toponame
+        Utilities util = new Utilities();
         
-        return null;
+        String url = "http://" + rabbit_host + ":15672/api/queues";
+        
+        try
+        {
+            String response = util.callGETAuthorized(new URL(url), rabbit_user, rabbit_passwd);
+            JSONArray arr = new JSONArray(response);
+            String queuename;
+            
+            queues = new ArrayList<>();
+            
+            for (int i = 0; i < arr.length(); i++)
+            {
+                queuename = arr.getJSONObject(i).getString("name");
+                if (queuename.startsWith(this.name + "_"))
+                    queues.add(queuename);
+            }
+        }
+        catch (IOException | JSONException e)
+        {
+            System.err.println("Exception while retrieving topology queues list: " + e);
+        }
+        
+        return queues;
+    }
+    
+    public void deleteTopologyQueues()
+    {
+        ArrayList<String> al = this.getTopologyQueues();
+        if (al != null)
+        {
+            String url = "http://" + rabbit_host + ":15672/api/queues/%2f/";
+            Utilities util = new Utilities();
+            
+            try
+            {
+                for (String queue: al)
+                {
+                    System.out.println("Deleting queue " + queue);
+                    util.callDELETEAuthorized(new URL(url + queue), rabbit_user, rabbit_passwd);
+                }
+            }
+            catch (IOException e)
+            {
+                System.err.println("Exception while deleting topology queues list: " + e);
+            }
+        }
     }
 }

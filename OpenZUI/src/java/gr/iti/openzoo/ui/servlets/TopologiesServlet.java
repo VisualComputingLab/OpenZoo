@@ -170,6 +170,10 @@ public class TopologiesServlet extends HttpServlet {
                     {
                         err("There was an error in the Key-Value repository, topology could not be removed");
                     }
+                    else
+                    {
+                        top.deleteTopologyQueues();
+                    }
             
                     processRequest(request, response);
                 }
