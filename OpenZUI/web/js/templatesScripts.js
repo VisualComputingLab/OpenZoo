@@ -1,7 +1,3 @@
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 $(document).ready(function(){
    
     $('.tmpl-workerType').on('click',function(){
@@ -19,7 +15,7 @@ $(document).ready(function(){
     $('#template_create').submit(function(e){
        if ($('input[name=tmpl-workerType]:checked').val()==="operator" && $('#tmpl-numOutputs').val()<1 && !$('#tmpl-hasInput').is(":checked")){
            e.preventDefault();
-           alertify.error("Operator service must have either input, either output endpoints");
+           alertify.error("Operator service must have at least one endpoint (input or output)");
            $('input[name=tmpl-workerType]:checked').focus();
        } 
        else{

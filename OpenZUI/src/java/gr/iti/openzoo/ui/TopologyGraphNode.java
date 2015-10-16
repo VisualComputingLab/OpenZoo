@@ -12,7 +12,7 @@ public class TopologyGraphNode {
 
     private String component_id;
     private int instances = 1;
-    private int workerspercore = 1;
+    private int threadspercore = 1;
     private HashMap<String, String> requirements = null;
 
     public TopologyGraphNode(String cid, JSONObject json)
@@ -21,7 +21,7 @@ public class TopologyGraphNode {
         try
         {
             instances = json.getInt("instances");
-            workerspercore = json.getInt("workerspercore");
+            threadspercore = json.getInt("threadspercore");
         }
         catch (JSONException e)
         {
@@ -48,12 +48,12 @@ public class TopologyGraphNode {
         this.instances = inst;
     }
 
-    public int getWorkerspercore() {
-        return workerspercore;
+    public int getThreadspercore() {
+        return threadspercore;
     }
 
-    public void setWorkerspercore(int w) {
-        this.workerspercore = w;
+    public void setThreadspercore(int w) {
+        this.threadspercore = w;
     }
     
     public void addRequirement(String key, String value)

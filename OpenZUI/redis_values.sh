@@ -13,10 +13,10 @@ redis-cli HSET topologies:vSeen mongo:user "dbadmin"
 redis-cli HSET topologies:vSeen mongo:passwd "vseen"
 
 # nodes
-redis-cli HSET topologies:vSeen node:FileCrawler "{'instances':1, 'workerspercore':0}"
-redis-cli HSET topologies:vSeen node:DescriptorExtractor "{'instances':2, 'workerspercore':2}"
-redis-cli HSET topologies:vSeen node:DescriptorSaver "{'instances':1, 'workerspercore':0}"
-redis-cli HSET topologies:vSeen node:SearchBroker "{'instances':1, 'workerspercore':0}"
+redis-cli HSET topologies:vSeen node:FileCrawler "{'instances':1, 'threadspercore':0}"
+redis-cli HSET topologies:vSeen node:DescriptorExtractor "{'instances':2, 'threadspercore':2}"
+redis-cli HSET topologies:vSeen node:DescriptorSaver "{'instances':1, 'threadspercore':0}"
+redis-cli HSET topologies:vSeen node:SearchBroker "{'instances':1, 'threadspercore':0}"
 
 # requires
 redis-cli HSET topologies:vSeen requires:DescriptorExtractor:extract_lbp 4
@@ -55,13 +55,13 @@ redis-cli HSET topologies:vSeen conf_object "{...}"
 		'server_id':
 		{
 			'instance_id': 0,
-			'workerspercore': 2,
+			'threadspercore': 2,
 			'status': 'installed/running'
 		},
 		'server_id':
 		{
 			'instance_id': 1,
-			'workerspercore': 0,
+			'threadspercore': 0,
 			'status': 'installed/running'
 		}
 	}

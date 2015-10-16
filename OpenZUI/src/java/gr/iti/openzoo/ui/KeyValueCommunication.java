@@ -341,7 +341,6 @@ public class KeyValueCommunication {
                 jedis.del(key);
             }
 
-            //WarFile war = new WarFile(prop.get("component_id"), prop.get("name"), prop.get("service_path"), prop.get("description"), prop.get("filename"), prop.get("folder"), prop.get("version"), prop.get("status"), sreq, swrk);
             WarFile war = new WarFile(prop);
 
             return war;
@@ -363,7 +362,6 @@ public class KeyValueCommunication {
         prop.put("service_path", war.getService_path());
         prop.put("description", war.getDescription());
         prop.put("filename", war.getFilename());
-        prop.put("folder", war.getFolder());
         prop.put("version", war.getVersion());
         prop.put("status", war.getStatus());
         prop.put("type", war.getType());
@@ -478,8 +476,8 @@ public class KeyValueCommunication {
             sb.append(nod.getName());
             sb.append("','instances':");
             sb.append(nod.getInstances());
-            sb.append(",'workerspercore':");
-            sb.append(nod.getWorkerspercore());
+            sb.append(",'threadspercore':");
+            sb.append(nod.getThreadspercore());
             sb.append("}");
             prop.put("node:" + nod.getName(), sb.toString());
             

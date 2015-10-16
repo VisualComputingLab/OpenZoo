@@ -135,7 +135,7 @@ public class Deployer {
                     continue;
                 try
                 {
-                    server_conf = new JSONObject().put("instance_id", assigned).put("workerspercore", nod.getWorkerspercore()).put("status", "void");
+                    server_conf = new JSONObject().put("instance_id", assigned).put("threadspercore", nod.getThreadspercore()).put("status", "void");
                     triples.add(new Triple(sres.getServername(), wfile, server_conf));
                 }
                 catch (JSONException ex)
@@ -178,15 +178,15 @@ public class Deployer {
             // open war file
             // include kv_host, kv_port, topo_name, instance_id into config.json
             File f_copy;
-            JSONObject config = Utilities.readJSONFromWAR(war.getFolder() + "/" + war.getFilename(), "config.json");
+            JSONObject config = Utilities.readJSONFromWAR(repo + "/" + war.getFilename(), "config.json");
             try
             {
                 config.put("keyvalue", new JSONObject().put("host", kv_host).put("port", kv_port));
                 config.put("instance_id", server_conf.getInt("instance_id"));
                 config.put("topology_id", topo_name);
                 
-                File f = new File(war.getFolder() + "/" + war.getFilename());
-                f_copy = new File(war.getFolder() + "/" + war.getFilename() + "_" + servername + ".war");
+                File f = new File(repo + "/" + war.getFilename());
+                f_copy = new File(repo + "/" + war.getFilename() + "_" + servername + ".war");
                 Files.copy(f.toPath(), f_copy.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
                 System.out.println("Updating config.json in " + f_copy.getAbsolutePath());

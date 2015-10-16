@@ -90,7 +90,6 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
         $("#war-upd-servpath").val(result.response.service_path);
         $("#war-upd-descr").val(result.response.description);
         $("#war-upd-filename").val(result.response.filename);
-        $("#war-upd-folder").val(result.response.folder);
         $("#war-upd-version").val(result.response.version);
         $("#war-upd-status").val(result.response.status);
         $('#detailsModal').modal('show');

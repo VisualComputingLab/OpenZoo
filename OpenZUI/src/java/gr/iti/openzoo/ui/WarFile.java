@@ -18,7 +18,6 @@ public class WarFile {
     private String service_path;
     private String description;
     private String filename;
-    private String folder;
     private String version;
     private String status;
     private String type;
@@ -27,10 +26,9 @@ public class WarFile {
     
     private static Utilities util = new Utilities();
     
-    public WarFile(String fi, String fo, String v, String s, JSONObject config)
+    public WarFile(String fi, String v, String s, JSONObject config)
     {
         filename = fi;
-        folder = fo;
         version = v;        
         status = s;
         
@@ -83,7 +81,6 @@ public class WarFile {
         service_path = prop.get("service_path");
         description = prop.get("description");        
         filename = prop.get("filename");
-        folder = prop.get("folder");
         version = prop.get("version");        
         status = prop.get("status");
         type = prop.get("type");
@@ -130,20 +127,6 @@ public class WarFile {
      */
     public void setFilename(String filename) {
         this.filename = filename;
-    }
-
-    /**
-     * @return the folder
-     */
-    public String getFolder() {
-        return folder;
-    }
-
-    /**
-     * @param folder the folder to set
-     */
-    public void setFolder(String folder) {
-        this.folder = folder;
     }
 
     /**
@@ -207,7 +190,6 @@ public class WarFile {
             ret.put("service_path", service_path);
             ret.put("description", description);
             ret.put("filename", filename);
-            ret.put("folder", folder);
             ret.put("version", version);
             ret.put("status", status);
             ret.put("type", type);

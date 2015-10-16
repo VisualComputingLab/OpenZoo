@@ -505,11 +505,11 @@ $(document).ready(function() {
                     //$('#routing_field').hide();
                     $('#routing_manager').hide();
                     $('#instances').val('1');
-                    $('#wpc').val('0');
+                    $('#tpc').val('0');
                     $(".addToServiceForm").remove();
                     $("#service_form").removeClass();
                     $('#instances').attr('readonly', false);
-                    $('#wpc').attr('readonly', false);
+                    $('#tpc').attr('readonly', false);
 
                     for (var i = 0; i < warfiles.length; i++) {
                         if (warfiles[i].component_id == objectId) {
@@ -555,8 +555,8 @@ $(document).ready(function() {
                     if (localObj.hasOwnProperty('type') && localObj.type==="broker"){
                         $('#instances').value=1;
                         $('#instances').attr('readonly', true);
-                        $('#wpc').value=0;
-                        $('#wpc').attr('readonly', true);
+                        $('#tpc').value=0;
+                        $('#tpc').attr('readonly', true);
                     }
                     $('#service_manager').show(200);
 
