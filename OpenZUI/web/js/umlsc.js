@@ -286,15 +286,15 @@ function serializeFormToGraphConf(form, focusObjectId) {
 var graph;
 var paper;
 
-
-$(document).ready(function() {
-
-    fetchServicesList(cb);
-
-    var cb =  function load(){
+function loadWars(){
         var wf = localStorage["WAR"];
         warfiles = JSON.parse(wf);
     }
+    
+    
+$(document).ready(function() {
+    
+    fetchServicesList(loadWars);
     
     $('#service_manager').hide();
     $('#connection_manager').hide();
