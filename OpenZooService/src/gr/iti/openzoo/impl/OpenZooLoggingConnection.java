@@ -20,7 +20,7 @@ public class OpenZooLoggingConnection {
        
     protected static Logger log = LogManager.getLogger(OpenZooLoggingConnection.class.getName());
     
-    private static int RABBITMQ_MESSAGE_TTL = 5000;
+    private static int RABBITMQ_MESSAGE_TTL = 30000;
     
     private static SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd yyyy zzz HH:mm:ss.SSS");
     
@@ -63,17 +63,17 @@ public class OpenZooLoggingConnection {
     
     public void info(String message)
     {
-        put(message, "info");
+        put(message, "INFO");
     }
     
     public void error(String message)
     {
-        put(message, "error");
+        put(message, "ERROR");
     }
     
     public void debug(String message)
     {
-        put(message, "debug");
+        put(message, "DEBUG");
     }
     
     private void put(String message, String type)

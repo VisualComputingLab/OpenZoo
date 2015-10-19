@@ -80,12 +80,12 @@
               <hr>
               Service logs
               <select id="logLevelDropdown" name="logLevelDropdown" class="selectpicker" title='Select minimum logging level'>
-                <option>DEBUG</option>
-                <option>INFO</option>
-                <option>ERROR</option>
+                <option>debug</option>
+                <option>info</option>
+                <option>error</option>
               </select>
               <div class="well well-sm">
-                <textarea style="width:100%" rows="10" id="serviceLogTextArea"></textarea>
+                <textarea style="width:100%" rows="10" id="serviceLogTextArea" wrap="off"></textarea>
               </div>
             </div>
           </div> 

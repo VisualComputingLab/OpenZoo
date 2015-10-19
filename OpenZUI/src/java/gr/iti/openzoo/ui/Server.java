@@ -154,7 +154,7 @@ public class Server {
         String output = null;
         try
         {
-            output = util.callGET(new URL("http://" + address + ":" + port));
+            output = util.callGET(new URL("http://" + address + ":" + port), null, null);
             //Logger.getLogger(Server.class.getName()).log(Level.INFO, output);
             if (output == null || output.equalsIgnoreCase("zero"))
                 newStatus = "inactive";

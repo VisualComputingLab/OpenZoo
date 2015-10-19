@@ -12,6 +12,8 @@ import gr.iti.openzoo.ui.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -62,89 +64,63 @@ public class ServiceLogServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        getLastQueueLogging(request, response);
+    }
+
+    public void getLastQueueLogging(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
         String toponame = request.getParameter("topo");
         String s_level = request.getParameter("level");
-        if (s_level == null) s_level = "DEBUG";
+        if (s_level == null) s_level = "debug";
         String queuename = toponame + "_logging";
         
         JSONObject json = new JSONObject();
         JSONArray logs = new JSONArray();
-        JSONObject message;
-        Delivery delivery;
         
-        try
+        Topology topo = kv.getTopology(toponame);
+        if (topo != null)
         {
-            json.put("topo", toponame);
+            String url = "http://" + topo.getRabbit_host() + ":15672/api/queues/%2f/";
+            util = new Utilities();
             
-            Topology topo = kv.getTopology(toponame);
-            if (topo != null)
-            {                
-                factory.setHost(topo.getRabbit_host());
-                factory.setPort(topo.getRabbit_port());
-                String usr = topo.getRabbit_user();
-                String pwd = topo.getRabbit_passwd();
-                if (usr != null && !usr.isEmpty())
+            try
+            {            
+                json.put("topo", toponame);
+                
+                JSONObject pdata = new JSONObject();
+                pdata.put("count", 10);
+                pdata.put("requeue", false);
+                pdata.put("encoding", "auto");
+            
+                //System.out.println("Querying queue " + queuename);
+                String result = util.callPOST(new URL(url + queuename + "/get"), topo.getRabbit_user(), topo.getRabbit_passwd(), pdata);
+                
+                if (result != null && result.startsWith("["))
                 {
-                    factory.setUsername(usr);
-                    factory.setPassword(pwd);
-                }
+                    // parse response and put filtered results into logs
+                    JSONArray arr = new JSONArray(result);
+                    JSONObject msg;
+                    for (int i = 0; i < arr.length(); i++)
+                    {
+                        msg = new JSONObject(arr.getJSONObject(i).getString("payload"));
 
-                connection = factory.newConnection();
-                channel = connection.createChannel();     
-                channel.basicQos(RABBITMQ_DEFAULT_NUM_MESSAGES);
-                qconsumer = new QueueingConsumer(channel);
-                
-                System.out.println("Connected to rabbitmq for aquiring the logs of topology " + toponame);
-                
-                Map<String, Object> args = new HashMap<>();
-                args.put("x-message-ttl", 5000);
-                channel.queueDeclare(queuename, true, false, false, args);
-                channel.basicConsume(queuename, false, qconsumer);
-                
-                for (int i = 0; i < RABBITMQ_DEFAULT_NUM_MESSAGES; i++)
-                {
-                    delivery = qconsumer.nextDelivery(RABBITMQ_DELIVERY_TIMEOUT);
-                    
-                    if (delivery == null)
-                    {
-                        System.out.println("queue is probably empty");
-                        break;
-                    }
-                    
-                    message = new JSONObject(new String(delivery.getBody()));
-                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-                    
-                    switch (s_level)
-                    {
-                        case "ERROR": if (message.getString("type").equalsIgnoreCase("info")) break;
-                        case "INFO": if (message.getString("type").equalsIgnoreCase("debug")) break;
-                        case "DEBUG": logs.put(message);
+                        switch (s_level)
+                        {
+                            case "debug": logs.put(msg); break;
+                            case "info": if (!msg.getString("type").equalsIgnoreCase("debug")) logs.put(msg); break;
+                            case "error": if (msg.getString("type").equalsIgnoreCase("error")) logs.put(msg); break;
+                        }
                     }
                 }
                 
                 json.put("response", logs);
             }
+            catch (IOException | JSONException e)
+            {
+                System.err.println("Exception at getLastQueueLogging: " + e);
+            }
         }
-        catch (IOException | JSONException e)
-        {
-            System.err.println("Exception at doGet: " + e);
-        }
-        catch (InterruptedException ex) 
-        {
-            System.err.println("InterruptedException during message delivery: " + ex);
-        }
-        catch (ConsumerCancelledException ex) 
-        {
-            System.err.println("ConsumerCancelledException during message delivery: " + ex);
-        }
-        catch (ShutdownSignalException ex) 
-        {
-        }
-        finally
-        {
-            if (connection != null)
-                connection.close();
-        }
+        
         
         response.setContentType("application/json");
         
@@ -152,12 +128,9 @@ public class ServiceLogServlet extends HttpServlet {
         {
             out.println(json);
         }
-        
-        
-        
-        //processRequest(request, response);
     }
-
+    
+    
     /**
      * Returns a short description of the servlet.
      *

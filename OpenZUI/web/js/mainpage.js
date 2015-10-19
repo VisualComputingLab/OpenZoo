@@ -8,38 +8,43 @@ $(document).ready(function(){
 
     });
 
-	// (function worker() {
 
- //        // console.log("Calling worker");
- //        if (localStorage["selectedTopologyStatus"] == "STARTED" || localStorage["selectedTopologyStatus"] == "SEMISTARTED")
- //        {
- //    		$.ajax({
- //    			url: "/OpenZUI/ServiceLogServlet?topo="+$('#topologyDropdown option:selected').val()+"&level="+$('#logLevelDropdown option:selected').val(), 
- //    			success: function(data) {
- //    		  		console.log(data);
- //    		  		if (data == null || data.response == null)
- //                        console.log("ServiceLogServlet returned nothing");
- //                    else if (data.response.length == 0)
- //                        console.log("ServiceLogServlet returned no logs");
- //                    else
- //                    {
- //                        $.each(data['response'], function(key,val){
+	(function worker() {
 
- //                            var line = val.type + " (:) " + val.componentId + " (:) " + val.date + " (:) " + val.message;
+        // console.log("Calling worker");
+        if (localStorage["selectedTopologyStatus"] == "STARTED" || localStorage["selectedTopologyStatus"] == "SEMISTARTED")
+        {
+    		$.ajax({
+    			url: "/OpenZUI/ServiceLogServlet?topo="+$('#topologyDropdown option:selected').val()+"&level="+$('#logLevelDropdown option:selected').val(), 
+    			success: function(data) {
+    		  		console.log(data);
+    		  		if (data == null || data.response == null)
+                        console.log("ServiceLogServlet returned nothing");
+                    else if (data.response.length == 0)
+                        console.log("ServiceLogServlet returned no logs");
+                    else
+                    {
+                        $.each(data['response'], function(key,val){
 
- //                            $('#serviceLogTextArea').val($('#serviceLogTextArea').val() + "\n" + line);
- //                        });
- //                    }
- //    			}//,
- //    			// complete: function() {
- //    		 //  		setTimeout(worker, 50000);
- //    			// }
- //    		});
- //        }
+                            var line = "<" + val.type + "> : " + val.componentId + " : " + val.date + " : " + val.message;
 
- //        setTimeout(worker, 5000);
+                            $('#serviceLogTextArea').val($('#serviceLogTextArea').val() + "\n" + line);
+                        });
 
-	// })();
+                        $('#serviceLogTextArea').scrollTop($('#serviceLogTextArea')[0].scrollHeight);
+                    }
+    			}//,
+    			// complete: function() {
+    		 //  		setTimeout(worker, 50000);
+    			// }
+    		});
+
+            // getLastTopologyLogs("160.40.51.165", $('#topologyDropdown option:selected').val());
+        }
+
+        setTimeout(worker, 5000);
+
+	})();
 });
 
 
@@ -76,4 +81,4 @@ function detailsTopologyConfiguration(name){
             });
         }
     });
- };
+}

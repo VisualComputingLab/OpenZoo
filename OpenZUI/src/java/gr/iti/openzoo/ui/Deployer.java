@@ -73,7 +73,7 @@ public class Deployer {
             for (Server srv : servers)
             {
                 url = new URL("http://" + srv.getAddress() + ":" + srv.getPort() + "/ServerStatistics/resources/stats");
-                stat = new JSONObject(util.callGET(url));
+                stat = new JSONObject(util.callGET(url, null, null));
                 sr = new ServerResources(srv.getName(), stat);
                 // check if server fits the criteria (heap mem usage < 80%, space free > 1 GB, cpu usage < 80 %)
                 if (sr.areResourcesAvailable())
@@ -299,7 +299,7 @@ public class Deployer {
                     Server srv = kv.getServer(server_id);
                     WarFile war = kv.getWarFile(service_id);
                     URL url = new URL("http://" + srv.getAddress() + ":" + srv.getPort() + "/" + war.getComponent_id() + war.getService_path() + "?action=" + command);
-                    JSONObject output = new JSONObject(util.callGET(url));
+                    JSONObject output = new JSONObject(util.callGET(url, null, null));
                     
                     // on error, print and exit
                     // on success, set stati to 'running'

@@ -771,7 +771,7 @@ public class Topology {
         
         try
         {
-            String response = util.callGETAuthorized(new URL(url), rabbit_user, rabbit_passwd);
+            String response = util.callGET(new URL(url), rabbit_user, rabbit_passwd);
             JSONArray arr = new JSONArray(response);
             String queuename;
             
@@ -805,7 +805,7 @@ public class Topology {
                 for (String queue: al)
                 {
                     System.out.println("Deleting queue " + queue);
-                    util.callDELETEAuthorized(new URL(url + queue), rabbit_user, rabbit_passwd);
+                    util.callDELETE(new URL(url + queue), rabbit_user, rabbit_passwd);
                 }
             }
             catch (IOException e)

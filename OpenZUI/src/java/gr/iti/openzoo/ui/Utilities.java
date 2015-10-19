@@ -60,111 +60,193 @@ import org.codehaus.jettison.json.JSONObject;
  * @author Dimitris Samaras <dimitris.samaras@iti.gr>
  */
 public class Utilities {
-
-    /**
-     * Method callGET
-     *
-     * @param url URL, the url to send the get request
-     * @exception IOException When kv directory does not exist (First time web
-     * service installed) exception gets generated. Not an issue!
-     *
-     */
-    public String callGET(URL url) {
-        String output = null;
-        int code = 0;
-        String msg = null;
-        //InetAddress myip;
-        //String myip = "195.251.117.110";
-
-        try {
-            //myip = InetAddress.getLocalHost(); // does not provide me the address i want....
-
-            //URL url = new URL("http://"+myip+":8500/v1/catalog/service/"+service);
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            // you need the following if you pass server credentials
-            // httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("GET");
-            output = convertStreamToString(httpCon.getInputStream());
-            code = httpCon.getResponseCode();
-            msg = httpCon.getResponseMessage();
-            //output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
-
-        } catch (IOException e) {
-            int codeMe = getFirstDigit(code);
-            if (codeMe==4) {
-                System.err.println("IOException during GET (Client error): " + e + ", output: " + code);
-            } else if (codeMe==5) {
-                System.err.println("IOException during GET (Server error): " + e + ", output: " + code);
-            } else if (codeMe==0) {
-                System.out.println("First of its kind");
-                output = "zero";
-            }
-        }
-//        System.out.println("ds. CallGet code:" + code + " output: " + output + " msg: " + msg);
-        return output;
-
-    }
     
-    public String callGETAuthorized(URL url, String usr, String pass) {
+    public String callGET(URL url, String usr, String pass)
+    {
         String output = null;
         int code = 0;
         String msg = null;
-        String servercredentials = usr + ":" + pass;
+        String servercredentials = null;
+        
+        if (usr != null && !usr.isEmpty() && pass != null && !pass.isEmpty())
+            servercredentials = usr + ":" + pass;
 
-        try {
+        try
+        {
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+            if (servercredentials != null)
+                httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
             httpCon.setDoOutput(true);
             httpCon.setRequestMethod("GET");
             output = convertStreamToString(httpCon.getInputStream());
             code = httpCon.getResponseCode();
             msg = httpCon.getResponseMessage();
 
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             int codeMe = getFirstDigit(code);
-            if (codeMe==4) {
+            if (codeMe==4)
+            {
                 System.err.println("IOException during GET (Client error): " + e + ", output: " + code);
-            } else if (codeMe==5) {
+            }
+            else if (codeMe==5)
+            {
                 System.err.println("IOException during GET (Server error): " + e + ", output: " + code);
-            } else if (codeMe==0) {
+            }
+            else if (codeMe==0)
+            {
                 System.out.println("First of its kind");
                 output = "zero";
             }
         }
 
         return output;
-
     }
     
-    public String callDELETEAuthorized(URL url, String usr, String pass) {
+    public String callPOST(URL url, String usr, String pass, JSONObject object)
+    {
+        String output = null;
+        int code = 0;
+        String servercredentials = null;
+        
+        if (usr != null && !usr.isEmpty() && pass != null && !pass.isEmpty())
+            servercredentials = usr + ":" + pass;
+
+        try 
+        {
+            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+            httpCon.setDoOutput(true);
+            httpCon.setRequestProperty("Content-Type", "application/json");
+            if (servercredentials != null)
+                httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));  // for accessing rabbit rest api
+            else
+                httpCon.setRequestProperty("Accept", "application/json");   // for accessing own services
+            httpCon.setRequestMethod("POST");
+            
+            String objectStr = object.toString();
+            try (OutputStreamWriter osw = new OutputStreamWriter(httpCon.getOutputStream())) {
+                osw.write(objectStr);
+            }
+            
+            code = httpCon.getResponseCode();
+            output = convertStreamToString(httpCon.getInputStream());
+        } 
+        catch (IOException e)
+        {
+            int codeMe = getFirstDigit(code);
+            if (codeMe==4)
+            {
+                System.err.println("IOException during POST (Client error): " + e + ", output: " + code);
+            }
+            else if (codeMe==5)
+            {
+                System.err.println("IOException during POST (Server error): " + e + ", output: " + code);
+            }
+            else if (codeMe==0)
+            {
+                System.out.println("First of its kind");
+                output = "zero";
+            }
+        }
+
+        return output;
+    }
+            
+    public String callDELETE(URL url, String usr, String pass) 
+    {
         String output = null;
         int code = 0;
         String msg = null;
-        String servercredentials = usr + ":" + pass;
+        String servercredentials = null;
+        
+        if (usr != null && !usr.isEmpty() && pass != null && !pass.isEmpty())
+            servercredentials = usr + ":" + pass;
 
-        try {
+        try
+        {
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+            if (servercredentials != null)
+                httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
             httpCon.setDoOutput(true);
             httpCon.setRequestMethod("DELETE");
             output = convertStreamToString(httpCon.getInputStream());
             code = httpCon.getResponseCode();
             msg = httpCon.getResponseMessage();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             int codeMe = getFirstDigit(code);
-            if (codeMe==4) {
+            if (codeMe==4)
+            {
                 System.err.println("IOException during DELETE (Client error): " + e + ", output: " + code);
-            } else if (codeMe==5) {
+            }
+            else if (codeMe==5)
+            {
                 System.err.println("IOException during DELETE (Server error): " + e + ", output: " + code);
-            } else if (codeMe==0) {
+            }
+            else if (codeMe==0)
+            {
                 System.out.println("First of its kind");
                 output = "zero";
             }
         }
         
         return output;
+    }
 
+    public String callPUT(URL url, String usr, String pass, String data)
+    {
+        String output = null;
+        int code = 0;
+        String servercredentials = null;
+        
+        if (usr != null && !usr.isEmpty() && pass != null && !pass.isEmpty())
+            servercredentials = usr + ":" + pass;
+
+        try
+        {
+            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+            httpCon.setDoOutput(true);
+            if (servercredentials != null)
+                    httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+            httpCon.setRequestMethod("PUT");
+            httpCon.setRequestProperty("Content-Type", "application/json");
+            //httpCon.setRequestProperty("Accept", "application/json");
+            //connection.setRequestProperty("Content-Length", String.valueOf(data.length()));
+
+            StringBuilder responseSB;
+            try (OutputStream os = httpCon.getOutputStream()) {
+                os.write(data.getBytes());
+                responseSB = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(httpCon.getInputStream()))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        responseSB.append(line);
+                    }
+                }
+            }
+            output = responseSB.toString();
+        }
+        catch (IOException e)
+        {
+            int codeMe = getFirstDigit(code);
+            if (codeMe==4)
+            {
+                System.err.println("IOException during POST (Client error): " + e + ", output: " + code);
+            }
+            else if (codeMe==5)
+            {
+                System.err.println("IOException during POST (Server error): " + e + ", output: " + code);
+            }
+            else if (codeMe==0)
+            {
+                System.out.println("First of its kind");
+                output = "zero";
+            }
+        }
+        
+        return output;
     }
 
     private static String convertStreamToString(InputStream is) throws IOException {
@@ -193,106 +275,7 @@ public class Utilities {
             return "";
         }
     }
-
-    public String callPut(URL url, String data) throws IOException {
-        // Encode the query
-        // String encodedQuery = URLEncoder.encode(data, "UTF-8");
-        // This is the data that is going to be send to itcuties.com via POST request
-        // 'e' parameter contains data to echo
-        // String postData = "e=" + encodedQuery +"'";
-
-        // Connect to google.com
-        //URL url = new URL("http://echo.itcuties.com");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
-        connection.setRequestMethod("PUT");
-        connection.setRequestProperty("Content-Type", "application/json");
-        //connection.setRequestProperty("Content-Length",  String.valueOf(postData.length()));
-        connection.setRequestProperty("Content-Length", String.valueOf(data.length()));
-        
-        StringBuilder responseSB;
-        try (OutputStream os = connection.getOutputStream()) {
-            os.write(data.getBytes());
-            responseSB = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    responseSB.append(line);
-                }
-            }
-        }
-
-        return responseSB.toString();
-    }
     
-    public String callPOST(URL url, JSONObject object) throws IOException
-    {
-        try
-        {
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestProperty("Content-Type", "application/json");
-            httpCon.setRequestProperty("Accept", "application/json");
-            //httpCon.setRequestProperty("Content-Length", String.valueOf(data.length()));
-            httpCon.setRequestMethod("POST");
-            
-            String objectStr = object.toString();
-            try (OutputStreamWriter osw = new OutputStreamWriter(httpCon.getOutputStream())) {
-                osw.write(objectStr);
-            }
-            
-            int status = ((HttpURLConnection) httpCon).getResponseCode();
-            if (status != 200)
-            {
-                System.err.println("callPOST returned with status: " + status);
-                return null;
-            }
-            
-            String output = convertStreamToString(httpCon.getInputStream());
-            return output;
-        }
-        catch (IOException e)
-        {
-            System.err.println("callPOST : IOException: " + e);
-            return null;
-        }
-    }
-
-    public String callDELETE(URL url) {
-        String output;
-        int code = 0;
-        String msg = null;
-        //InetAddress myip;
-
-        try {
-            //myip = InetAddress.getLocalHost(); // does not provide me the address i want....
-
-            //URL url = new URL("http://"+myip+":8500/v1/catalog/service/"+service);
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            // you need the following if you pass server credentials
-            // httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("DELETE");
-            output = convertStreamToString(httpCon.getInputStream());
-            code = httpCon.getResponseCode();
-            msg = httpCon.getResponseMessage();
-            //output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
-
-        } catch (IOException e) {
-            output = "IOException during DELETE: " + e;
-            System.err.println(output);
-        }
-        // Check for Response 
-        if ((code != 200 || code != 201) && !("OK".equals(msg))) {
-            //output = "NOT OK RESPONSE";
-            System.err.println("Failed : HTTP error code : " + code);
-            output = Integer.toString(code);
-        }
-        //System.out.println(output);
-        return output;
-
-    }
-
     public String getHostname() {
         String hostname = "localhost";
 
