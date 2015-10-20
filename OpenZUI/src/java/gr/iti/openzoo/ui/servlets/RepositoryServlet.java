@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -71,7 +73,7 @@ public class RepositoryServlet extends HttpServlet {
         }
         else root.put("ftp", repo);
         
-        ArrayList<WarFile> allWarfiles = kv.getWarFiles();    
+        ArrayList<WarFile> allWarfiles = kv.getWarFiles();
         if (allWarfiles == null)
         {
             err("There was an error in the Key-Value repository, War files list could not be retrieved.");
@@ -172,16 +174,13 @@ public class RepositoryServlet extends HttpServlet {
                     inf("WAR file uploaded");
                     JSONObject config = Utilities.readJSONFromWAR(f.getAbsolutePath(), "config.json");
                     
-                    if (config == null)
-                    {
-                        System.err.println("War file does not contain a config.json, or config.json is not in json format");
-                        err("War file does not contain a config.json, or config.json is not in json format");
-                    }
-                    else
-                    {
-                        WarFile w = new WarFile(fileName, "1.0", "inactive", config);
-                        kv.putWarFile(w);
-                    }
+                    String status = "inactive";
+                    
+                    if (isValid(fileName, config))
+                        status = "active";
+                    
+                    WarFile w = new WarFile(fileName, "1.0", status, config);
+                    kv.putWarFile(w);
                 }
                 break;
                 
@@ -195,6 +194,170 @@ public class RepositoryServlet extends HttpServlet {
         }
         
         processRequest(request, response);
+    }
+    
+    private boolean isValid(String war, JSONObject config)
+    {
+        File f = new File(localRepository + "/" + war);
+        if (!f.exists())
+        {
+            System.err.println("War file " + war + " cannot be found in the repository");
+            logs.add("War file " + war + " cannot be found in the repository");
+            return false;
+        }
+        
+//        JSONObject config = Utilities.readJSONFromWAR(f.getAbsolutePath(), "config.json");
+        if (config == null)
+        {
+            System.err.println("War file " + war + " does not contain a config.json, or config.json is not in json format");
+            logs.add("War file " + war + " does not contain a config.json, or config.json is not in json format");
+            return false;
+        }
+        
+        String msg;
+        
+        JSONObject srv = config.optJSONObject("service");
+        if (srv == null)
+        {
+            msg = "service is not specified";
+            System.err.println("War file " + war + " has an invalid config.json: " + msg);
+            logs.add("War file " + war + " has an invalid config.json: " + msg);
+            return false;
+        }
+        else
+        {
+            if (srv.optString("component_id").isEmpty())
+            {
+                msg = "service.component_id is not specified";
+                System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                logs.add("War file " + war + " has an invalid config.json: " + msg);
+                return false;
+            }
+            
+            if (srv.optString("name").isEmpty())
+            {
+                msg = "service.name is not specified";
+                System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                logs.add("War file " + war + " has an invalid config.json: " + msg);
+                return false;
+            }
+            
+            if (srv.optString("path").isEmpty())
+            {
+                msg = "service.path is not specified";
+                System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                logs.add("War file " + war + " has an invalid config.json: " + msg);
+                return false;
+            }
+            
+            if (srv.optString("description").isEmpty())
+            {
+                msg = "service.description is not specified";
+                System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                logs.add("War file " + war + " has an invalid config.json: " + msg);
+                return false;
+            }
+        }
+        
+        JSONArray wrks = config.optJSONArray("workers");
+        if (wrks == null)
+        {
+            msg = "workers is not specified";
+            System.err.println("War file " + war + " has an invalid config.json: " + msg);
+            logs.add("War file " + war + " has an invalid config.json: " + msg);
+            return false;
+        }
+        else
+        {
+            if (wrks.length() == 0)
+            {
+                msg = "workers is empty";
+                System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                logs.add("War file " + war + " has an invalid config.json: " + msg);
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < wrks.length(); i++)
+                {
+                    JSONObject w = wrks.optJSONObject(i);
+
+                    if (w == null)
+                    {
+                        msg = "workers[" + i + "] is not valid";
+                        System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                        logs.add("War file " + war + " has an invalid config.json: " + msg);
+                        return false;
+                    }
+                    else
+                    {
+                        if (w.optString("worker_id").isEmpty())
+                        {
+                            msg = "workers[" + i + "].worker_id is not specified";
+                            System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                            logs.add("War file " + war + " has an invalid config.json: " + msg);
+                            return false;
+                        }
+                        
+                        JSONArray eps = w.optJSONArray("endpoints");
+                        
+                        if (eps == null)
+                        {
+                            msg = "workers[" + i + "].endpoints is not specified";
+                            System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                            logs.add("War file " + war + " has an invalid config.json: " + msg);
+                            return false;
+                        }
+                        else
+                        {
+                            if (eps.length() == 0)
+                            {
+                                msg = "workers[" + i + "].endpoints is empty";
+                                System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                                logs.add("War file " + war + " has an invalid config.json: " + msg);
+                                return false;
+                            }
+                            else
+                            {
+                                for (int j = 0; j < eps.length(); j++)
+                                {
+                                    JSONObject e = eps.optJSONObject(j);
+                                    
+                                    if (e == null)
+                                    {
+                                        msg = "workers[" + i + "].endpoints[" + j + "] is not valid";
+                                        System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                                        logs.add("War file " + war + " has an invalid config.json: " + msg);
+                                        return false;
+                                    }
+                                    else
+                                    {
+                                        if (e.optString("endpoint_id").isEmpty())
+                                        {
+                                            msg = "workers[" + i + "].endpoints[" + j + "].endpoint_id is not specified";
+                                            System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                                            logs.add("War file " + war + " has an invalid config.json: " + msg);
+                                            return false;
+                                        }
+                                        
+                                        String type = e.optString("type");
+                                        if (!type.equalsIgnoreCase("in") && !type.equalsIgnoreCase("out"))
+                                        {
+                                            msg = "workers[" + i + "].endpoints[" + j + "].type must be either in or out";
+                                            System.err.println("War file " + war + " has an invalid config.json: " + msg);
+                                            logs.add("War file " + war + " has an invalid config.json: " + msg);
+                                            return false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return true;
     }
 
     // http://stackoverflow.com/questions/2422468/how-to-upload-files-to-server-using-jsp-servlet

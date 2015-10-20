@@ -290,6 +290,11 @@ public class WarFile {
         this.description = description;
     }
 
+    public void updateStatus()
+    {
+        
+    }
+    
     @Override
     public String toString()
     {
