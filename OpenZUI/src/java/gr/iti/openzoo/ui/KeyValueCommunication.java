@@ -161,6 +161,92 @@ public class KeyValueCommunication {
         }
     }
     
+    public MessageStatistics getEndpointStats(String toponame)
+    {        
+        try (Jedis jedis = pool.getResource())
+        {
+            MessageStatistics ms = new MessageStatistics();
+            
+            Set<String> ss = jedis.hkeys("statistics:" + toponame);
+            if (ss != null && !ss.isEmpty())
+            {
+                for (String kk : ss)
+                {
+                    if (kk.startsWith("endpoint:messages:"))
+                    {
+                        ms.addEndpointMessages(kk.substring(18), Long.parseLong(jedis.hget("statistics:" + toponame, kk)));
+                    }
+                    else if (kk.startsWith("endpoint:bytes:"))
+                    {
+                        ms.addEndpointBytes(kk.substring(15), Long.parseLong(jedis.hget("statistics:" + toponame, kk)));
+                    }
+                }
+                
+                return ms;
+            }
+        }
+        catch (Exception ex)
+        {
+            error("Redis exception (getEndpointStatValues)", ex);
+        }
+        
+        return null;
+    }
+    
+    public HashMap<String, ArrayList<Long>> getEndpointStatValues(String toponame)
+    {        
+        try (Jedis jedis = pool.getResource())
+        {
+            HashMap<String, ArrayList<Long>> results = new HashMap<>();
+            String key;
+            ArrayList<Long> sub;
+            
+            Set<String> ss = jedis.hkeys("statistics:" + toponame);
+            if (ss != null && !ss.isEmpty())
+            {
+                for (String kk : ss)
+                {
+                    if (kk.startsWith("endpoint:messages:"))
+                    {
+                        key = kk.substring(18);
+                        sub = results.get(key);
+                        if (sub == null)
+                        {
+                            sub = new ArrayList<>();
+                            sub.add(0L);
+                            sub.add(0L);
+                            results.put(key, sub);
+                        }
+                        
+                        sub.set(0, Long.parseLong(jedis.hget("statistics:" + toponame, kk)));
+                    }
+                    else if (kk.startsWith("endpoint:bytes:"))
+                    {
+                        key = kk.substring(15);
+                        sub = results.get(key);
+                        if (sub == null)
+                        {
+                            sub = new ArrayList<>();
+                            sub.add(0L);
+                            sub.add(0L);
+                            results.put(key, sub);
+                        }
+                        
+                        sub.set(1, Long.parseLong(jedis.hget("statistics:" + toponame, kk)));
+                    }
+                }
+                
+                return results;
+            }
+        }
+        catch (Exception ex)
+        {
+            error("Redis exception (getEndpointStatValues)", ex);
+        }
+        
+        return null;
+    }
+    
     public ArrayList<Server> getServers()
     {
         return getServers(false);

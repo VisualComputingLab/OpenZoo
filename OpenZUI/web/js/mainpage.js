@@ -14,30 +14,34 @@ $(document).ready(function(){
         // console.log("Calling worker");
         if (localStorage["selectedTopologyStatus"] == "STARTED" || localStorage["selectedTopologyStatus"] == "SEMISTARTED")
         {
-    		$.ajax({
-    			url: "/OpenZUI/ServiceLogServlet?topo="+$('#topologyDropdown option:selected').val()+"&level="+$('#logLevelDropdown option:selected').val(), 
-    			success: function(data) {
-    		  		console.log(data);
-    		  		if (data == null || data.response == null)
-                        console.log("ServiceLogServlet returned nothing");
-                    else if (data.response.length == 0)
-                        console.log("ServiceLogServlet returned no logs");
-                    else
-                    {
-                        $.each(data['response'], function(key,val){
+            if ($('#logsToggleButton').is(':checked'))
+            {
+        		$.ajax({
+        			url: "/OpenZUI/ServiceLogServlet?topo="+$('#topologyDropdown option:selected').val()+"&level="+$('#logLevelDropdown option:selected').val(), 
+        			success: function(data) {
+        		  		console.log(data);
+        		  		if (data == null || data.response == null)
+                            console.log("ServiceLogServlet returned nothing");
+                        else if (data.response.length == 0)
+                            console.log("ServiceLogServlet returned no logs");
+                        else
+                        {
+                            $.each(data['response'], function(key,val){
 
-                            var line = "<" + val.type + "> : " + val.componentId + " : " + val.date + " : " + val.message;
+                                var line = "<" + val.type + "> : " + val.componentId + " : " + val.date + " : " + val.message;
 
-                            $('#serviceLogTextArea').val($('#serviceLogTextArea').val() + "\n" + line);
-                        });
+                                $('#serviceLogTextArea').val($('#serviceLogTextArea').val() + "\n" + line);
+                            });
 
-                        $('#serviceLogTextArea').scrollTop($('#serviceLogTextArea')[0].scrollHeight);
-                    }
-    			}//,
-    			// complete: function() {
-    		 //  		setTimeout(worker, 50000);
-    			// }
-    		});
+                            $('#serviceLogTextArea').scrollTop($('#serviceLogTextArea')[0].scrollHeight);
+                        }
+        			}//,
+        			// complete: function() {
+        		 //  		setTimeout(worker, 50000);
+        			// }
+        		});
+            }
+            else console.log('is not checked');
 
             // getLastTopologyLogs("160.40.51.165", $('#topologyDropdown option:selected').val());
         }

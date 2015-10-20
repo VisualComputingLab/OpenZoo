@@ -1,6 +1,7 @@
 package gr.iti.openzoo.ui.servlets;
 
 import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.MessageStatistics;
 import gr.iti.openzoo.ui.RepositoryParameters;
 import gr.iti.openzoo.ui.Server;
 import gr.iti.openzoo.ui.Topology;
@@ -9,6 +10,7 @@ import gr.iti.openzoo.ui.WarFile;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -146,6 +148,23 @@ public class KeyValueServlet extends HttpServlet {
                         Topology topo = kv.getTopology(name);
                         if (topo != null)
                             json.put("response", topo.getServerStatus());
+                    }
+                    break;
+                    
+                case "endpointstats":
+                    if (name == null || name.equalsIgnoreCase("all"))
+                    {
+                        json.put("response", "Please specify a topology");
+                    }
+                    else
+                    {
+                        Topology topo = kv.getTopology(name);
+                        if (topo != null)
+                        {
+                            //HashMap<String, ArrayList<Long>> eps = kv.getEndpointStatValues(name);
+                            MessageStatistics eps = kv.getEndpointStats(name);
+                            json.put("response", eps.getJSON());
+                        }
                     }
                     break;
             }

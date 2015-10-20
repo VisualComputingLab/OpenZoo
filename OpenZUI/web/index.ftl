@@ -84,6 +84,7 @@
                 <option>info</option>
                 <option>error</option>
               </select>
+              <input type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> Play" data-off="<i class='fa fa-pause'></i> Pause" data-onstyle="success" id="logsToggleButton">
               <div class="well well-sm">
                 <textarea style="width:100%" rows="10" id="serviceLogTextArea" wrap="off"></textarea>
               </div>
@@ -155,6 +156,7 @@
 	<!-- script references -->
 		<script src="./libs/jquery/jquery-1.11.3.min.js"></script>
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./libs/bootstrap/js/bootstrap-toggle.min.js"></script>
     <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
     <script src="./js/mainpage.js"></script>

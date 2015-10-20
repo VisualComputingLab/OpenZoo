@@ -88,7 +88,7 @@ public class ServiceLogServlet extends HttpServlet {
                 json.put("topo", toponame);
                 
                 JSONObject pdata = new JSONObject();
-                pdata.put("count", 10);
+                pdata.put("count", 100);
                 pdata.put("requeue", false);
                 pdata.put("encoding", "auto");
             
