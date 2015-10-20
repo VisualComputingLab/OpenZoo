@@ -218,7 +218,7 @@ public class TopologiesServlet extends HttpServlet {
                 break;
                 
             case "deploy":
-                logs.addAll(deployer.deployTopology(name));
+                logs.addAll(deployer.deployTopologyNew(name));
                 processRequest(request, response);
                 break;
                 

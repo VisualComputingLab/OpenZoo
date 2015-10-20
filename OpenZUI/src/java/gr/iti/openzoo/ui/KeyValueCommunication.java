@@ -39,6 +39,16 @@ public class KeyValueCommunication {
         }
     }
     
+    public String getKVHost()
+    {
+        return redis_host;
+    }
+    
+    public int getKVPort()
+    {
+        return redis_port;
+    }
+    
     public void stop()
     {
         if (pool != null)

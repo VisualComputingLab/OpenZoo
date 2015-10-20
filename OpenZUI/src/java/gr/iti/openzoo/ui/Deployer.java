@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.xml.bind.DatatypeConverter;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -33,6 +35,8 @@ public class Deployer {
     private String repo;
     private static String kv_host;
     private static Integer kv_port;
+    
+    private static final int THREADPOOL_SIZE = 5;
     
     public Deployer(JSONObject properties, KeyValueCommunication thekv)
     {
@@ -238,6 +242,194 @@ public class Deployer {
                 return logs;
             }
         }      
+                
+        // save configuration to the topology
+        topo.setConf_object(conf_object);
+        
+        // save topology to the kv
+        // update topo.getGraph_object()
+        kv.putTopology(topo);
+                
+        return logs;
+    }
+    
+    public ArrayList<String> deployTopologyNew(String topo_name)
+    {
+        ArrayList<String> logs = new ArrayList<>();
+        
+        // get topology and servers from kv
+        Topology topo = kv.getTopology(topo_name);
+        ArrayList<Server> servers = kv.getServers();
+        
+        ArrayList<TopologyGraphNode> nodes = topo.getNodes();
+        Map<String, ServerResources> server2resources = new HashMap<>();
+        
+        // for each service instance, choose a server based on server statistics and previously installed services
+        // if servers not sufficient, create less instances and print warning
+        // if servers still not sufficient, print error and exit
+        URL url;
+        JSONObject stat;
+        ServerResources sr;
+        ArrayList<String> slist;
+        
+        try
+        {
+            for (Server srv : servers)
+            {
+                url = new URL("http://" + srv.getAddress() + ":" + srv.getPort() + "/ServerStatistics/resources/stats");
+                stat = new JSONObject(util.callGET(url, null, null));
+                sr = new ServerResources(srv.getName(), stat);
+                // check if server fits the criteria (heap mem usage < 80%, space free > 1 GB, cpu usage < 80 %)
+                if (sr.areResourcesAvailable())
+                {
+                    slist = listServices("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd());
+                    sr.addDeployedServices(slist);
+                    server2resources.put(sr.getServername(), sr);
+//                    System.out.println("Server " + srv.getName() + " will be used");
+                }
+                else
+                {
+                    System.out.println("Server " + srv.getName() + " has limited resources and will not be used");
+                }
+            }
+        }
+        catch (IOException | JSONException e)
+        {
+            System.err.println("Exception at deployTopology: " + e);
+            logs.add("ERROR:" + "Exception at deployTopology: " + e);
+            return logs;
+        }
+        
+        server2resources = MapUtil.sortByValueAscending( server2resources );
+                
+        ArrayList<ServerResources> sortedResources = new ArrayList<>();
+        for(Map.Entry<String, ServerResources> entry : server2resources.entrySet()) {
+//            System.out.println("Resource " + entry.getValue().getServername() + ": " + entry.getValue().getSystemCpuLoad());
+            sortedResources.add(entry.getValue());
+        }
+        
+//        System.out.println("Size of sortedResources is " + sortedResources.size());
+        
+        // Cycle now through sortedResources and throw a service instance at each server
+        int res_index = 0;
+        int assigned;
+        ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
+        JSONObject server_conf;
+        
+        for (TopologyGraphNode nod : nodes)
+        {            
+            WarFile wfile = kv.getWarFile(nod.getName());
+            
+//            System.out.println("Checking node " + nod.getName() + "(" + wfile.getComponent_id() + ")");
+            
+            int instances = nod.getInstances();
+            assigned = 0;
+            ServerResources sres;
+            
+            // check if service not already deployed
+            // ensure that instances < num of available servers
+            
+            for (int i = 0; i < sortedResources.size() && assigned < instances; i++)
+            {
+                sres = sortedResources.get((res_index) % sortedResources.size());
+//                System.out.println("Checking resource " + sres.getServername());
+                res_index++;
+                
+                if (sres.isServiceDeployed(wfile.getComponent_id()))
+                    continue;
+                try
+                {
+                    server_conf = new JSONObject().put("instance_id", assigned).put("threadspercore", nod.getThreadspercore()).put("status", "void");
+                    triples.add(new Triple(sres.getServername(), wfile, server_conf));
+                }
+                catch (JSONException ex)
+                {
+                    System.err.println("JSONException while creating triple: " + ex);
+                    logs.add("ERROR:" + "JSONException while creating triple: " + ex);
+                }
+//                System.out.println("Triple added");
+                assigned++;
+            }
+            if (assigned == 0)
+            {
+                System.err.println("There are no servers for deploying service " + nod.getName() + ", aborting...");
+                logs.add("ERROR:" + "There are no servers for deploying service " + nod.getName() + ", aborting...");
+                return logs;
+            }
+            else if (assigned < instances)
+            {
+                System.out.println("There are not enough servers for deploying " + instances + " instances of service " + nod.getName() + ". Instance number is set to " + assigned);
+                logs.add("WARN:" + "There are not enough servers for deploying " + instances + " instances of service " + nod.getName() + ". Instance number is set to " + assigned);
+                nod.setInstances(instances);
+            }
+        }
+        
+        // create a configuration json
+        
+        
+        
+        WarFile war;
+        String servername;
+        
+        // create thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(THREADPOOL_SIZE);
+        int index = 0;
+        
+        ArrayList<JSONObject> allData = new ArrayList<>();
+        
+        // split jobs
+        for (Triple triplo : triples)
+        {
+            allData.add(new JSONObject());
+            servername = (String) triplo.getLeft();
+            war = (WarFile) triplo.getMiddle();
+            server_conf = (JSONObject) triplo.getRight();
+            Runnable worker = new WorkerThread(servername, war, server_conf, repo, allData.get(index), index, topo_name, kv);
+            index++;
+            executor.execute(worker);
+        }
+        executor.shutdown();
+        while (!executor.isTerminated())
+        {
+        }
+         
+        // merge results
+        JSONObject conf_object = new JSONObject();
+        Iterator<String> iter, iter2;
+        String s_comp, s_comp2;
+        JSONObject j_comp, j_comp2;
+        
+        for (JSONObject json : allData)
+        {
+            iter = json.keys();
+            while (iter.hasNext())
+            {
+                try
+                {
+                    s_comp = iter.next();
+                    j_comp = json.getJSONObject(s_comp);
+                    if (conf_object.has(s_comp))
+                    {
+                        iter2 = j_comp.keys();
+                        while (iter2.hasNext())
+                        {
+                            s_comp2 = iter2.next();
+                            j_comp2 = j_comp.getJSONObject(s_comp2);
+                            conf_object.getJSONObject(s_comp).put(s_comp2, j_comp2);
+                        }
+                    }
+                    else
+                    {
+                        conf_object.put(s_comp, j_comp);
+                    }
+                }
+                catch (JSONException e)
+                {
+                    System.err.println("JSONException during merging deployment results: " + e);
+                }
+            }
+        }
+            
                 
         // save configuration to the topology
         topo.setConf_object(conf_object);
