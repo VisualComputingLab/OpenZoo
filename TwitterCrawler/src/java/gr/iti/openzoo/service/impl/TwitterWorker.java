@@ -139,7 +139,7 @@ public class TwitterWorker extends OpenZooWorker {
 
                     message.setSuccess(true);
 
-                    outConn.put(message);
+                    if (!enough) outConn.put(message);
                     
                 } 
                 catch (JSONException ex) 
