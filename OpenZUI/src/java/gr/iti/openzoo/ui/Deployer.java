@@ -15,8 +15,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,8 +35,6 @@ public class Deployer {
     private Utilities util = new Utilities();
     private static KeyValueCommunication kv;
     private String repo;
-    private static String kv_host;
-    private static Integer kv_port;
     
     private static final int THREADPOOL_SIZE = 5;
     
@@ -42,8 +42,6 @@ public class Deployer {
     {
         try 
         {
-            kv_host = properties.getJSONObject("keyvalue").getString("host");
-            kv_port = properties.getJSONObject("keyvalue").getInt("port");
             kv = thekv;
             repo = properties.getString("localRepository");
         }
@@ -52,10 +50,11 @@ public class Deployer {
             System.err.println("ERROR retrieving keyValue server: " + ex);
         }
     }
-    
-    public ArrayList<String> deployTopology(String topo_name)
+        
+    public List<String> deployTopology(String topo_name)
     {
-        ArrayList<String> logs = new ArrayList<>();
+        //ArrayList<String> logs = new ArrayList<>();
+        List<String> logs = Collections.synchronizedList(new ArrayList<String>());
         
         // get topology and servers from kv
         Topology topo = kv.getTopology(topo_name);
@@ -163,209 +162,7 @@ public class Deployer {
                 nod.setInstances(instances);
             }
         }
-        
-        // create a configuration json
-        JSONObject conf_object = new JSONObject();
-        JSONObject service_conf;
-        
-        WarFile war;
-        String servername;
-        
-        for (Triple triplo : triples)
-        {
-//            System.out.println(triplo.toString());
-            
-            servername = (String) triplo.getLeft();
-            war = (WarFile) triplo.getMiddle();
-            server_conf = (JSONObject) triplo.getRight();
-            
-            // open war file
-            // include kv_host, kv_port, topo_name, instance_id into config.json
-            File f_copy;
-            JSONObject config = Utilities.readJSONFromWAR(repo + "/" + war.getFilename(), "config.json");
-            try
-            {
-                config.put("keyvalue", new JSONObject().put("host", kv_host).put("port", kv_port));
-                config.put("instance_id", server_conf.getInt("instance_id"));
-                config.put("topology_id", topo_name);
                 
-                File f = new File(repo + "/" + war.getFilename());
-                f_copy = new File(repo + "/" + war.getFilename() + "_" + servername + ".war");
-                Files.copy(f.toPath(), f_copy.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-                System.out.println("Updating config.json in " + f_copy.getAbsolutePath());
-                Utilities.writeJSONToWAR(f_copy.getAbsolutePath(), "config.json", config);
-                
-                if (conf_object.has(war.getComponent_id()))
-                {
-                    service_conf = conf_object.getJSONObject(war.getComponent_id());
-                    service_conf.put(servername, server_conf);
-                }
-                else
-                {
-                    service_conf = new JSONObject();
-                    service_conf.put(servername, server_conf);
-                    conf_object.put(war.getComponent_id(), service_conf);
-                }
-            }
-            catch (IOException | JSONException e)
-            {
-                System.out.println("Exception during writing to config.json: " + e);
-                logs.add("ERROR:" + "Exception during writing to config.json: " + e);
-                return logs;
-            }
-                        
-            
-            // deploy services according to configuration
-            Server srv = kv.getServer(servername);
-            JSONObject outjson = deployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), f_copy.getAbsolutePath(), "/" + war.getComponent_id());
-            
-            // on error, print and go to next
-            // on success, set stati to 'installed'
-            try
-            {
-                if (outjson.getString("status").equalsIgnoreCase("success"))
-                {
-                    conf_object.getJSONObject(war.getComponent_id()).getJSONObject(servername).put("status", "installed");
-                }
-                else
-                {
-                    System.err.println("Service deployment failed with: " + outjson.getString("message"));
-                    logs.add("ERROR:" + "Service deployment failed with: " + outjson.getString("message"));
-                    continue;
-                }
-            }
-            catch (JSONException e)
-            {
-                System.out.println("Exception during updating conf_object: " + e);
-                logs.add("ERROR:" + "Exception during updating conf_object: " + e);
-                return logs;
-            }
-        }      
-                
-        // save configuration to the topology
-        topo.setConf_object(conf_object);
-        
-        // save topology to the kv
-        // update topo.getGraph_object()
-        kv.putTopology(topo);
-                
-        return logs;
-    }
-    
-    public ArrayList<String> deployTopologyNew(String topo_name)
-    {
-        ArrayList<String> logs = new ArrayList<>();
-        
-        // get topology and servers from kv
-        Topology topo = kv.getTopology(topo_name);
-        ArrayList<Server> servers = kv.getServers();
-        
-        ArrayList<TopologyGraphNode> nodes = topo.getNodes();
-        Map<String, ServerResources> server2resources = new HashMap<>();
-        
-        // for each service instance, choose a server based on server statistics and previously installed services
-        // if servers not sufficient, create less instances and print warning
-        // if servers still not sufficient, print error and exit
-        URL url;
-        JSONObject stat;
-        ServerResources sr;
-        ArrayList<String> slist;
-        
-        try
-        {
-            for (Server srv : servers)
-            {
-                url = new URL("http://" + srv.getAddress() + ":" + srv.getPort() + "/ServerStatistics/resources/stats");
-                stat = new JSONObject(util.callGET(url, null, null));
-                sr = new ServerResources(srv.getName(), stat);
-                // check if server fits the criteria (heap mem usage < 80%, space free > 1 GB, cpu usage < 80 %)
-                if (sr.areResourcesAvailable())
-                {
-                    slist = listServices("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd());
-                    sr.addDeployedServices(slist);
-                    server2resources.put(sr.getServername(), sr);
-//                    System.out.println("Server " + srv.getName() + " will be used");
-                }
-                else
-                {
-                    System.out.println("Server " + srv.getName() + " has limited resources and will not be used");
-                }
-            }
-        }
-        catch (IOException | JSONException e)
-        {
-            System.err.println("Exception at deployTopology: " + e);
-            logs.add("ERROR:" + "Exception at deployTopology: " + e);
-            return logs;
-        }
-        
-        server2resources = MapUtil.sortByValueAscending( server2resources );
-                
-        ArrayList<ServerResources> sortedResources = new ArrayList<>();
-        for(Map.Entry<String, ServerResources> entry : server2resources.entrySet()) {
-//            System.out.println("Resource " + entry.getValue().getServername() + ": " + entry.getValue().getSystemCpuLoad());
-            sortedResources.add(entry.getValue());
-        }
-        
-//        System.out.println("Size of sortedResources is " + sortedResources.size());
-        
-        // Cycle now through sortedResources and throw a service instance at each server
-        int res_index = 0;
-        int assigned;
-        ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
-        JSONObject server_conf;
-        
-        for (TopologyGraphNode nod : nodes)
-        {            
-            WarFile wfile = kv.getWarFile(nod.getName());
-            
-//            System.out.println("Checking node " + nod.getName() + "(" + wfile.getComponent_id() + ")");
-            
-            int instances = nod.getInstances();
-            assigned = 0;
-            ServerResources sres;
-            
-            // check if service not already deployed
-            // ensure that instances < num of available servers
-            
-            for (int i = 0; i < sortedResources.size() && assigned < instances; i++)
-            {
-                sres = sortedResources.get((res_index) % sortedResources.size());
-//                System.out.println("Checking resource " + sres.getServername());
-                res_index++;
-                
-                if (sres.isServiceDeployed(wfile.getComponent_id()))
-                    continue;
-                try
-                {
-                    server_conf = new JSONObject().put("instance_id", assigned).put("threadspercore", nod.getThreadspercore()).put("status", "void");
-                    triples.add(new Triple(sres.getServername(), wfile, server_conf));
-                }
-                catch (JSONException ex)
-                {
-                    System.err.println("JSONException while creating triple: " + ex);
-                    logs.add("ERROR:" + "JSONException while creating triple: " + ex);
-                }
-//                System.out.println("Triple added");
-                assigned++;
-            }
-            if (assigned == 0)
-            {
-                System.err.println("There are no servers for deploying service " + nod.getName() + ", aborting...");
-                logs.add("ERROR:" + "There are no servers for deploying service " + nod.getName() + ", aborting...");
-                return logs;
-            }
-            else if (assigned < instances)
-            {
-                System.out.println("There are not enough servers for deploying " + instances + " instances of service " + nod.getName() + ". Instance number is set to " + assigned);
-                logs.add("WARN:" + "There are not enough servers for deploying " + instances + " instances of service " + nod.getName() + ". Instance number is set to " + assigned);
-                nod.setInstances(instances);
-            }
-        }
-        
-        // create a configuration json
-        
         
         
         WarFile war;
@@ -380,11 +177,11 @@ public class Deployer {
         // split jobs
         for (Triple triplo : triples)
         {
-            allData.add(new JSONObject());
             servername = (String) triplo.getLeft();
             war = (WarFile) triplo.getMiddle();
             server_conf = (JSONObject) triplo.getRight();
-            Runnable worker = new WorkerThread(servername, war, server_conf, repo, allData.get(index), index, topo_name, kv);
+            allData.add(new JSONObject());
+            Runnable worker = new WorkerThread("deploy", servername, war, server_conf, repo, allData.get(index), index, topo_name, kv, logs);
             index++;
             executor.execute(worker);
         }
@@ -441,29 +238,30 @@ public class Deployer {
         return logs;
     }
     
-    public ArrayList<String> startTopology(String topo_name)
+    public List<String> startTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "start");
     }
     
-    public ArrayList<String> stopTopology(String topo_name)
+    public List<String> stopTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "stop");
     }
     
-    public ArrayList<String> statusTopology(String topo_name)
+    public List<String> statusTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "status");
     }
     
-    public ArrayList<String> resetTopology(String topo_name)
+    public List<String> resetTopology(String topo_name)
     {
         return callTopologyServices(topo_name, "reset");
     }
     
-    public ArrayList<String> callTopologyServices(String topo_name, String command)
+    public List<String> callTopologyServices(String topo_name, String command)
     {
-        ArrayList<String> logs = new ArrayList<>();
+//        ArrayList<String> logs = new ArrayList<>();
+        List<String> logs = Collections.synchronizedList(new ArrayList<String>());
                 
         // get topology json from kv
         Topology topo = kv.getTopology(topo_name);
@@ -476,6 +274,8 @@ public class Deployer {
             Iterator it_service = conf_object.keys();
             String service_id, server_id;
             JSONObject service_json, server_json;
+            ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
+            WarFile war;
             
             while (it_service.hasNext())
             {
@@ -488,43 +288,36 @@ public class Deployer {
                     server_json = service_json.getJSONObject(server_id);
                     
                     // run services
-                    Server srv = kv.getServer(server_id);
-                    WarFile war = kv.getWarFile(service_id);
-                    URL url = new URL("http://" + srv.getAddress() + ":" + srv.getPort() + "/" + war.getComponent_id() + war.getService_path() + "?action=" + command);
-                    JSONObject output = new JSONObject(util.callGET(url, null, null));
-                    
-                    // on error, print and exit
-                    // on success, set stati to 'running'
-                    if (output.has("error"))
-                    {
-                        System.err.println("Calling " + command + " on service " + service_id + " on server " + server_id + " failed with output: " + output.toString(4));
-                        logs.add("ERROR:" + "Calling " + command + " on service " + service_id + " on server " + server_id + " failed with output: " + output.toString(4));
-//                        response.put(service_id + "_" + server_id, output);
-//                        return null;
-                        
-                    }
-                    else
-                    {
-                        switch (command)
-                        {
-                            case "start":
-                                server_json.put("status", "running");
-                                break;
-                                
-                            case "stop":
-                                server_json.put("status", "installed");
-                                break;
-                        }
-//                        response.put(service_id + "_" + server_id, output);
-                        logs.add("INFO:" + "Service " + service_id + " on server " + server_id + ": " + command);
-                    }
+                    war = kv.getWarFile(service_id);
+                    triples.add(new Triple(server_id, war, server_json));
                 }
             }
+            
+            // create thread pool
+            ExecutorService executor = Executors.newFixedThreadPool(THREADPOOL_SIZE);
+            ArrayList<JSONObject> allData = new ArrayList<>();
+            int index = 0;
+
+            // split jobs
+            for (Triple triplo : triples)
+            {
+                server_id = (String) triplo.getLeft();
+                war = (WarFile) triplo.getMiddle();
+                server_json = (JSONObject) triplo.getRight();
+                allData.add(new JSONObject());
+                Runnable worker = new WorkerThread(command, server_id, war, server_json, repo, allData.get(index), index, topo_name, kv, logs);
+                index++;
+                executor.execute(worker);
+            }
+            executor.shutdown();
+            while (!executor.isTerminated())
+            {
+            }
         }
-        catch (JSONException | IOException ex)
+        catch (JSONException ex)
         {
-            System.err.println("Exception in callTopologyServices: " + ex);
-            logs.add("ERROR:" + "Exception in callTopologyServices: " + ex);
+            System.err.println("JSONException in callTopologyServices: " + ex);
+            logs.add("ERROR:" + "JSONException in callTopologyServices: " + ex);
         }
         
         // save configuration to the topology
@@ -536,9 +329,10 @@ public class Deployer {
         return logs;
     }
         
-    public ArrayList<String> undeployTopology(String topo_name)
+    public List<String> undeployTopology(String topo_name)
     {        
-        ArrayList<String> logs = new ArrayList<>();
+//        ArrayList<String> logs = new ArrayList<>();
+        List<String> logs = Collections.synchronizedList(new ArrayList<String>());
         
         // get topology and servers from kv
         Topology topo = kv.getTopology(topo_name);
@@ -553,10 +347,14 @@ public class Deployer {
                 Iterator it_service = conf_object.keys();
                 String service_id, server_id;
                 JSONObject service_json, server_json;
+                
+                ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
 
                 // server items to be deleted from each service item
                 ArrayList<String> serversToDelete = new ArrayList<>();
                 ArrayList<String> servicesToDelete = new ArrayList<>();
+                
+                WarFile war;
 
                 while (it_service.hasNext())
                 {
@@ -572,42 +370,60 @@ public class Deployer {
 
                         // run services
                         Server srv = kv.getServer(server_id);
-                        WarFile war = kv.getWarFile(service_id);
-                        JSONObject outjson = undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/" + war.getComponent_id());
-
-                        // on error, print and exit
-                        // on success, set stati to 'running'
-                        if (outjson.getString("status").equalsIgnoreCase("success"))
-                        {
-                            server_json.put("status", "void");
-                            serversToDelete.add(server_id);
-                        }
-                        else
-                        {
-                            System.err.println("Service undeployment failed with: " + outjson.getString("message"));
-                            logs.add("ERROR:" + "Service undeployment failed with: " + outjson.getString("message"));
-                            continue;
-                        }
-                    }
-
-                    // delete all server items with status void
-                    for (String srid : serversToDelete)
-                    {
-                        service_json.remove(srid);
-                    }
-
-                    if (service_json.length() == 0)
-                    {
-                        servicesToDelete.add(service_id);
+                        war = kv.getWarFile(service_id);
+                        triples.add(new Triple(server_id, war, server_json));
                     }
                 }
-
-                // delete all empty service items
-                for (String ssid : servicesToDelete)
+                
+                // create thread pool
+                ExecutorService executor = Executors.newFixedThreadPool(THREADPOOL_SIZE);
+                ArrayList<JSONObject> allData = new ArrayList<>();
+                int index = 0;
+                
+                // split jobs
+                for (Triple triplo : triples)
                 {
-                    conf_object.remove(ssid);
+                    server_id = (String) triplo.getLeft();
+                    war = (WarFile) triplo.getMiddle();
+                    server_json = (JSONObject) triplo.getRight();
+                    allData.add(new JSONObject());
+                    Runnable worker = new WorkerThread("undeploy", server_id, war, server_json, repo, allData.get(index), index, topo_name, kv, logs);
+                    index++;
+                    executor.execute(worker);
+                }
+                executor.shutdown();
+                while (!executor.isTerminated())
+                {
                 }
 
+                // merge results
+                Iterator<String> iter;
+                String s_comp, s_serv;
+                JSONObject j_comp;
+
+                for (JSONObject json : allData)
+                {
+                    iter = json.keys();
+                    while (iter.hasNext())
+                    {
+                        try
+                        {
+                            s_comp = iter.next();
+                            s_serv = json.getString(s_comp);
+                            j_comp = conf_object.getJSONObject(s_comp);
+                            if (j_comp != null)
+                            {
+                                j_comp.remove(s_serv);
+                                if (j_comp.length() == 0) conf_object.remove(s_comp);
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            System.err.println("JSONException during merging undeployment results: " + e);
+                        }
+                    }
+                }
+                
                 // if everything ok, conf_object should be empty
                 if (conf_object.length() == 0)
                     conf_object = null;
@@ -628,7 +444,7 @@ public class Deployer {
                 
         return logs;
     }
-    
+        
     public JSONObject deployService(String httpserverandport, String servercredentials, String warfilepath, String webservicepath)
     {
         // httpserverandport: server to call, e.g. "http://localhost:8080"

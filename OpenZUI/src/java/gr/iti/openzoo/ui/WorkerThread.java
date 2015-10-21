@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -32,9 +33,13 @@ public class WorkerThread implements Runnable
     private String repository;
     private String topology_id;
     private KeyValueCommunication kv;
+    private List<String> logs;
     
-    public WorkerThread(String srvname, WarFile wf, JSONObject srvconf, String repo, JSONObject j, int i, String toponame, KeyValueCommunication kvc)
+    private String action;
+    
+    public WorkerThread(String act, String srvname, WarFile wf, JSONObject srvconf, String repo, JSONObject j, int i, String toponame, KeyValueCommunication kvc, List<String> loglist)
     {
+        action = act;
         servername = srvname;
         war = wf;
         server_conf = srvconf;
@@ -43,16 +48,23 @@ public class WorkerThread implements Runnable
         index = i;
         topology_id = toponame;
         kv = kvc;
+        logs = loglist;
     }
 
     @Override
     public void run() {
-        System.out.println("Thread " + index + " starts");
-        process();
-        System.out.println("Thread " + index + " ends");
+//        System.out.println("Thread " + index + " starts");
+        switch (action)
+        {
+            case "deploy":      deploy(); break;
+            case "undeploy":    undeploy(); break;
+            case "start": 
+            case "stop":        runCommand(); break;
+        }
+//        System.out.println("Thread " + index + " ends");
     }
     
-    private void process()
+    private void deploy()
     {
         // open war file
         // include kv_host, kv_port, topo_name, instance_id into config.json
@@ -87,9 +99,8 @@ public class WorkerThread implements Runnable
         }
         catch (IOException | JSONException e)
         {
-            System.err.println("Exception during writing to config.json: " + e);
-//            logs.add("ERROR:" + "Exception during writing to config.json: " + e);
-//            return logs;
+            System.err.println("Exception during injecting config.json to " + war.getComponent_id() + " for " + servername + ":" + e);
+            logs.add("ERROR:" + "Exception during injecting config.json to " + war.getComponent_id() + " for " + servername + ":" + e);
             return;
         }
 
@@ -108,18 +119,88 @@ public class WorkerThread implements Runnable
             }
             else
             {
-                System.err.println("Service deployment failed with: " + outjson.getString("message"));
-//                logs.add("ERROR:" + "Service deployment failed with: " + outjson.getString("message"));
-//                continue;
+                System.err.println("Service deployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
+                logs.add("ERROR:" + "Service deployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
                 return;
             }
         }
         catch (JSONException e)
         {
-            System.out.println("Exception during updating conf_object: " + e);
-//            logs.add("ERROR:" + "Exception during updating conf_object: " + e);
-//            return logs;
+            System.out.println("JSONException during updating conf_object for " + war.getComponent_id() + " on " + servername + ": " + e);
+            logs.add("ERROR:" + "JSONException during updating conf_object for " + war.getComponent_id() + " on " + servername + ": " + e);
             return;
+        }
+        
+        logs.add("INFO:" + "Deployed " + war.getComponent_id() + " on " + servername);
+    }
+    
+    private void undeploy()
+    {
+        Server srv = kv.getServer(servername);
+        JSONObject outjson = undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/" + war.getComponent_id());
+
+        // on error, print and exit
+        // on success, set status to 'void'
+        try
+        {
+            if (outjson.getString("status").equalsIgnoreCase("success"))
+            {
+                server_conf.put("status", "void");
+                conf_object.put(war.getComponent_id(), servername);
+            }
+            else
+            {
+                System.err.println("Service undeployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
+                logs.add("ERROR:" + "Service undeployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
+                return;
+            }
+        }
+        catch (JSONException e)
+        {
+            System.out.println("Exception during updating conf_object of " + war.getComponent_id() + " for " + servername + ": " + e);
+            logs.add("ERROR:" + "Exception during updating conf_object of " + war.getComponent_id() + " for " + servername + ": " + e);
+            return;
+        }
+        
+        logs.add("INFO:" + "Undeployed " + war.getComponent_id() + " on " + servername);
+    }
+    
+    private void runCommand()
+    {
+        Server srv = kv.getServer(servername);
+        Utilities util = new Utilities();
+        
+        try
+        {
+            URL url = new URL("http://" + srv.getAddress() + ":" + srv.getPort() + "/" + war.getComponent_id() + war.getService_path() + "?action=" + action);
+            JSONObject output = new JSONObject(util.callGET(url, null, null));
+
+            // on error, print and exit
+            // on success, set stati to 'running'
+            if (output.has("error"))
+            {
+                System.err.println("Calling " + action + " on service " + war.getComponent_id() + " on server " + servername + " failed with output: " + output.toString(4));
+            }
+            else
+            {
+                switch (action)
+                {
+                    case "start":
+                        server_conf.put("status", "running");
+                        break;
+
+                    case "stop":
+                        server_conf.put("status", "installed");
+                        break;
+                }
+//                        response.put(service_id + "_" + server_id, output);
+//                logs.add("INFO:" + "Service " + service_id + " on server " + server_id + ": " + command);
+            }
+        }
+        catch (JSONException | IOException ex)
+        {
+            System.err.println("Exception in callTopologyServices: " + ex);
+//            logs.add("ERROR:" + "Exception in callTopologyServices: " + ex);
         }
     }
     
@@ -160,6 +241,43 @@ public class WorkerThread implements Runnable
         catch (JSONException ex)
         {
             System.err.println("JSONException in deployService: " + ex);
+            return null;
+        }
+        
+        return outjson;
+    }
+    
+    public JSONObject undeployService(String httpserverandport, String servercredentials, String webservicepath)
+    {
+        String output;
+        JSONObject outjson = new JSONObject();
+        
+        try
+        {
+            try
+            {
+                URL url = new URL(httpserverandport + "/manager/text/undeploy?path=" + webservicepath);
+                HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+                //httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
+                httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
+                httpCon.setDoOutput(true);
+                httpCon.setRequestMethod("GET");
+                output = convertStreamToString(httpCon.getInputStream());
+                outjson.put("status", "success");
+                outjson.put("message", output);
+                outjson.put("response_code", httpCon.getResponseCode());
+                outjson.put("response_message", httpCon.getResponseMessage());
+            }
+            catch (IOException e)
+            {
+                output = "IOException during web service undeployment: " + e;
+                outjson.put("status", "failure");
+                outjson.put("message", output);
+            }
+        }
+        catch (JSONException ex)
+        {
+            System.err.println("JSONException in undeployService: " + ex);
             return null;
         }
         
