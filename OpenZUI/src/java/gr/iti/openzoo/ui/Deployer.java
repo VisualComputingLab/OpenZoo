@@ -1,7 +1,6 @@
 package gr.iti.openzoo.ui;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +11,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -223,6 +220,7 @@ public class Deployer {
                 catch (JSONException e)
                 {
                     System.err.println("JSONException during merging deployment results: " + e);
+                    logs.add("WARN:" + "JSONException during merging deployment results: " + e);
                 }
             }
         }
@@ -233,6 +231,123 @@ public class Deployer {
         
         // save topology to the kv
         // update topo.getGraph_object()
+        kv.putTopology(topo);
+                
+        return logs;
+    }
+    
+    public List<String> undeployTopology(String topo_name)
+    {        
+//        ArrayList<String> logs = new ArrayList<>();
+        List<String> logs = Collections.synchronizedList(new ArrayList<String>());
+        
+        // get topology and servers from kv
+        Topology topo = kv.getTopology(topo_name);
+        JSONObject conf_object = topo.getConf_object();
+        
+        // for each service/server pair in config, call undeploy
+        // on success, set status to void
+        // on error, print warning
+        if (conf_object != null)
+            try
+            {
+                Iterator it_service = conf_object.keys();
+                String service_id, server_id;
+                JSONObject service_json, server_json;
+                
+                ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
+
+                // server items to be deleted from each service item
+                ArrayList<String> serversToDelete = new ArrayList<>();
+                ArrayList<String> servicesToDelete = new ArrayList<>();
+                
+                WarFile war;
+
+                while (it_service.hasNext())
+                {
+                    service_id = (String) it_service.next();
+                    service_json = conf_object.getJSONObject(service_id);
+                    serversToDelete.clear();
+
+                    Iterator it_server = service_json.keys();
+                    while (it_server.hasNext())
+                    {
+                        server_id = (String) it_server.next();
+                        server_json = service_json.getJSONObject(server_id);
+
+                        // run services
+                        Server srv = kv.getServer(server_id);
+                        war = kv.getWarFile(service_id);
+                        triples.add(new Triple(server_id, war, server_json));
+                    }
+                }
+                
+                // create thread pool
+                ExecutorService executor = Executors.newFixedThreadPool(THREADPOOL_SIZE);
+                ArrayList<JSONObject> allData = new ArrayList<>(); // using allData for communicating the results
+                int index = 0;
+                
+                // split jobs
+                for (Triple triplo : triples)
+                {
+                    server_id = (String) triplo.getLeft();
+                    war = (WarFile) triplo.getMiddle();
+                    server_json = (JSONObject) triplo.getRight();
+                    allData.add(new JSONObject());
+                    Runnable worker = new WorkerThread("undeploy", server_id, war, server_json, repo, allData.get(index), index, topo_name, kv, logs);
+                    index++;
+                    executor.execute(worker);
+                }
+                executor.shutdown();
+                while (!executor.isTerminated())
+                {
+                }
+
+                // merge results
+                Iterator<String> iter;
+                String s_comp, s_serv;
+                JSONObject j_comp;
+
+                for (JSONObject json : allData)
+                {
+                    iter = json.keys();
+                    while (iter.hasNext())
+                    {
+                        try
+                        {
+                            s_comp = iter.next();
+                            s_serv = json.getString(s_comp);
+                            j_comp = conf_object.getJSONObject(s_comp);
+                            if (j_comp != null)
+                            {
+                                j_comp.remove(s_serv);
+                                if (j_comp.length() == 0) conf_object.remove(s_comp);
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            System.err.println("JSONException during merging undeployment results: " + e);
+                            logs.add("WARN:" + "JSONException during merging undeployment results: " + e);
+                        }
+                    }
+                }
+                
+                // if everything ok, conf_object should be empty
+                if (conf_object.length() == 0)
+                    conf_object = null;
+            }
+            catch (JSONException ex)
+            {
+                System.err.println("JSONException in undeployTopology: " + ex);
+                logs.add("ERROR:" + "JSONException in undeployTopology: " + ex);
+                return logs;
+            }
+         
+        
+        // save configuration to the topology
+        topo.setConf_object(conf_object);
+        
+        // save topology to the kv
         kv.putTopology(topo);
                 
         return logs;
@@ -328,123 +443,7 @@ public class Deployer {
                 
         return logs;
     }
-        
-    public List<String> undeployTopology(String topo_name)
-    {        
-//        ArrayList<String> logs = new ArrayList<>();
-        List<String> logs = Collections.synchronizedList(new ArrayList<String>());
-        
-        // get topology and servers from kv
-        Topology topo = kv.getTopology(topo_name);
-        JSONObject conf_object = topo.getConf_object();
-        
-        // for each service/server pair in config, call undeploy
-        // on success, set status to void
-        // on error, print warning
-        if (conf_object != null)
-            try
-            {
-                Iterator it_service = conf_object.keys();
-                String service_id, server_id;
-                JSONObject service_json, server_json;
                 
-                ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
-
-                // server items to be deleted from each service item
-                ArrayList<String> serversToDelete = new ArrayList<>();
-                ArrayList<String> servicesToDelete = new ArrayList<>();
-                
-                WarFile war;
-
-                while (it_service.hasNext())
-                {
-                    service_id = (String) it_service.next();
-                    service_json = conf_object.getJSONObject(service_id);
-                    serversToDelete.clear();
-
-                    Iterator it_server = service_json.keys();
-                    while (it_server.hasNext())
-                    {
-                        server_id = (String) it_server.next();
-                        server_json = service_json.getJSONObject(server_id);
-
-                        // run services
-                        Server srv = kv.getServer(server_id);
-                        war = kv.getWarFile(service_id);
-                        triples.add(new Triple(server_id, war, server_json));
-                    }
-                }
-                
-                // create thread pool
-                ExecutorService executor = Executors.newFixedThreadPool(THREADPOOL_SIZE);
-                ArrayList<JSONObject> allData = new ArrayList<>();
-                int index = 0;
-                
-                // split jobs
-                for (Triple triplo : triples)
-                {
-                    server_id = (String) triplo.getLeft();
-                    war = (WarFile) triplo.getMiddle();
-                    server_json = (JSONObject) triplo.getRight();
-                    allData.add(new JSONObject());
-                    Runnable worker = new WorkerThread("undeploy", server_id, war, server_json, repo, allData.get(index), index, topo_name, kv, logs);
-                    index++;
-                    executor.execute(worker);
-                }
-                executor.shutdown();
-                while (!executor.isTerminated())
-                {
-                }
-
-                // merge results
-                Iterator<String> iter;
-                String s_comp, s_serv;
-                JSONObject j_comp;
-
-                for (JSONObject json : allData)
-                {
-                    iter = json.keys();
-                    while (iter.hasNext())
-                    {
-                        try
-                        {
-                            s_comp = iter.next();
-                            s_serv = json.getString(s_comp);
-                            j_comp = conf_object.getJSONObject(s_comp);
-                            if (j_comp != null)
-                            {
-                                j_comp.remove(s_serv);
-                                if (j_comp.length() == 0) conf_object.remove(s_comp);
-                            }
-                        }
-                        catch (JSONException e)
-                        {
-                            System.err.println("JSONException during merging undeployment results: " + e);
-                        }
-                    }
-                }
-                
-                // if everything ok, conf_object should be empty
-                if (conf_object.length() == 0)
-                    conf_object = null;
-            }
-            catch (JSONException ex)
-            {
-                System.err.println("JSONException in undeployTopology: " + ex);
-                logs.add("ERROR:" + "JSONException in undeployTopology: " + ex);
-                return logs;
-            }
-         
-        
-        // save configuration to the topology
-        topo.setConf_object(conf_object);
-        
-        // save topology to the kv
-        kv.putTopology(topo);
-                
-        return logs;
-    }
-        
     public JSONObject deployService(String httpserverandport, String servercredentials, String warfilepath, String webservicepath)
     {
         // httpserverandport: server to call, e.g. "http://localhost:8080"
@@ -523,6 +522,69 @@ public class Deployer {
         }
         
         return outjson;
+    }
+    
+    public List<String> updateService(String topo_name, String service_id)
+    {
+        //ArrayList<String> logs = new ArrayList<>();
+        List<String> logs = Collections.synchronizedList(new ArrayList<String>());
+        
+        // get topology and servers from kv
+        Topology topo = kv.getTopology(topo_name);
+        JSONObject conf_object = topo.getConf_object();
+        JSONObject service_json = conf_object.optJSONObject(service_id);
+        
+        if (service_json == null)
+        {
+            System.err.println("Could not find service " + service_id + " in conf_object");
+            logs.add("ERROR:" + "Could not find service " + service_id + " in conf_object");
+            return logs;
+        }
+        
+        Iterator<String> iter = service_json.keys();
+        String server_id;
+        JSONObject server_json;
+        HashMap<String, JSONObject> server2conf = new HashMap<>();
+        
+        while (iter.hasNext())
+        {
+            server_id = iter.next();
+            server_json = service_json.optJSONObject(server_id);
+            if (server_json != null)
+            {
+                server2conf.put(server_id, server_json);
+            }
+        }
+        
+        WarFile war = kv.getWarFile(service_id);
+        
+        // create thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(THREADPOOL_SIZE);
+        int index = 0;
+                
+        // split jobs
+        for (String servername : server2conf.keySet())
+        {
+            server_json = server2conf.get(servername);
+            Runnable worker = new WorkerThread("redeploy", servername, war, server_json, repo, null, index, topo_name, kv, logs);
+            index++;
+            executor.execute(worker);
+        }
+        executor.shutdown();
+        while (!executor.isTerminated())
+        {
+        }
+        
+        // check if needed to put server_json back into the conf_object
+        
+        // save configuration to the topology
+        topo.setConf_object(conf_object);
+        
+        // save topology to the kv
+        // update topo.getGraph_object()
+        kv.putTopology(topo);
+                
+        return logs;
     }
     
     public ArrayList<String> listServices(String httpserverandport, String servercredentials)

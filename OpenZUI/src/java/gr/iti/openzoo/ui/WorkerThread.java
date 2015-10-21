@@ -53,15 +53,14 @@ public class WorkerThread implements Runnable
 
     @Override
     public void run() {
-//        System.out.println("Thread " + index + " starts");
         switch (action)
         {
             case "deploy":      deploy(); break;
             case "undeploy":    undeploy(); break;
+            case "redeploy":    redeploy(); break;
             case "start": 
             case "stop":        runCommand(); break;
         }
-//        System.out.println("Thread " + index + " ends");
     }
     
     private void deploy()
@@ -111,6 +110,13 @@ public class WorkerThread implements Runnable
 
         // on error, print and go to next
         // on success, set stati to 'installed'
+        if (outjson == null)
+        {
+            System.err.println("Service deployment for " + war.getComponent_id() + " on " + servername + " failed");
+            logs.add("ERROR:" + "Service deployment for " + war.getComponent_id() + " on " + servername + " failed");
+            return;
+        }
+        
         try
         {
             if (outjson.getString("status").equalsIgnoreCase("success"))
@@ -126,7 +132,7 @@ public class WorkerThread implements Runnable
         }
         catch (JSONException e)
         {
-            System.out.println("JSONException during updating conf_object for " + war.getComponent_id() + " on " + servername + ": " + e);
+            System.err.println("JSONException during updating conf_object for " + war.getComponent_id() + " on " + servername + ": " + e);
             logs.add("ERROR:" + "JSONException during updating conf_object for " + war.getComponent_id() + " on " + servername + ": " + e);
             return;
         }
@@ -141,6 +147,14 @@ public class WorkerThread implements Runnable
 
         // on error, print and exit
         // on success, set status to 'void'
+        
+        if (outjson == null)
+        {
+            System.err.println("Service undeployment for " + war.getComponent_id() + " on " + servername + " failed");
+            logs.add("ERROR:" + "Service undeployment for " + war.getComponent_id() + " on " + servername + " failed");
+            return;
+        }
+        
         try
         {
             if (outjson.getString("status").equalsIgnoreCase("success"))
@@ -164,6 +178,103 @@ public class WorkerThread implements Runnable
         
         logs.add("INFO:" + "Undeployed " + war.getComponent_id() + " on " + servername);
     }
+
+    private void redeploy()
+    {
+        Server srv = kv.getServer(servername);
+        JSONObject outjson = undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/" + war.getComponent_id());
+
+        // on error, print and exit
+        // on success, set status to 'void'
+        
+        if (outjson == null)
+        {
+            System.err.println("Service undeployment for " + war.getComponent_id() + " on " + servername + " failed");
+            logs.add("ERROR:" + "Service undeployment for " + war.getComponent_id() + " on " + servername + " failed");
+            return;
+        }
+        
+        try
+        {
+            if (outjson.getString("status").equalsIgnoreCase("success"))
+            {
+                server_conf.put("status", "void");
+                
+                //-
+                // open war file
+                // include kv_host, kv_port, topo_name, instance_id into config.json
+                File f_copy;
+                JSONObject config = Utilities.readJSONFromWAR(repository + "/" + war.getFilename(), "config.json");
+                try
+                {
+                    config.put("keyvalue", new JSONObject().put("host", kv.getKVHost()).put("port", kv.getKVPort()));
+                    config.put("instance_id", server_conf.getInt("instance_id"));
+                    config.put("topology_id", topology_id);
+
+                    File f = new File(repository + "/" + war.getFilename());
+                    f_copy = new File(repository + "/" + war.getFilename() + "_" + servername + ".war");
+                    Files.copy(f.toPath(), f_copy.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                    System.out.println("Updating config.json in " + f_copy.getAbsolutePath());
+                    Utilities.writeJSONToWAR(f_copy.getAbsolutePath(), "config.json", config);
+                }
+                catch (IOException | JSONException e)
+                {
+                    System.err.println("Exception during injecting config.json to " + war.getComponent_id() + " for " + servername + ":" + e);
+                    logs.add("ERROR:" + "Exception during injecting config.json to " + war.getComponent_id() + " for " + servername + ":" + e);
+                    return;
+                }
+
+
+                // deploy services according to configuration
+                outjson = deployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), f_copy.getAbsolutePath(), "/" + war.getComponent_id());
+
+                // on error, print and go to next
+                // on success, set stati to 'installed'
+                if (outjson == null)
+                {
+                    System.err.println("Service deployment for " + war.getComponent_id() + " on " + servername + " failed");
+                    logs.add("ERROR:" + "Service deployment for " + war.getComponent_id() + " on " + servername + " failed");
+                    return;
+                }
+
+                try
+                {
+                    if (outjson.getString("status").equalsIgnoreCase("success"))
+                    {
+                        server_conf.put("status", "void");
+                    }
+                    else
+                    {
+                        System.err.println("Service deployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
+                        logs.add("ERROR:" + "Service deployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
+                        return;
+                    }
+                }
+                catch (JSONException e)
+                {
+                    System.err.println("JSONException during updating conf_object for " + war.getComponent_id() + " on " + servername + ": " + e);
+                    logs.add("ERROR:" + "JSONException during updating conf_object for " + war.getComponent_id() + " on " + servername + ": " + e);
+                    return;
+                }
+                //-
+            }
+            else
+            {
+                System.err.println("Service undeployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
+                logs.add("ERROR:" + "Service undeployment for " + war.getComponent_id() + " on " + servername + " failed with: " + outjson.getString("message"));
+                return;
+            }
+        }
+        catch (JSONException e)
+        {
+            System.out.println("Exception during updating conf_object of " + war.getComponent_id() + " for " + servername + ": " + e);
+            logs.add("ERROR:" + "Exception during updating conf_object of " + war.getComponent_id() + " for " + servername + ": " + e);
+            return;
+        }
+        
+        logs.add("INFO:" + "Redeployed " + war.getComponent_id() + " on " + servername);
+    }
     
     private void runCommand()
     {
@@ -180,6 +291,7 @@ public class WorkerThread implements Runnable
             if (output.has("error"))
             {
                 System.err.println("Calling " + action + " on service " + war.getComponent_id() + " on server " + servername + " failed with output: " + output.toString(4));
+                logs.add("ERROR:" + "Calling " + action + " on service " + war.getComponent_id() + " on server " + servername + " failed");
             }
             else
             {
@@ -193,15 +305,16 @@ public class WorkerThread implements Runnable
                         server_conf.put("status", "installed");
                         break;
                 }
-//                        response.put(service_id + "_" + server_id, output);
-//                logs.add("INFO:" + "Service " + service_id + " on server " + server_id + ": " + command);
             }
         }
         catch (JSONException | IOException ex)
         {
-            System.err.println("Exception in callTopologyServices: " + ex);
-//            logs.add("ERROR:" + "Exception in callTopologyServices: " + ex);
+            System.err.println("Running action " + action + " for " + war.getComponent_id() + " on " + servername + " failed: " + ex);
+            logs.add("ERROR:" + "Running action " + action + " for " + war.getComponent_id() + " on " + servername + " failed: " + ex);
+            return;
         }
+        
+        logs.add("INFO:" + "Run command " + action + " for " + war.getComponent_id() + " on " + servername);
     }
     
     private JSONObject deployService(String httpserverandport, String servercredentials, String warfilepath, String webservicepath)

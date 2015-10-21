@@ -7,7 +7,7 @@
     <!--main-->
     <div class="container" id="main">
       <div class="row">
-        <div class="col-md-4 col-sm-6">
+        <div class="col-md-3 col-sm-6">
           <a href="Servers">
             <div class="well"> 
               <h4>Setup Servers</h4>
@@ -17,7 +17,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-4 col-sm-6">
+        <div class="col-md-3 col-sm-6">
           <a href="Repository">
             <div class="well"> 
               <h4>Manage repository</h4>
@@ -27,12 +27,22 @@
             </div>
           </a>
         </div>
-        <div class="col-md-4 col-sm-6">
+        <div class="col-md-3 col-sm-6">
           <a href="Topologies">
             <div class="well"> 
               <h4>Topologies</h4>
               <div  style="padding:5px;">
                 <h4><i class="fa fa-cubes fa-5x"></i></h4> 
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <a href="Configurations">
+            <div class="well"> 
+              <h4>Configurations</h4>
+              <div  style="padding:5px;"> 
+                <h4><i class="fa fa-cogs fa-5x"></i></h4> 
               </div>
             </div>
           </a>
