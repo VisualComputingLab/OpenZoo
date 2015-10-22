@@ -26,7 +26,6 @@ import org.codehaus.jettison.json.JSONObject;
 public class TopologiesServlet extends HttpServlet {
 
     protected static Configuration cfg;
-    private Utilities util;
     private static KeyValueCommunication kv;
     private JSONObject properties;
     private Deployer deployer;
@@ -35,7 +34,6 @@ public class TopologiesServlet extends HttpServlet {
     @Override
     public void init()
     {
-        util = (Utilities) getServletContext().getAttribute("util");
         kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");

@@ -81,6 +81,10 @@
         <servlet-name>ServiceTemplateCreation</servlet-name>
         <servlet-class>gr.iti.openzoo.ui.servlets.ServiceTemplateCreationServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Configurations</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.servlets.ConfigurationsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthorizationServlet</servlet-name>
         <url-pattern>/AuthorizationServlet</url-pattern>
@@ -120,6 +124,10 @@
     <servlet-mapping>
         <servlet-name>ServiceTemplateCreation</servlet-name>
         <url-pattern>/Templates</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Configurations</servlet-name>
+        <url-pattern>/Configurations</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

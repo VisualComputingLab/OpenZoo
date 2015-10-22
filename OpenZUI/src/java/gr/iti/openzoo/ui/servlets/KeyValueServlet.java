@@ -162,7 +162,8 @@ public class KeyValueServlet extends HttpServlet {
                         {
                             //HashMap<String, ArrayList<Long>> eps = kv.getEndpointStatValues(name);
                             MessageStatistics eps = kv.getEndpointStats(name);
-                            json.put("response", eps.getJSON());
+                            if (eps != null)
+                                json.put("response", eps.getJSON());
                         }
                     }
                     break;
