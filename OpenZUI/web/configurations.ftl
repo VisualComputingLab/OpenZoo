@@ -7,7 +7,8 @@
 <!--main-->
 <div class="container" id="main">
    <div class="row">
-   
+
+    <!-- Topologies -->
     <div class="col-md-3 col-sm-6">
       <div class="well"> 
         <h4>Topologies</h4>
@@ -20,6 +21,7 @@
       </div>
     </div>
 
+    <!-- Components -->
     <div class="col-md-3 col-sm-6">
       <div class="well"> 
         <h4>Components</h4>
@@ -32,56 +34,62 @@
       </div>
     </div>
 
+    <!-- Servers -->
     <div class="col-md-3 col-sm-6">
-      <div class="well"> 
-        <h4>Servers (Instances)</h4>
-        <ul class="list-group">
-          <a class="list-group-item active" onclick="console.log('vseen clicked');"><span class="badge">Running</span> vseen</a>
-          <a class="list-group-item" onclick="console.log('basement_107 clicked');"><span class="badge">Running</span> basement_107</a> 
-        </ul>
-        <input type="hidden" class="form-control" id="selectedServer" value="">
-      </div>
-      <div class="well"> 
-        <h4>Endpoints (Component level)</h4>
-        <ul class="list-group">
-          <li class="list-group-item"><span class="badge">3213 (323.5 Kb)</span> input</li>
-          <li class="list-group-item"><span class="badge">2 (23.2 Kb)</span> output_1</li> 
-          <li class="list-group-item"><span class="badge">11 (300.3 Kb)</span> output_2</li> 
-        </ul>
+      <div style="background-color: rgba(255,127,255,0.2); padding: 5px">
+        <div class="well"> 
+          <h4>Servers (Instances)</h4>
+          <ul class="list-group" id='lg-serv'>
+            <!-- <a class="list-group-item active" onclick="console.log('vseen clicked');"><span class="badge">Running</span> vseen</a>
+            <a class="list-group-item" onclick="console.log('basement_107 clicked');"><span class="badge">Running</span> basement_107</a>  -->
+          </ul>
+          <input type="hidden" class="form-control" id="selectedServer" value="">
+        </div>
+        <div class="well"> 
+          <h4>Endpoints (Component level)</h4>
+          <ul class="list-group" id='lg-endp-comp'>
+            <!-- <li class="list-group-item"><span class="badge">3213 (323.5 Kb)</span> input</li>
+            <li class="list-group-item"><span class="badge">2 (23.2 Kb)</span> output_1</li> 
+            <li class="list-group-item"><span class="badge">11 (300.3 Kb)</span> output_2</li>  -->
+          </ul>
+        </div>
       </div>
     </div>
 
+    <!-- Endpoints -->
     <div class="col-md-3 col-sm-6">
-      <div class="well"> 
-        <h4>Server load</h4>
-        <ul class="list-group">
-          <a href="#" class="list-group-item">
-            <h5 class="list-group-item-heading">CPU</h5>
-            <div class="progress">
-              <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="23" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 23%;">23 %</div>
-            </div>
-          </a>
-          <a href="#" class="list-group-item">
-            <h5 class="list-group-item-heading">Memory (235.3 MB free)</h5>
-            <div class="progress">
-              <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 67%;">67 %</div>
-            </div>
-          </a>
-          <a href="#" class="list-group-item">
-            <h5 class="list-group-item-heading">Disc (1234.4 MB free)</h5>
-            <div class="progress">
-              <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="14" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 14%;">14 %</div>
-            </div>
-          </a>
-        </ul>
-      </div>
-      <div class="well"> 
-        <h4>Endpoints (Instance level)</h4>
-        <ul class="list-group">
-          <li class="list-group-item"><span class="badge">3213 (323.5 Kb)</span> input</li>
-          <li class="list-group-item"><span class="badge">2 (23.2 Kb)</span> output_1</li> 
-          <li class="list-group-item"><span class="badge">11 (300.3 Kb)</span> output_2</li> 
-        </ul>
+      <div style="background-color: rgba(255,127,255,0.2); padding: 5px">
+        <div class="well"> 
+          <h4>Server load</h4>
+          <ul class="list-group" id='lg-serv-load'>
+            <!-- <a href="#" class="list-group-item">
+              <h5 class="list-group-item-heading">CPU</h5>
+              <div class="progress">
+                <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="23" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 23%;">23 %</div>
+              </div>
+            </a>
+            <a href="#" class="list-group-item">
+              <h5 class="list-group-item-heading">Memory (235.3 MB free)</h5>
+              <div class="progress">
+                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 67%;">67 %</div>
+              </div>
+            </a>
+            <a href="#" class="list-group-item">
+              <h5 class="list-group-item-heading">Disc (1234.4 MB free)</h5>
+              <div class="progress">
+                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="14" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 14%;">14 %</div>
+              </div>
+            </a> -->
+          </ul>
+        </div>
+        <div class="well"> 
+          <h4>Endpoints (Instance level)</h4>
+          <ul class="list-group"  id='lg-endp-serv'>
+            <!-- <li class="list-group-item"><span class="badge">3213 (323.5 Kb)</span> input</li>
+            <li class="list-group-item"><span class="badge">2 (23.2 Kb)</span> output_1</li> 
+            <li class="list-group-item"><span class="badge">11 (300.3 Kb)</span> output_2</li>  -->
+          </ul>
+        </div>
       </div>
     </div>
 
