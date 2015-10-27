@@ -6,7 +6,7 @@
 
 <!--main-->
 <div class="container" id="main">
-   <div class="row">
+  <div class="row">
 
     <!-- Topologies -->
     <div class="col-md-3 col-sm-6">
@@ -23,20 +23,21 @@
 
     <!-- Components -->
     <div class="col-md-3 col-sm-6">
-      <div class="well"> 
+      <div class="well clearfix"> 
         <h4>Components</h4>
         <ul class="list-group" id='lg-comp'>
           <!-- <a class="list-group-item active" onclick="console.log('TwitterCrawler clicked');"> TwitterCrawler</a>
           <a class="list-group-item" onclick="console.log('URLValidator clicked');"> URLValidator</a>  -->
         </ul>
+        <button class="btn btn-success pull-left" id="resetCompBtn" style="width: 45%;" onclick="resetComponent();">Reset</button>
+        <button class="btn btn-success pull-right" id="redeployCompBtn" style="width: 45%;" onclick="redeployComponent();">Redeploy</button>
         <input type="hidden" class="form-control" id="selectedComponent" value="">
-        <button class="btn btn-success" id="redeployBtn" style="width: 100%;">Redeploy component</button>
       </div>
     </div>
 
     <!-- Servers -->
     <div class="col-md-3 col-sm-6">
-      <div style="background-color: rgba(255,127,255,0.2); padding: 5px">
+      <div style="background-color: rgba(51, 122, 183, 0.2); padding: 5px">
         <div class="well"> 
           <h4>Servers (Instances)</h4>
           <ul class="list-group" id='lg-serv'>
@@ -58,7 +59,7 @@
 
     <!-- Endpoints -->
     <div class="col-md-3 col-sm-6">
-      <div style="background-color: rgba(255,127,255,0.2); padding: 5px">
+      <div style="background-color: rgba(51, 122, 183, 0.2); padding: 5px">
         <div class="well"> 
           <h4>Server load</h4>
           <ul class="list-group" id='lg-serv-load'>
@@ -91,23 +92,45 @@
           </ul>
         </div>
       </div>
-    </div>
+    </div> 
 
- 
-  	
-    <div class="clearfix"></div>
-      
-    <hr>
-    <div class="col-md-12 text-center">
-      <p>
-        <a href="http://openzoo.org" target="_ext">openzoo website</a>
-        <br>
-        <a href="http://vcl.iti.gr" target="_ext">vcl@iti.gr</a> || <a href="http://www.certh.gr" target="_ext">CERTH</a>
-      </p>
-    </div>
-    
-    
   </div>
+
+  <hr>
+
+  <div class="row">
+    <div class="col-md-12 col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading"><h4>Topology service logs</h4></div>
+        <div class="panel-body">
+          Service logs
+          <select id="logLevelDropdown" name="logLevelDropdown" class="selectpicker" title='Select minimum logging level'>
+            <option>debug</option>
+            <option>info</option>
+            <option>error</option>
+          </select>
+          <input type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> Play" data-off="<i class='fa fa-pause'></i> Pause" data-onstyle="success" id="logsToggleButton">
+          <button class="btn btn-success" id="logsClearButton" onclick="$('#serviceLogTextArea').val('');">Clear</button>
+          <div class="well well-sm">
+            <textarea style="width:100%" rows="10" id="serviceLogTextArea" wrap="off"></textarea>
+          </div>
+        </div>
+      </div> 
+    </div>
+  </div>
+
+  <div class="clearfix"></div>
+      
+  <hr>
+  <div class="col-md-12 text-center">
+    <p>
+      <a href="http://openzoo.org" target="_ext">openzoo website</a>
+      <br>
+      <a href="http://vcl.iti.gr" target="_ext">vcl@iti.gr</a> || <a href="http://www.certh.gr" target="_ext">CERTH</a>
+    </p>
+  </div>
+  <hr>
+
 </div><!--/main-->
 
 
@@ -116,6 +139,7 @@
 	<!-- script references -->
 		<script src="./libs/jquery/jquery-1.11.3.min.js"></script>
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./libs/bootstrap/js/bootstrap-toggle.min.js"></script>
     <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
     <script src="./js/configs.js"></script>

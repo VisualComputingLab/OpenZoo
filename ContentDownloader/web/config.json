@@ -13,11 +13,11 @@
             "endpoints":
             [
                 {
-                    "endpoint_id": "dl_input",
+                    "endpoint_id": "input",
                     "type": "in"
                 },
                 {
-                    "endpoint_id": "dl_output",
+                    "endpoint_id": "output_1",
                     "type": "out"
                 }
             ]

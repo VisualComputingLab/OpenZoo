@@ -13,15 +13,15 @@
             "endpoints":
             [
                 {
-                    "endpoint_id": "urlval_input",
+                    "endpoint_id": "input",
                     "type": "in"
                 },
                 {
-                    "endpoint_id": "urlval_output_dl",
+                    "endpoint_id": "output_1",
                     "type": "out"
                 },
                 {
-                    "endpoint_id": "urlval_output_db",
+                    "endpoint_id": "output_2",
                     "type": "out"
                 }
             ]

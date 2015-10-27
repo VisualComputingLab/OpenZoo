@@ -24,7 +24,7 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class DBWorker extends OpenZooWorker {
 
-    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "db_input");
+    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     private Mongo mongo;

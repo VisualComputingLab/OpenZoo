@@ -7,17 +7,17 @@
     <!--main-->
     <div class="container" id="main">
       <div class="row">
-        <div class="col-md-3 col-sm-6">
+        <div class="col-md-6 col-sm-6">
           <a href="Servers">
             <div class="well"> 
               <h4>Setup Servers</h4>
-              <div  style="padding:5px;">
-                <h4><i class="fa fa-server fa-5x"></i></h4> 
+              <div style="padding:5px;">
+                <h4><i class="fa fa-server fa-5x"></i></h4>
               </div>
             </div>
           </a>
         </div>
-        <div class="col-md-3 col-sm-6">
+        <div class="col-md-6 col-sm-6">
           <a href="Repository">
             <div class="well"> 
               <h4>Manage repository</h4>
@@ -27,7 +27,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3 col-sm-6">
+        <div class="col-md-6 col-sm-6">
           <a href="Topologies">
             <div class="well"> 
               <h4>Topologies</h4>
@@ -37,7 +37,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3 col-sm-6">
+        <div class="col-md-6 col-sm-6">
           <a href="Configurations">
             <div class="well"> 
               <h4>Configurations</h4>
@@ -48,101 +48,6 @@
           </a>
         </div>
       </div><!--/row-->
-
-      <hr>
-
-      <div class="row">
-        <div class="col-md-12 col-sm-6">
-          <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Topology Monitor</h4></div>
-            <div class="panel-body">
-              Please select topology:
-              <select id="topologyDropdown" name="topologyDropdown" class="selectpicker" title='Select a topology'>
-                <#if topologies??>
-                  <#list topologies as topo>
-                  <option>${topo.name}</option>
-                  </#list>
-                </#if>
-              </select>
-              Status:<div id="topologyStatus"></div>
-              <hr>
-              Server statistics
-
-              <div class="table-responsive">
-                <table class="table table-condensed table-hover" id="serverTable">
-                  <thead>
-                    <tr>
-                      <th>Server ID</th>
-                      <th>Service List</th>
-                    </tr>
-                  </thead>
-                  <tbody id="serverTableTbody">
-                    <!-- <tr>
-                      <td>name</td>
-                      <td>bar1</td>
-                      <td>bar2</td>
-                      <td>bar3</td>
-                    </tr> -->
-                  </tbody>
-                </table>
-              </div>
-
-              <hr>
-              Service logs
-              <select id="logLevelDropdown" name="logLevelDropdown" class="selectpicker" title='Select minimum logging level'>
-                <option>debug</option>
-                <option>info</option>
-                <option>error</option>
-              </select>
-              <input type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> Play" data-off="<i class='fa fa-pause'></i> Pause" data-onstyle="success" id="logsToggleButton">
-              <div class="well well-sm">
-                <textarea style="width:100%" rows="10" id="serviceLogTextArea" wrap="off"></textarea>
-              </div>
-            </div>
-          </div> 
-        </div>
-
-        <!-- <div class="col-md-8 col-sm-6">
-          <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Logs</h4></div>
-            <div class="panel-body">
-              Check out some of our member profiles..
-              <hr>
-              <div class="well well-sm">
-                <div class="media">
-                  <a class="thumbnail pull-left" href="#">
-                    <img class="media-object" src="//placehold.it/80">
-                  </a>
-                  <div class="media-body">
-                    <h4 class="media-heading">John Doe</h4>
-                  	<p><span class="label label-info">10 photos</span> <span class="label label-primary">89 followers</span></p>
-                    <p>
-                      <a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-comment"></span> Message</a>
-                      <a href="#" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-heart"></span> Favorite</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> 
-        </div> -->
-        <!-- <div class="col-md-4 col-sm-6">
-          <div class="panel panel-default">
-            <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>Storage</h4></div>
-            <div class="panel-body">
-              <img src="//placehold.it/150" class="img-circle pull-right"> <a href="#">Articles</a>
-              <div class="clearfix"></div>
-              <hr>
-              <div class="clearfix"></div>
-              <img src="http://placehold.it/120x90/3333CC/FFF" class="img-responsive img-thumbnail pull-right">
-              <p>The more powerful (and 100% fluid) Bootstrap 3 grid now comes in 4 sizes (or "breakpoints"). Tiny (for smartphones), Small (for tablets), Medium (for laptops) and Large (for laptops/desktops).</p>
-              <div class="clearfix"></div>              
-            </div>
-          </div> 
-        </div> -->
-      </div>
-
-      <hr>
 
 <!--       <input type="hidden" id="uiLogTextArea">
 </input> -->

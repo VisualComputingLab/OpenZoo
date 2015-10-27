@@ -23,7 +23,7 @@ import twitter4j.json.DataObjectFactory;
  */
 public class TwitterWorker extends OpenZooWorker {
 
-    private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "tw_output");
+    private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "output_1");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     public TwitterWorker(String threadName)

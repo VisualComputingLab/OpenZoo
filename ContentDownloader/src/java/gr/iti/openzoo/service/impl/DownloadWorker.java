@@ -14,8 +14,8 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class DownloadWorker extends OpenZooWorker {
 
-    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "dl_input");
-    private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "dl_output");
+    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
+    private OpenZooOutputConnection outConn = new OpenZooOutputConnection(this, "output_1");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     public DownloadWorker(String threadName)

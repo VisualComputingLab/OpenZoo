@@ -13,7 +13,7 @@
             "endpoints":
             [
                 {
-                    "endpoint_id": "tw_output",
+                    "endpoint_id": "output_1",
                     "type": "out"
                 }
             ]

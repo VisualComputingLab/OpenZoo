@@ -28,9 +28,9 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class URLWorker extends OpenZooWorker {
 
-    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "urlval_input");
-    private OpenZooOutputConnection outConnDl = new OpenZooOutputConnection(this, "urlval_output_dl");
-    private OpenZooOutputConnection outConnDb = new OpenZooOutputConnection(this, "urlval_output_db");
+    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
+    private OpenZooOutputConnection outConnDl = new OpenZooOutputConnection(this, "output_1");
+    private OpenZooOutputConnection outConnDb = new OpenZooOutputConnection(this, "output_2");
     private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     private SimpleDateFormat dateFormatter;
