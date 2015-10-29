@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -140,7 +141,13 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         
         logs.clear();
         
-        System.out.println("request is: " + request);
+//        System.out.println("request is: " + request.toString());
+//        Enumeration params = request.getParameterNames(); 
+//        while(params.hasMoreElements())
+//        {
+//            String paramName = (String)params.nextElement();
+//            System.out.println("Attribute Name - "+paramName+", Value - "+request.getParameter(paramName));
+//        }
         
         String proglang = request.getParameter("tmpl-proglang");
         
@@ -193,7 +200,7 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         int numOutputs = Integer.parseInt(request.getParameter("tmpl-numOutputs"));
         boolean queueLogging = request.getParameter("tmpl-queueLogging") != null;
         boolean usesMongo = request.getParameter("tmpl-usesMongo") != null;
-        boolean isBroker = request.getParameter("tmpl-workerType").equalsIgnoreCase("broker");
+        boolean isBroker = request.getParameter("tmpl-workerType") == null;
         HashSet<String> requiredParameters = null;
         String s_req = request.getParameter("tmpl-requiredParameters");
         if (s_req != null && !s_req.trim().isEmpty())

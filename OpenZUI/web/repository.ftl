@@ -17,7 +17,7 @@
           <form class="form-horizontal" action="Templates" method="GET">
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-success pull-right">Create</button>
+                <button type="submit" class="btn btn-success pull-right">Configure</button>
               </div>
             </div>
           </form>

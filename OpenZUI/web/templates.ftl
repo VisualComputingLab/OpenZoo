@@ -61,7 +61,8 @@
           <div class="form-group">
             <label for="tmpl-hasInput" class="col-sm-4 control-label">Has input endpoint</label>
             <div class="col-sm-4">
-              <input type="checkbox" class="form-control" name="tmpl-hasInput" id="tmpl-hasInput" value="O" checked>
+              <!-- <input type="checkbox" class="form-control" name="tmpl-hasInput" id="tmpl-hasInput" value="O" checked> -->
+              <input type="checkbox" class="form-control" data-toggle="toggle" data-on="<i class='fa fa-plug'></i> Yes" data-off="<i class='fa fa-times'></i> No" data-onstyle="success" data-offstyle="warning" id="tmpl-hasInput" name="tmpl-hasInput" value="O" data-width="100%" checked>
             </div>
           </div>
           <div class="form-group">
@@ -73,24 +74,28 @@
           <div class="form-group">
             <label for="tmpl-queueLogging" class="col-sm-4 control-label">Uses queue logging</label>
             <div class="col-sm-4">
-              <input type="checkbox" class="form-control" name="tmpl-queueLogging" value="O" checked >
+              <input type="checkbox" class="form-control" data-toggle="toggle" data-on="<i class='fa fa-pencil-square-o'></i> Yes" data-off="<i class='fa fa-times'></i> No" data-onstyle="success" data-offstyle="warning" id="tmpl-queueLogging" name="tmpl-queueLogging" value="O" data-width="100%" checked>
+              <!-- <input type="checkbox" class="form-control" name="tmpl-queueLogging" value="O" checked > -->
             </div>
           </div>
           <div class="form-group">
             <label for="tmpl-usesMongo" class="col-sm-4 control-label">Uses MongoDB</label>
             <div class="col-sm-4">
-              <input type="checkbox" class="form-control" name="tmpl-usesMongo" value="O" >
+              <input type="checkbox" class="form-control" data-toggle="toggle" data-on="<i class='fa fa-database'></i> Yes" data-off="<i class='fa fa-times'></i> No" data-onstyle="success" data-offstyle="warning" id="tmpl-usesMongo" name="tmpl-usesMongo" value="O" data-width="100%">
+              <!-- <input type="checkbox" class="form-control" name="tmpl-usesMongo" value="O" > -->
             </div>
           </div>
           <div class="form-group">
             <label for="tmpl-workerType" class="col-sm-4 control-label">Worker type</label>
-            <div class="col-sm-2">
+            <div class="col-sm-4">
+              <input type="checkbox" class="form-control" data-toggle="toggle" data-on="<i class='fa fa-long-arrow-right'></i> Operator" data-off="<i class='fa fa-arrows-alt'></i> Broker" data-onstyle="success" data-offstyle="warning" id="tmpl-workerType" name="tmpl-workerType" value="O" data-width="100%" checked>
+            </div>
+            <!-- <div class="col-sm-2">
               Operator <input type="radio" class="form-control tmpl-workerType" name="tmpl-workerType" value="operator" checked>
             </div>
-              <!-- <br> -->
             <div class="col-sm-2">
               Broker <input type="radio" class="form-control tmpl-workerType" name="tmpl-workerType" value="broker">
-            </div>
+            </div> -->
           </div>
           <div class="form-group">
             <label for="tmpl-requiredParameters" class="col-sm-4 control-label">Required Parameters (Comma separated list)</label>
@@ -130,9 +135,10 @@
 	<!-- script references -->
 		<script src="./libs/jquery/jquery-1.11.3.min.js"></script>
 		<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./libs/bootstrap/js/bootstrap-toggle.min.js"></script>
     <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
-                <script src="./js/templatesScripts.js"></script>
+    <script src="./js/templatesScripts.js"></script>
 
     <script>
       var logcontainer = [];

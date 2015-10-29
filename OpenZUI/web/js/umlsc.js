@@ -586,13 +586,23 @@ $(document).ready(function() {
     $("#openzooServiceSelectBtn").on('click', function() {
 
         var serviceName = $('#openzooServiceSelect').find(":selected").text();
+        var serviceType = JSON.parse(localStorage[serviceName]).type;
+        var serviceAttrs;
+        if (serviceType === "broker") serviceAttrs = {'.uml-state-body': { fill: 'rgba(236, 151, 31, 0.1)', stroke: 'rgba(236, 151, 31, 0.5)', 'stroke-width': 1.5 }, '.uml-state-separator': { stroke: 'rgba(236, 151, 31, 0.4)' }};
+        else serviceAttrs = {'.uml-state-body': { fill: 'rgba(101, 176, 69, 0.1)', stroke: 'rgba(101, 176, 69, 0.5)', 'stroke-width': 1.5 }, '.uml-state-separator': { stroke: 'rgba(101, 176, 69, 0.4)' }};
+
         // servicesCounter = servicesCounter +1;
         var srv = new uml.State({
             id: serviceName,
             position: {x: 20, y: 20},
             size: {width: 160, height: 60},
             name: serviceName,
-            events: ["status: --"]
+            events: ["type: " + serviceType],
+            attrs: serviceAttrs
+            //attrs: {'.uml-state-body': { fill: 'rgba(48, 208, 198, 0.1)', stroke: 'rgba(48, 208, 198, 0.5)', 'stroke-width': 1.5 }, '.uml-state-separator': { stroke: 'rgba(48, 208, 198, 0.4)' }}
+            // uml-state-body.fill is the fill color of the box
+            // uml-state-body.stroke is the color of the box shape
+            // uml-state-separator.stroke is the color of the separator between header and main body
         });
         services[serviceName] = srv;
         graph.addCell(srv);

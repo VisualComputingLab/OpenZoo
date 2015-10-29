@@ -130,3 +130,8 @@ position: absolute;
 right: 10;  
 top: 100;
 }
+
+.text
+{
+    display:inline-block;
+}

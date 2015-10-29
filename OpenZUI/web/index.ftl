@@ -9,40 +9,68 @@
       <div class="row">
         <div class="col-md-6 col-sm-6">
           <a href="Servers">
-            <div class="well"> 
+            <!-- <div class="well"> 
               <h4>Setup Servers</h4>
               <div style="padding:5px;">
                 <h4><i class="fa fa-server fa-5x"></i></h4>
+              </div>
+            </div> -->
+            <div class="well"> 
+              <i class="fa fa-server fa-5x fa-fw"></i>
+              <div class="text" style="padding:15px;">
+                <h2>Setup Servers</h2>
+                <p>Register cluster servers</p>
               </div>
             </div>
           </a>
         </div>
         <div class="col-md-6 col-sm-6">
           <a href="Repository">
-            <div class="well"> 
+            <!-- <div class="well"> 
               <h4>Manage repository</h4>
-              <div  style="padding:5px;">
+              <div style="padding:5px;">
                 <h4><i class="fa fa-cloud-upload fa-5x"></i></h4> 
+              </div>
+            </div> -->
+            <div class="well"> 
+              <i class="fa fa-cloud-upload fa-5x fa-fw"></i>
+              <div class="text" style="padding:15px;">
+                <h2>Manage repository</h2>
+                <p>Download service templates and upload services</p>
               </div>
             </div>
           </a>
         </div>
         <div class="col-md-6 col-sm-6">
           <a href="Topologies">
-            <div class="well"> 
+            <!-- <div class="well"> 
               <h4>Topologies</h4>
               <div  style="padding:5px;">
                 <h4><i class="fa fa-cubes fa-5x"></i></h4> 
+              </div>
+            </div> -->
+            <div class="well"> 
+              <i class="fa fa-cubes fa-5x fa-fw"></i>
+              <div class="text" style="padding:15px;">
+                <h2>Topologies</h2>
+                <p>Draw, deploy and run topologies</p>
               </div>
             </div>
           </a>
         </div>
         <div class="col-md-6 col-sm-6">
           <a href="Configurations">
-            <div class="well"> 
+            <!-- <div class="well"> 
               <h4>Configurations</h4>
               <div  style="padding:5px;"> 
                 <h4><i class="fa fa-cogs fa-5x"></i></h4> 
+              </div>
+            </div> -->
+            <div class="well"> 
+              <i class="fa fa-cogs fa-5x fa-fw"></i>
+              <div class="text" style="padding:15px;">
+                <h2>Configurations</h2>
+                <p>Monitor running topologies</p>
               </div>
             </div>
           </a>

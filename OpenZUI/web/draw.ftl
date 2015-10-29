@@ -63,10 +63,10 @@
                   <form id="service_form"> 
 
                   <label for="instances">instances</label>
-                  <input type="number" class="form-control" id="instances" name="instances" value="1">
+                  <input type="number" class="form-control" id="instances" name="instances" value="1" min="1" max="100">
                   
                   <label for="tpc">threads per core</label>
-                  <input type="number" class="form-control" id="tpc" name="tpc" value="0">
+                  <input type="number" class="form-control" id="tpc" name="tpc" value="0" min="0" max="16">
 
                   </form>
               </div>
