@@ -524,7 +524,7 @@ public class Deployer {
         return outjson;
     }
     
-    public List<String> updateService(String topo_name, String service_id)
+    public List<String> updateService(String topo_name, String service_id, boolean redeploy)
     {
         //ArrayList<String> logs = new ArrayList<>();
         List<String> logs = Collections.synchronizedList(new ArrayList<String>());
@@ -566,7 +566,10 @@ public class Deployer {
         for (String servername : server2conf.keySet())
         {
             server_json = server2conf.get(servername);
-            Runnable worker = new WorkerThread("redeploy", servername, war, server_json, repo, null, index, topo_name, kv, logs);
+            Runnable worker;
+            if (redeploy)
+                worker = new WorkerThread("redeploy", servername, war, server_json, repo, null, index, topo_name, kv, logs);
+            else worker = new WorkerThread("reset", servername, war, server_json, repo, null, index, topo_name, kv, logs);
             index++;
             executor.execute(worker);
         }

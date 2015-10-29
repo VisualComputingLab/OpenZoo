@@ -125,6 +125,30 @@ public class KeyValueCommunication {
         }
     }
     
+    public void incrHashValue(String key, String field, int i)
+    {                
+        try (Jedis jedis = pool.getResource())
+        {
+            jedis.hincrBy(key, field, i);
+        }
+        catch (Exception ex)
+        {
+            log.error("Redis is not accessible (incrValue): " + ex);
+        }
+    }
+    
+    public void delHashValue(String key, String field)
+    {                
+        try (Jedis jedis = pool.getResource())
+        {
+            jedis.hdel(key, field);
+        }
+        catch (Exception ex)
+        {
+            log.error("Redis is not accessible (incrValue): " + ex);
+        }
+    }
+    
     public String getHashValue(String key, String field)
     {
         return getHashValue(key, field, false);

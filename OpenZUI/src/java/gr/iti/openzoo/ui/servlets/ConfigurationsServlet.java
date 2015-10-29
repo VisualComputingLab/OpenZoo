@@ -6,7 +6,6 @@ import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Topology;
-import static gr.iti.openzoo.ui.servlets.TopologiesServlet.cfg;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -89,6 +88,8 @@ public class ConfigurationsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        logs.clear();
         processRequest(request, response);
     }
 
@@ -104,6 +105,16 @@ public class ConfigurationsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        logs.clear();
+        
+        String action = request.getParameter("cnf-action");
+        boolean redeploy = action.equalsIgnoreCase("redeploy");
+        String toponame = request.getParameter("cnf-topo");
+        String service_id = request.getParameter("cnf-service");
+        
+        logs.addAll(deployer.updateService(toponame, service_id, redeploy));
+        
         processRequest(request, response);
     }
 

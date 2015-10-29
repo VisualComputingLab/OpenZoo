@@ -1,9 +1,6 @@
 package gr.iti.openzoo.impl;
 
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.QueueingConsumer;
 import gr.iti.openzoo.admin.KeyValueCommunication;
 import gr.iti.openzoo.admin.ServiceParameters;
 import gr.iti.openzoo.util.SerializationUtil;
@@ -30,12 +27,6 @@ public abstract class OpenZooService {
     
     protected ServiceParameters parameters = new ServiceParameters();
     protected JSONObject properties;
-    protected ConnectionFactory factory;
-    protected Connection connectionOUT;
-    protected Channel channelOUT;
-    protected Connection connectionIN;
-    protected Channel channelIN;
-    protected QueueingConsumer qconsumer1;
     protected static List<Connection> allConnections;
     protected int parallelismIdx = 1;
     protected KeyValueCommunication kv;
@@ -177,7 +168,7 @@ public abstract class OpenZooService {
                 String threadName;
                 int i;
 
-                for (i = 0; i < numWorkers; i++)
+                for (i = 0; i < numThreads; i++)
                 {
                     threadName = "consumer_" + i;
                     

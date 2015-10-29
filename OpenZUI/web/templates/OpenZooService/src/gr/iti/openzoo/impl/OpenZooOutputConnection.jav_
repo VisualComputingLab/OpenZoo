@@ -54,24 +54,6 @@ public class OpenZooOutputConnection {
         // component_id_source:worker_id_source:output_endpoint_id_source:component_id_target:worker_id_target:input_endpoint_id_target[:instance_id_target]
         // Since this is an output connection, we are the source (to the next component), so we don't care about the instance_id_target (if any)
         // We just need a queue or exchange name        
-//        try
-//        {
-//            String pattern = topologyId + ":" + componentId + ":" + workerId + ":" + id + ":*:*:*";
-//            String keyval = kv.getFirstKeyLike(pattern);
-//            
-//            if (keyval == null)
-//            {
-//                log.error("Could not find an appropriate KV record: " + pattern);
-//                return false;
-//            }
-//                        
-//            JSONObject queue = new JSONObject(kv.getValue(keyval));
-//            queueParams = new ParametersQueue(queue);
-//        }
-//        catch (JSONException e)
-//        {
-//            log.error("JSONException while creating JSONObject from KV: " + e);
-//        }
         
         try
         {
@@ -93,6 +75,10 @@ public class OpenZooOutputConnection {
         }
                 
         mapping = queueParams.getMapping();
+        
+        // delete if exists
+        kv.delHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
+        kv.delHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
         
         try
         {
@@ -130,21 +116,25 @@ public class OpenZooOutputConnection {
         
         try
         {
+            byte [] bytes = copy.getBytes();
             switch (mapping)
             {
                 case AVAIL:
                     log.debug("Publishing to available");
-                    channel.basicPublish( "", queue_name, MessageProperties.PERSISTENT_TEXT_PLAIN, copy.getBytes());
+                    channel.basicPublish( "", queue_name, MessageProperties.PERSISTENT_TEXT_PLAIN, bytes);
                     break;
                 case ALL:
                     log.debug("Publishing to all");
-                    channel.basicPublish(exchange_name, "#", null, copy.getBytes());
+                    channel.basicPublish(exchange_name, "#", null, bytes);
                     break;
                 case ROUTE:
                     log.debug("Publishing to selected");
-                    channel.basicPublish(exchange_name, copy.getRouting_key(), null, copy.getBytes());
+                    channel.basicPublish(exchange_name, copy.getRouting_key(), null, bytes);
                     break;
             }
+            
+            kv.incrHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, 1);
+            kv.incrHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, bytes.length);
         }
         catch (IOException e)
         {

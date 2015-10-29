@@ -33,6 +33,18 @@
         <filter-name>MemberLoginFilter</filter-name>
         <url-pattern>/Templates</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>MemberLoginFilter</filter-name>
+        <url-pattern>/Configurations</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>MemberLoginFilter</filter-name>
+        <url-pattern>/KeyValueServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>MemberLoginFilter</filter-name>
+        <url-pattern>/ServiceLogServlet</url-pattern>
+    </filter-mapping>
     <error-page>
         <error-code>401</error-code>
         <location>/denied.jsp</location>

@@ -29,8 +29,15 @@
           <!-- <a class="list-group-item active" onclick="console.log('TwitterCrawler clicked');"> TwitterCrawler</a>
           <a class="list-group-item" onclick="console.log('URLValidator clicked');"> URLValidator</a>  -->
         </ul>
-        <button class="btn btn-success pull-left" id="resetCompBtn" style="width: 45%;" onclick="resetComponent();">Reset</button>
-        <button class="btn btn-success pull-right" id="redeployCompBtn" style="width: 45%;" onclick="redeployComponent();">Redeploy</button>
+        <form class="form-horizontal" method="POST" action="Configurations" id="updateComponentForm">
+          <input type="hidden" class="form-control" name="cnf-action" id="cnf-action" >
+          <input type="hidden" class="form-control" name="cnf-topo" id="cnf-topo" >
+          <input type="hidden" class="form-control" name="cnf-service" id="cnf-service" >
+          <div type="button" id="resetCompBtn" class="btn btn-success pull-left" style="width: 45%;"><i class="fa fa-step-backward"></i> Reset</div>
+          <div type="button" id="redeployCompBtn" class="btn btn-success pull-right" style="width: 45%;"><i class="fa fa-exchange"></i> Redeploy</div>
+          <!-- <button class="btn btn-success pull-left" id="resetCompBtn" style="width: 45%;" onclick="resetComponent();">Reset</button>
+          <button class="btn btn-success pull-right" id="redeployCompBtn" style="width: 45%;" onclick="redeployComponent();">Redeploy</button> -->
+        </form>
         <input type="hidden" class="form-control" id="selectedComponent" value="">
       </div>
     </div>

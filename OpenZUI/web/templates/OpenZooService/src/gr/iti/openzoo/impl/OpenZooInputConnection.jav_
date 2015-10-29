@@ -56,30 +56,7 @@ public class OpenZooInputConnection {
         // If the connection is of type ROUTE, we use the instance_id_target to obtain the correct parameters (routing keys) for this instance
         // If the connection is of type ANY or ALL, we don't care, we just need a queue or exchange name
         // So we first check if key with instance_id_target exists, and if not then we check without the instance_id_target
-//        try
-//        {
-//            String pattern = topologyId + ":*:*:*:" + componentId + ":" + workerId + ":" + id + ":" + instanceId;
-//            String keyval = kv.getFirstKeyLike(pattern);
-//            if (keyval == null)
-//            {
-//                pattern = topologyId + ":*:*:*:" + componentId + ":" + workerId + ":" + id;
-//                keyval = kv.getFirstKeyLike(pattern);
-//            }
-//            
-//            if (keyval == null)
-//            {
-//                log.error("Could not find an appropriate KV record: " + pattern);
-//                return false;
-//            }
-//            
-//            JSONObject queue = new JSONObject(kv.getValue(keyval));            
-//            queueParams = new ParametersQueue(queue);
-//        }
-//        catch (JSONException e)
-//        {
-//            log.error("JSONException while creating JSONObject from KV: " + e);
-//            return false;
-//        }
+        
         try
         {
             String pattern = "connection:(.*):(.*):(.*):" + componentId + ":" + workerId + ":" + id + ":" + instanceId;
@@ -104,7 +81,11 @@ public class OpenZooInputConnection {
             log.error("JSONException while creating JSONObject from KV: " + e);
             return false;
         }
-                
+        
+        // delete if exists
+        kv.delHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
+        kv.delHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
+        
         qconsumer = new QueueingConsumer(channel);
         String queue_name, exchange_name;
         mapping = queueParams.getMapping();
@@ -158,6 +139,9 @@ public class OpenZooInputConnection {
         {
             message = new Message(qconsumer.nextDelivery(), componentId, instanceId, workerId, id);
             log.debug("Consumed message");
+            
+            kv.incrHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, 1);
+            kv.incrHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, message.getBytes().length);
         }
         catch (InterruptedException ex) 
         {

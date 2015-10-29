@@ -59,7 +59,8 @@ public class WorkerThread implements Runnable
             case "undeploy":    undeploy(); break;
             case "redeploy":    redeploy(); break;
             case "start": 
-            case "stop":        runCommand(); break;
+            case "stop": 
+            case "reset":        runCommand(); break;
         }
     }
     
@@ -181,6 +182,14 @@ public class WorkerThread implements Runnable
 
     private void redeploy()
     {
+        boolean isRunning = server_conf.optString("status", "").equalsIgnoreCase("running");
+        
+        // first try to stop service in any case
+        action = "stop";
+        runCommand();
+        
+        // then undeploy
+        action = "redeploy";
         Server srv = kv.getServer(servername);
         JSONObject outjson = undeployService("http://" + srv.getAddress() + ":" + srv.getPort(), srv.getUser() + ":" + srv.getPasswd(), "/" + war.getComponent_id());
 
@@ -242,7 +251,14 @@ public class WorkerThread implements Runnable
                 {
                     if (outjson.getString("status").equalsIgnoreCase("success"))
                     {
-                        server_conf.put("status", "void");
+                        server_conf.put("status", "running");
+                        
+                        if (isRunning)
+                        {
+                            action = "start";
+                            runCommand();
+                            action = "redeploy";
+                        }
                     }
                     else
                     {
@@ -303,6 +319,15 @@ public class WorkerThread implements Runnable
 
                     case "stop":
                         server_conf.put("status", "installed");
+                        break;
+                    case "reset":
+                        JSONObject j_stop = output.optJSONObject("stop");
+                        JSONObject j_start = output.optJSONObject("start");
+                        if (j_stop != null && !j_stop.has("error"))
+                        {
+                            if (j_start == null || j_start.has("error"))
+                                server_conf.put("status", "installed");
+                        }
                         break;
                 }
             }

@@ -17,7 +17,7 @@ $(document).ready(function(){
                     $.ajax({
                         url: "/OpenZUI/ServiceLogServlet?topo=" + topo_name + "&level=" + $('#logLevelDropdown option:selected').val(), 
                         success: function(data) {
-                            console.log(data);
+                            // console.log(data);
                             if (data == null || data.response == null)
                                 console.log("ServiceLogServlet returned nothing");
                             else if (data.response.length == 0)
@@ -48,6 +48,28 @@ $(document).ready(function(){
         setTimeout(worker, 5000);
 
     })();
+
+    $("#resetCompBtn").on('click', function()
+    {
+        var topo_name = $('#selectedTopo').val();
+        var service_id = $('#selectedComponent').val();
+
+        $("#cnf-action").val("reset");
+        $("#cnf-topo").val(topo_name);
+        $("#cnf-service").val(service_id);
+        $("#updateComponentForm").submit();
+    });
+
+    $("#redeployCompBtn").on('click', function()
+    {
+        var topo_name = $('#selectedTopo').val();
+        var service_id = $('#selectedComponent').val();
+
+        $("#cnf-action").val("redeploy");
+        $("#cnf-topo").val(topo_name);
+        $("#cnf-service").val(service_id);
+        $("#updateComponentForm").submit();
+    });
 });
 
 
@@ -194,38 +216,11 @@ function CompSelectedEvent(element, topo_name, service_id){
             elem_a.addEventListener("click", function(e){ ServSelectedEvent(elem_a, topo_name, service_id, server_id); });
             lg_serv.appendChild(elem_a);
 
-            // sum up enpoint stats for this component
-            // if (thisServer.endpoints != null)
-            //     Object.keys(thisServer.endpoints).forEach(function (endpoint_id) { 
-            //         var thisEndpoint = thisServer.endpoints[endpoint_id];
-            //         if (endpoint_id in compEndpoints)
-            //         {
-            //             compEndpoints[endpoint_id][0] += thisEndpoint[0];
-            //             compEndpoints[endpoint_id][1] += thisEndpoint[1];
-            //         }
-            //         else compEndpoints[endpoint_id] = thisEndpoint;
-            //     });
-
             if (i == 0) {
                 ServSelectedEvent(elem_a, topo_name, service_id, server_id);
                 i = 1;
             }
         });
-
-        // var lg_endp_comp = document.getElementById("lg-endp-comp");
-        // Object.keys(compEndpoints).forEach(function (endpoint_id) { 
-        //     var thisEndpoint = compEndpoints[endpoint_id];
-        //     var elem_li = document.createElement("li");
-        //     elem_li.className = "list-group-item";
-        //     var span = document.createElement('span');
-        //     span.className = 'badge';
-        //     span.innerHTML = "" + formatNum(thisEndpoint[0]) + " (" + formatBytes(thisEndpoint[1]) + ")";
-        //     elem_li.appendChild(span);
-        //     var endpoint_id_short = endpoint_id.substring(endpoint_id.lastIndexOf(":") + 1)
-        //     elem_li.appendChild(document.createTextNode(' ' + endpoint_id_short));
-
-        //     lg_endp_comp.appendChild(elem_li);
-        // });
     }
 }
 
@@ -248,22 +243,6 @@ function ServSelectedEvent(element, topo_name, service_id, server_id){
     {
         var thisComponent = conf_object[service_id];
         var thisServer = thisComponent[server_id];
-
-        // instance endpoints
-        // var lg_endp_serv = document.getElementById("lg-endp-serv");
-        // if (thisServer.endpoints != null)
-        //     Object.keys(thisServer.endpoints).forEach(function (endpoint_id) { 
-        //         var thisEndpoint = thisServer.endpoints[endpoint_id];
-        //         var elem_li = document.createElement("li");
-        //         elem_li.className = "list-group-item";
-        //         var span = document.createElement('span');
-        //         span.className = 'badge';
-        //         span.innerHTML = "" + formatNum(thisEndpoint[0]) + " (" + formatBytes(thisEndpoint[1]) + ")";
-        //         elem_li.appendChild(span);
-        //         var endpoint_id_short = endpoint_id.substring(endpoint_id.lastIndexOf(":") + 1)
-        //         elem_li.appendChild(document.createTextNode(' ' + endpoint_id_short)); // ------------------------------------------------
-        //         lg_endp_serv.appendChild(elem_li);
-        //     });
 
         // server loads
         var lg_serv_load = document.getElementById("lg-serv-load");
@@ -399,10 +378,6 @@ function updateEndpointStats(topo_name)
     var conf_object = thisTopo["conf_object"];
     var compEndpoints = {};
 
-    console.log("topo: " + $('#selectedTopo').val());
-    console.log("comp: " + $('#selectedComponent').val());
-    console.log("server: " + $('#selectedServer').val());
-
     if (conf_object != null)
     {
         var service_id = $('#selectedComponent').val();
@@ -423,7 +398,13 @@ function updateEndpointStats(topo_name)
                         compEndpoints[endpoint_id][0] += thisEndpoint[0];
                         compEndpoints[endpoint_id][1] += thisEndpoint[1];
                     }
-                    else compEndpoints[endpoint_id] = thisEndpoint;
+                    else
+                    {
+                        var newEp = [];
+                        newEp[0] = thisEndpoint[0];
+                        newEp[1] = thisEndpoint[1];
+                        compEndpoints[endpoint_id] = newEp;
+                    }
                 });
         });
 
@@ -556,3 +537,4 @@ function resetComponent()
         }
     }
 }
+

@@ -139,6 +139,9 @@ public class OpenZooInputConnection {
         {
             message = new Message(qconsumer.nextDelivery(), componentId, instanceId, workerId, id);
             log.debug("Consumed message");
+            
+            kv.incrHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, 1);
+            kv.incrHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, message.getBytes().length);
         }
         catch (InterruptedException ex) 
         {
@@ -168,9 +171,6 @@ public class OpenZooInputConnection {
             log.error("Could not deliver acknowledgment, aborting (consumer exit?): " + e);
             res = false;
         }
-        
-        kv.incrHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, 1);
-        kv.incrHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, message.getBytes().length);
         
         return res;
     }
