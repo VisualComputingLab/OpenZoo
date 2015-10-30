@@ -358,10 +358,13 @@ function getEndpointStats(topo_name, asynchronous)
             Object.keys(thisConf).forEach(function (service_id) { 
                 var allInstances = thisConf[service_id];
                 var thisService = allServices[service_id];
-                Object.keys(allInstances).forEach(function (server_id) { 
-                    var thisServer = allInstances[server_id];
-                    thisServer.endpoints = thisService[thisServer["instance_id"]];
-                });
+                if (thisService != null)
+                {
+                    Object.keys(allInstances).forEach(function (server_id) { 
+                        var thisServer = allInstances[server_id];
+                        thisServer.endpoints = thisService[thisServer["instance_id"]];
+                    });
+                }
             });
 
             localStorage.setItem("allTopologies", JSON.stringify(allTopos));

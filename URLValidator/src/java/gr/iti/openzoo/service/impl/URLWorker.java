@@ -62,6 +62,7 @@ public class URLWorker extends OpenZooWorker {
             if (processTweet(tweet))
             {
                 JSONObject result = new JSONObject();
+                result.put("tweet_id", tweet.getLong("id"));
                 result.put("date_posted", tweet.getLong("date_posted"));
                 if (tweet.has("images"))
                     result.put("images", tweet.getJSONArray("images"));

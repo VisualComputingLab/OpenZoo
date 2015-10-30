@@ -534,6 +534,7 @@ public class KeyValueCommunication {
             if (delete)
             {
                 jedis.del(key);
+                jedis.del("statistics:" + toponame);
             }
 
             Topology topo = new Topology(prop);

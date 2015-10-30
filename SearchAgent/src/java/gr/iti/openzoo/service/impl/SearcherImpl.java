@@ -2,27 +2,25 @@ package gr.iti.openzoo.service.impl;
 
 import gr.iti.openzoo.impl.OpenZooService;
 import org.codehaus.jettison.json.JSONObject;
-<#if IsBroker??>
 import gr.iti.openzoo.impl.OpenZooWorker;
-</#if>
 
 /**
  *
- * @author ${Author}
+ * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class ${ServiceID}Impl extends OpenZooService {
+public class SearcherImpl extends OpenZooService {
 
-    public ${ServiceID}Impl()
+    public SearcherImpl()
     {
-        super("${ComponentID}");
+        super("SearchAgent");
         
-        log.debug("-- ${ServiceID}Impl()");
+        log.debug("-- SearcherImpl()");
     }
     
     public JSONObject get(String action)
     {
         JSONObject response;
-        String workerClassName = "gr.iti.openzoo.service.impl.${WorkerID}Worker";
+        String workerClassName = "gr.iti.openzoo.service.impl.SearchWorker";
         
         switch (action) {
             case "start":
@@ -45,7 +43,6 @@ public class ${ServiceID}Impl extends OpenZooService {
         return response;
     }
 
-<#if IsBroker??>
     public JSONObject post(JSONObject content)
     {
         OpenZooWorker ozw = null;
@@ -60,7 +57,7 @@ public class ${ServiceID}Impl extends OpenZooService {
         
         if (ticket != null)
             return ozw.getResponse(ticket, TIMEOUT_IN_SECS);
-
+        
         return null;
     }
-</#if>}
+}
