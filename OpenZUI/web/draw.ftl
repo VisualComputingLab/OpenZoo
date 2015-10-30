@@ -51,8 +51,8 @@
                 <div class="row">
 
          
-            <div class="col-md-9">
-            <div id="paper" class="topologyBox">
+            <div class="col-md-9 minBox850">
+            <div id="paper" class="topologyBox minBox850">
             </div>   
           	</div>
 

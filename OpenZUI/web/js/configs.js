@@ -140,10 +140,46 @@ function TopoSelectedEvent(element, topo_name){
     $("#lg-endp-comp").empty();
     $("#lg-serv-load").empty();
     $("#lg-endp-serv").empty();
+    $("#paper").empty();
 
     var allTopos = JSON.parse(localStorage["allTopologies"]);
     var thisTopo = allTopos[topo_name];
     var conf_object = thisTopo["conf_object"];
+    var graph_object = thisTopo["graph_object"];
+
+    var graph = new joint.dia.Graph;
+
+    var paper = new joint.dia.Paper({
+        el: $('#paper'),
+        width: 500,
+        height: 375,
+        gridSize: 1,
+        model: graph,
+        interactive: false
+    });
+
+    if (graph_object != null && graph_object.graph != null)
+    {
+        var simpleGraph = {};
+        simpleGraph["cells"] = [];
+        for (var i = 0; i < graph_object.graph.cells.length; i++)
+        {
+            if (graph_object.graph.cells[i].type != "uml.StartState" && graph_object.graph.cells[i].type != "uml.EndState")
+            {
+                var state = graph_object.graph.cells[i];
+                // if (state.type == "uml.State" && state.attrs != null)
+                // {
+                //     state.attrs[".uml-state-name"]["font-size"] = 30;
+                // }
+                simpleGraph["cells"].push(state);
+            }
+        }
+
+        graph.fromJSON(simpleGraph);
+        var opt = {};
+        opt.padding = 10;
+        paper.scaleContentToFit(opt);
+    }
 
     if (conf_object != null)
     {

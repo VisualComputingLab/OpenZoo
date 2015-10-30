@@ -135,3 +135,18 @@ top: 100;
 {
     display:inline-block;
 }
+
+.minBox550
+{
+	min-width: 550px;
+}
+
+.minBox850
+{
+	min-width: 850px;
+}
+
+.centerBox
+{
+	margin: auto;
+}

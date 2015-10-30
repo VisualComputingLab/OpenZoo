@@ -8,37 +8,47 @@
 <div class="container" id="main">
   <div class="row">
 
-    <!-- Topologies -->
-    <div class="col-md-3 col-sm-6">
-      <div class="well"> 
-        <h4>Topologies</h4>
-        <ul class="list-group" id='lg-topo'>
-          <!-- <a class="list-group-item active" onclick="TopoSelectedEvent('TopoTest');"><span class="badge">Started</span> TopoTest</a>
-          <a class="list-group-item" onclick="console.log('TopoTwo clicked');"><span class="badge">Deployed</span> TopoTwo</a> 
-          <a class="list-group-item disabled" onclick="console.log('TopoThree clicked');"><span class="badge">Designed</span> TopoThree</a>  -->
-        </ul>
-        <input type="hidden" class="form-control" id="selectedTopo" value="">
+    <div class="col-md-6 col-sm-12">
+      <!-- Topologies -->
+      <div class="col-md-6 col-sm-6">
+        <div class="well"> 
+          <h4>Topologies</h4>
+          <ul class="list-group" id='lg-topo'>
+            <!-- <a class="list-group-item active" onclick="TopoSelectedEvent('TopoTest');"><span class="badge">Started</span> TopoTest</a>
+            <a class="list-group-item" onclick="console.log('TopoTwo clicked');"><span class="badge">Deployed</span> TopoTwo</a> 
+            <a class="list-group-item disabled" onclick="console.log('TopoThree clicked');"><span class="badge">Designed</span> TopoThree</a>  -->
+          </ul>
+          <input type="hidden" class="form-control" id="selectedTopo" value="">
+        </div>
       </div>
-    </div>
 
-    <!-- Components -->
-    <div class="col-md-3 col-sm-6">
-      <div class="well clearfix"> 
-        <h4>Components</h4>
-        <ul class="list-group" id='lg-comp'>
-          <!-- <a class="list-group-item active" onclick="console.log('TwitterCrawler clicked');"> TwitterCrawler</a>
-          <a class="list-group-item" onclick="console.log('URLValidator clicked');"> URLValidator</a>  -->
-        </ul>
-        <form class="form-horizontal" method="POST" action="Configurations" id="updateComponentForm">
-          <input type="hidden" class="form-control" name="cnf-action" id="cnf-action" >
-          <input type="hidden" class="form-control" name="cnf-topo" id="cnf-topo" >
-          <input type="hidden" class="form-control" name="cnf-service" id="cnf-service" >
-          <div type="button" id="resetCompBtn" class="btn btn-success pull-left" style="width: 45%;"><i class="fa fa-step-backward"></i> Reset</div>
-          <div type="button" id="redeployCompBtn" class="btn btn-success pull-right" style="width: 45%;"><i class="fa fa-exchange"></i> Redeploy</div>
-          <!-- <button class="btn btn-success pull-left" id="resetCompBtn" style="width: 45%;" onclick="resetComponent();">Reset</button>
-          <button class="btn btn-success pull-right" id="redeployCompBtn" style="width: 45%;" onclick="redeployComponent();">Redeploy</button> -->
-        </form>
-        <input type="hidden" class="form-control" id="selectedComponent" value="">
+      <!-- Components -->
+      <div class="col-md-6 col-sm-6">
+        <div class="well clearfix"> 
+          <h4>Components</h4>
+          <ul class="list-group" id='lg-comp'>
+            <!-- <a class="list-group-item active" onclick="console.log('TwitterCrawler clicked');"> TwitterCrawler</a>
+            <a class="list-group-item" onclick="console.log('URLValidator clicked');"> URLValidator</a>  -->
+          </ul>
+          <form class="form-horizontal" method="POST" action="Configurations" id="updateComponentForm">
+            <input type="hidden" class="form-control" name="cnf-action" id="cnf-action" >
+            <input type="hidden" class="form-control" name="cnf-topo" id="cnf-topo" >
+            <input type="hidden" class="form-control" name="cnf-service" id="cnf-service" >
+            <div type="button" id="resetCompBtn" class="btn btn-success pull-left" style="width: 45%;"><i class="fa fa-step-backward"></i> Reset</div>
+            <div type="button" id="redeployCompBtn" class="btn btn-success pull-right" style="width: 45%;"><i class="fa fa-exchange"></i> Redeploy</div>
+            <!-- <button class="btn btn-success pull-left" id="resetCompBtn" style="width: 45%;" onclick="resetComponent();">Reset</button>
+            <button class="btn btn-success pull-right" id="redeployCompBtn" style="width: 45%;" onclick="redeployComponent();">Redeploy</button> -->
+          </form>
+          <input type="hidden" class="form-control" id="selectedComponent" value="">
+        </div>
+      </div>
+      <div class="col-md-12 col-sm-12 minBox550">
+        <!-- Topology paper -->
+        <div class="well"> 
+          <h4>Topology overview</h4>
+          <div id="paper" class="minBox550">
+          </div>
+        </div>
       </div>
     </div>
 
@@ -149,6 +159,8 @@
     <script src="./libs/bootstrap/js/bootstrap-toggle.min.js"></script>
     <script src="./js/alertify.js"></script>
 		<script src="./js/scripts.js"></script>
+    <script src="./js/joint.js"></script>
+    <script src="./js/joint.shapes.uml.js"></script>
     <script src="./js/configs.js"></script>
 
     <script>
