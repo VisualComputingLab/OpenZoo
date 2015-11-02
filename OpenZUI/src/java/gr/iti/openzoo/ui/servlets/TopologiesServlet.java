@@ -6,7 +6,8 @@ import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Topology;
-import gr.iti.openzoo.ui.Utilities;
+import gr.iti.openzoo.ui.Triple;
+import gr.iti.openzoo.ui.WarFile;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -215,9 +216,20 @@ public class TopologiesServlet extends HttpServlet {
                 rd.forward(request,response);
                 break;
                 
-            case "deploy":
-                logs.addAll(deployer.deployTopology(name));
-                processRequest(request, response);
+//            case "deploy":
+//                Topology topo = kv.getTopology(name);
+//                ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
+//                logs.addAll(deployer.produceServerConfiguration(topo, triples));
+//                logs.addAll(deployer.deployTopologyServices(topo, triples));
+//                //logs.addAll(deployer.deployTopology(name));
+//                processRequest(request, response);
+//                
+//                break;
+                
+            case "create_config":
+                 rd = request.getRequestDispatcher("ConfirmServerConfig");
+                 rd.forward(request,response);
+                
                 break;
                 
             case "undeploy":

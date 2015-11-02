@@ -97,6 +97,10 @@
         <servlet-name>Configurations</servlet-name>
         <servlet-class>gr.iti.openzoo.ui.servlets.ConfigurationsServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ConfirmServerConfig</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.servlets.ConfirmServerConfigServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthorizationServlet</servlet-name>
         <url-pattern>/AuthorizationServlet</url-pattern>
@@ -140,6 +144,10 @@
     <servlet-mapping>
         <servlet-name>Configurations</servlet-name>
         <url-pattern>/Configurations</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ConfirmServerConfig</servlet-name>
+        <url-pattern>/ConfirmServerConfig</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

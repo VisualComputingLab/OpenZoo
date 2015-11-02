@@ -21,44 +21,6 @@ $(document).ready(function(){/* jQuery toggle layout */
     }
 });
 
-
-// function loadTopologyStatistics(name){
-//     var URL = "/OpenZUI/KeyValueServlet?action=servers";
-//     $.getJSON(URL, function(result){
-//         $("#srv-upd-name").val(name);
-//         $("#srv-upd-ip").val(result.response.address);
-//         $("#tmc-upd-port").val(result.response.port);
-//         $("#tmc-upd-user").val(result.response.user);
-//         $("#tmc-upd-pass").val(result.response.passwd);
-//         $("#tmc-upd-status").val(result.response.status);
-
-//         var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerStatistics/resources/stats";
-//         $.getJSON(StatsURL, function(sresult){
-//             $("#stats-cpu").val("" + Math.floor(sresult.cpu.systemCpuLoad * 100.0) + " %");
-//             $("#stats-mem").val("" + Math.floor(sresult.mem.physicalFree / 1024 / 1024) + " MB free / " + Math.floor(sresult.mem.physicalTotal / 1024 / 1024) + " MB total");
-//             $("#stats-disc").val("" + Math.floor(sresult.space.free / 1024 / 1024) + " MB free / " + Math.floor(sresult.space.total / 1024 / 1024) + " MB total");
-//         });
-
-//         $('#detailsModal').modal('show');
-//     });
-// }
-
-function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
-            
-    $("#detailsModalBody").empty();
-    $("#detailsModalBody").append("<table id='jsondata' class='table table-striped'>");
-    $("#jsondata").append("<tr><th>key</th><th>Val</th></tr>");
-    $("#jsondata").append("<tr><td>Name</td><td>"+name+"</td></tr>");
-    $("#jsondata").append("<tr><td>Address</td><td>"+address+"</td></tr>");
-    $("#jsondata").append("<tr><td>Port</td><td>"+port+"</td></tr>");
-    $("#jsondata").append("<tr><td>User</td><td>"+user+"</td></tr>");
-    $("#jsondata").append("<tr><td>Passwd</td><td>"+passwd+"</td></tr>");
-    $("#jsondata").append("<tr><td>Status</td><td>"+status+"</td></tr>");
-
-    $("#detailsModalBody").append("</table>");
- 	  $('#detailsModal').modal('show');
- };
-
  function detailsServer(name){
             
     var URL = "/OpenZUI/KeyValueServlet?action=server&name="+name;
@@ -189,7 +151,8 @@ function fetchdataAndShowModalOld(name, address, port, user, passwd, status){
 
  $('#deployBtn').on('click',function(){
 
-    $("#post-action").val('deploy');
+    //$("#post-action").val('deploy');
+    $("#post-action").val('create_config');
  });
 
  $('#undeployBtn').on('click',function(){
