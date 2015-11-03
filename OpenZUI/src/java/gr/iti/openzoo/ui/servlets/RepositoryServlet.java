@@ -4,9 +4,8 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.RepositoryParameters;
 import gr.iti.openzoo.ui.Utilities;
-import gr.iti.openzoo.ui.WarFile;
+import gr.iti.openzoo.pojos.WarFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -65,12 +64,6 @@ public class RepositoryServlet extends HttpServlet {
         Map<String, Object> root = new HashMap<>();
         
         // Fill data model from redis
-        RepositoryParameters repo = kv.getRepositoryParameters();
-        if (repo == null)
-        {
-            err("There was an error in the Key-Value repository, Repository Parameters could not be retrieved.");
-        }
-        else root.put("ftp", repo);
         
         ArrayList<WarFile> allWarfiles = kv.getWarFiles();
         if (allWarfiles == null)
@@ -124,43 +117,12 @@ public class RepositoryServlet extends HttpServlet {
             throws ServletException, IOException {
         
         logs.clear();
-        
-        //System.out.println(request);
-        
-        String action = request.getParameter("action");
-        
-//        System.out.println("POST Repository: action = " + action);
-        
-        switch (action)
-        {
-            case "updateRepo":
-//                System.out.println("Updating repo params");
-                String host = request.getParameter("ftp-host");
-                int port = 21;
-                try
-                {
-                    port = Integer.parseInt(request.getParameter("ftp-port"));
-                }
-                catch (NumberFormatException e)
-                {
-                    System.err.println("Wrong format for port number: " + e);
-                    err("Wrong format for port number");
-                }
-
-                String user = request.getParameter("ftp-user");
-                String pass = request.getParameter("ftp-pass");
-                String path = request.getParameter("ftp-path");
-
-                RepositoryParameters repo = new RepositoryParameters(host, port, user, pass, path);
-
-                //System.out.println("RepositoryServlet::POST called: " + request);
-
-                // add or update new server to redis
-                kv.putRepositoryParameters(repo);
-                break;
                 
+        String action = request.getParameter("action");
+                
+        switch (action)
+        {                
             case "uploadFile":
-//                System.out.println("Uploading war file");
                 
                 Part filePart = request.getPart("fileToUpload");
                 String fileName = getFileName(filePart);
@@ -205,7 +167,6 @@ public class RepositoryServlet extends HttpServlet {
             return false;
         }
         
-//        JSONObject config = Utilities.readJSONFromWAR(f.getAbsolutePath(), "config.json");
         if (config == null)
         {
             System.err.println("War file " + war + " does not contain a config.json, or config.json is not in json format");

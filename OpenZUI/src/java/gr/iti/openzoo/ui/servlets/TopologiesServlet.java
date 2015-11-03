@@ -5,7 +5,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
+import gr.iti.openzoo.pojos.Topology;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -59,13 +59,7 @@ public class TopologiesServlet extends HttpServlet {
         
         // Fill data model from redis
         ArrayList<Topology> allTopologies = kv.getTopologies();
-//        System.out.println("num of topologies in redis: " + allTopologies.size());
-        
-//        for (Topology tpl : allTopologies)
-//        {
-//            if (tpl.statusUpdated())
-//                kv.putTopology(tpl);
-//        }
+
         root.put("topologies", allTopologies);
         root.put("logs", logs);
         
@@ -115,9 +109,7 @@ public class TopologiesServlet extends HttpServlet {
         
         String action = request.getParameter("action");        
         String name = request.getParameter("topo-name");
-                
-//        System.out.println("POST Topologies: action = " + action + ", name = " + name);
-        
+                        
         String descr = request.getParameter("topo-descr");
         
         String rabbit_host = request.getParameter("topo-rabbit-host");
@@ -186,7 +178,6 @@ public class TopologiesServlet extends HttpServlet {
                 // At this point we have to open the topology drawing interface
                 // This will update the topology and call (GET) the TopologiesServlet servlet again
                 rd = request.getRequestDispatcher("DrawTopology");
-                //rd.include(request, response);
                 rd.forward(request,response);
                 break;
                 
@@ -210,19 +201,8 @@ public class TopologiesServlet extends HttpServlet {
                 // At this point we have to open the topology drawing interface
                 // This will update the topology and call (GET) the TopologiesServlet servlet again
                 rd = request.getRequestDispatcher("DrawTopology");
-                //rd.include(request, response);
                 rd.forward(request,response);
                 break;
-                
-//            case "deploy":
-//                Topology topo = kv.getTopology(name);
-//                ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
-//                logs.addAll(deployer.produceServerConfiguration(topo, triples));
-//                logs.addAll(deployer.deployTopologyServices(topo, triples));
-//                //logs.addAll(deployer.deployTopology(name));
-//                processRequest(request, response);
-//                
-//                break;
                 
             case "create_config":
                  rd = request.getRequestDispatcher("ConfirmServerConfig");

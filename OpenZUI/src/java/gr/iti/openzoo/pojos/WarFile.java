@@ -1,5 +1,7 @@
-package gr.iti.openzoo.ui;
+package gr.iti.openzoo.pojos;
 
+import gr.iti.openzoo.ui.Utilities;
+import gr.iti.openzoo.ui.Worker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;

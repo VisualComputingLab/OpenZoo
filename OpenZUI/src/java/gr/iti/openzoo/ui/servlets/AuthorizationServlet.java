@@ -39,7 +39,6 @@ public class AuthorizationServlet extends HttpServlet {
         LoggedInUser myBean = new LoggedInUser(email, passwd, configPath);
         request.getSession().setAttribute("userBean", myBean);
         
-        //request.getRequestDispatcher("/search.jsp").forward(request, response);
         response.sendRedirect("Main");
     }
 

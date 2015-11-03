@@ -16,7 +16,6 @@ public class MessageStatistics {
     public MessageStatistics()
     {
         data = new TreeMap<>();
-        //components.get("URLValidator").get(instance).get("urlworker").get("output_1").getNumMessages()
     }
     
     public void addEndpointMessages(String key, Long val)

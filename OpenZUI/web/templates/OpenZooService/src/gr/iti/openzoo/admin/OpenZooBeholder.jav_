@@ -2,14 +2,7 @@ package gr.iti.openzoo.admin;
 
 import gr.iti.openzoo.util.SerializationUtil;
 import gr.iti.openzoo.util.Utilities;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -56,16 +49,19 @@ public class OpenZooBeholder implements Runnable {
                 {
                     log.info("Parameter changes detected in KV, resetting service");
                     // call service reset interface
-                    // http://83.212.104.117:8080/OpenZooTemplateService/resources/test?action=reset
                     String getCall = "http://" + serverHostname + ":" + serverPort + "/" + parameters.getGeneral().getComponentID() + parameters.getGeneral().getPath() + "?action=reset";
                     log.debug("Calling: " + getCall);
-                    String response = callGET(getCall);
+                    String response = util.callGET(new URL(getCall), null, null);
                     log.debug("Response: " + response);
                 }
             } 
             catch (InterruptedException ex) 
             {
                 log.info("Sleep interrupted: " + ex);
+            }
+            catch (IOException ex) 
+            {
+                log.info("IOException while beholder calls reset: " + ex);
             }
         }
         
@@ -76,7 +72,6 @@ public class OpenZooBeholder implements Runnable {
      * Method setBasicRegistrationParameters
      * 
      * Deserialize and get basic parameters about web service
-     * Create web service seperate folder inside the local directory reserved for web services
      * 
      * @param fbs String, the serialized parameters object
      * 
@@ -138,62 +133,5 @@ public class OpenZooBeholder implements Runnable {
         }
         
         return false;
-    }
-    
-    private String callGET(String urlstr)
-    {
-        String output;
-
-        try
-        {
-            URL url = new URL(urlstr);
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            // you need the following if you pass server credentials
-            // httpCon.setRequestProperty("Authorization", "Basic " + new BASE64Encoder().encode(servercredentials.getBytes()));
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("GET");
-            output = convertStreamToString(httpCon.getInputStream());
-            output = "" + httpCon.getResponseCode() + "\n" + httpCon.getResponseMessage() + "\n" + output;
-        }
-        catch (IOException e)
-        {
-            output = "IOException during GET: " + e;
-        }
-
-        return output;
-    }
-    
-    private static String convertStreamToString(InputStream is) throws IOException {
-	//
-	// To convert the InputStream to String we use the
-	// Reader.read(char[] buffer) method. We iterate until the
-	// Reader return -1 which means there's no more data to
-	// read. We use the StringWriter class to produce the string.
-	//
-	if (is != null) 
-	{
-            Writer writer = new StringWriter();
-
-            char[] buffer = new char[1024];
-            try 
-            {
-                Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                int n;
-                while ((n = reader.read(buffer)) != -1) 
-                {
-                    writer.write(buffer, 0, n);
-                }
-            } 
-            finally 
-            {
-                is.close();
-            }
-
-            return writer.toString();
-	} 
-	else 
-	{       
-            return "";
-	}
     }
 }

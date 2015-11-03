@@ -10,7 +10,6 @@
       <div class="row">
         <div class="col-md-3">
           <div class="well">
-            <!--<h4><label>name:</label> <span id="topologyName">$(topology_name)</span></h4>-->
             <h4><label>name:</label> <span id="topologyName">${topology_name}</span></h4>
             <form class="form-horizontal" id="topoSubmitForm" method="POST" action="ProcessTopology">
               <input type="hidden" class="form-control" name="topo-name" value="${topology_name}">
@@ -35,17 +34,7 @@
               <div type="button" id="addLinkBtn" class="btn btn-primary"><i class="fa fa-link"></i> Add link</div>
             </form>
           </div> 
-        </div>
-
-        <!--div class="col-md-3">
-        <div class="well">
-        <h4>Add new data path</h4>
-        <div type="button" id="addLinkBtn" class="btn btn-primary"><i class="fa fa-link"></i> Add link</div-->
-        <!--div type="button" id="add1wayLinkBtn" class="btn btn-primary"><i class="fa fa-link"></i> Add 1 way link</div-->
-        <!--div type="button" id="add2wayLinkBtn" class="btn btn-primary"><i class="fa fa-link"></i> Add 2 way link</div-->
-        <!--/div>    
-        </div-->
-      
+        </div>      
       </div>
         
                 <div class="row">
@@ -90,12 +79,6 @@
                     <option value="conn_available">Available</option>
                     <option value="conn_route">Route</option>
                   </select>
-                  <!--
-                  <div id="routing_field">
-                    <label for="routing">routing keys</label>
-                  <input type="text" class="form-control" id="routing" name="routing">
-                  </div>
-                  -->
                   </div>
 
                   </form>
@@ -143,9 +126,9 @@
           <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">OK</button>
           </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /. details modal end -->
+        </div>
+      </div>
+    </div>
 
     <!-- script references -->
     <script src="./libs/jquery/jquery-1.11.3.min.js"></script>
@@ -156,11 +139,6 @@
     <script src="./js/joint.js"></script>
     <script src="./js/joint.shapes.uml.js"></script>
     <script src="./js/umlsc.js"></script>
-
-    <!--script src="./js/joint.shapes.openzoo.js"></script>
-    <script src="./js/openzoo.js"></script-->
-    <!--script src="./js/joint.shapes.devs.js"></script>
-    <script src="./js/devs.js"></script -->
 
     <script>
       var logcontainer = [];

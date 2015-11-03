@@ -10,8 +10,6 @@ public class ServiceParameters implements java.io.Serializable {
     private ParametersMessaging rabbit = new ParametersMessaging();
     private ParametersKeyValue redis = new ParametersKeyValue();
     private ParametersDatabase mongo = new ParametersDatabase();
-    //private HashMap<String, ParametersWorker> workers = new HashMap<String, ParametersWorker>();
-    //private HashMap<String, QueueParameters> queues = new HashMap<String, QueueParameters>();
 
     /**
      * @return the general
@@ -68,21 +66,7 @@ public class ServiceParameters implements java.io.Serializable {
     public void setMongo(ParametersDatabase mongo) {
         this.mongo = mongo;
     }
-    
-    /**
-     * @return the queues
-     */
-//    public HashMap<String, QueueParameters> getQueues() {
-//        return queues;
-//    }
-//
-//    /**
-//     * @param queues the queues to set
-//     */
-//    public void setQueues(HashMap<String, QueueParameters> queues) {
-//        this.queues = queues;
-//    }
-    
+        
     @Override
     public String toString()
     {
@@ -94,19 +78,5 @@ public class ServiceParameters implements java.io.Serializable {
         
         return out;
     }
-
-//    /**
-//     * @return the workers
-//     */
-//    public HashMap<String, ParametersWorker> getWorkers() {
-//        return workers;
-//    }
-//
-//    /**
-//     * @param workers the workers to set
-//     */
-//    public void setWorkers(HashMap<String, ParametersWorker> workers) {
-//        this.workers = workers;
-//    }
     
 }

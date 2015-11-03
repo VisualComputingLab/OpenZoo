@@ -77,9 +77,6 @@
         </div>
       </div><!--/row-->
 
-<!--       <input type="hidden" id="uiLogTextArea">
-</input> -->
-
 
       <div class="clearfix"></div>
     </div>

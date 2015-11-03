@@ -1,21 +1,11 @@
 package gr.iti.openzoo.ui.servlets;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.ConsumerCancelledException;
-import com.rabbitmq.client.QueueingConsumer;
-import com.rabbitmq.client.QueueingConsumer.Delivery;
-import com.rabbitmq.client.ShutdownSignalException;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
+import gr.iti.openzoo.pojos.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,19 +19,11 @@ import org.codehaus.jettison.json.JSONObject;
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
 public class ServiceLogServlet extends HttpServlet {
-    
-    private static int RABBITMQ_DELIVERY_TIMEOUT = 1000;    // msec
-    private static int RABBITMQ_DEFAULT_NUM_MESSAGES = 100;
-    
+        
     private Utilities util;
     private static KeyValueCommunication kv;
     private JSONObject properties;
-    
-    private ConnectionFactory factory = new ConnectionFactory();
-    private Connection connection;
-    protected Channel channel;
-    private QueueingConsumer qconsumer;
-    
+        
     @Override
     public void init()
     {

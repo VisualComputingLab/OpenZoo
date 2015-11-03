@@ -14,9 +14,6 @@
         <div class="well"> 
           <h4>Topologies</h4>
           <ul class="list-group" id='lg-topo'>
-            <!-- <a class="list-group-item active" onclick="TopoSelectedEvent('TopoTest');"><span class="badge">Started</span> TopoTest</a>
-            <a class="list-group-item" onclick="console.log('TopoTwo clicked');"><span class="badge">Deployed</span> TopoTwo</a> 
-            <a class="list-group-item disabled" onclick="console.log('TopoThree clicked');"><span class="badge">Designed</span> TopoThree</a>  -->
           </ul>
           <input type="hidden" class="form-control" id="selectedTopo" value="">
         </div>
@@ -27,8 +24,6 @@
         <div class="well clearfix"> 
           <h4>Components</h4>
           <ul class="list-group" id='lg-comp'>
-            <!-- <a class="list-group-item active" onclick="console.log('TwitterCrawler clicked');"> TwitterCrawler</a>
-            <a class="list-group-item" onclick="console.log('URLValidator clicked');"> URLValidator</a>  -->
           </ul>
           <form class="form-horizontal" method="POST" action="Configurations" id="updateComponentForm">
             <input type="hidden" class="form-control" name="cnf-action" id="cnf-action" >
@@ -36,8 +31,6 @@
             <input type="hidden" class="form-control" name="cnf-service" id="cnf-service" >
             <div type="button" id="resetCompBtn" class="btn btn-success pull-left" style="width: 45%;"><i class="fa fa-step-backward"></i> Reset</div>
             <div type="button" id="redeployCompBtn" class="btn btn-success pull-right" style="width: 45%;"><i class="fa fa-exchange"></i> Redeploy</div>
-            <!-- <button class="btn btn-success pull-left" id="resetCompBtn" style="width: 45%;" onclick="resetComponent();">Reset</button>
-            <button class="btn btn-success pull-right" id="redeployCompBtn" style="width: 45%;" onclick="redeployComponent();">Redeploy</button> -->
           </form>
           <input type="hidden" class="form-control" id="selectedComponent" value="">
         </div>
@@ -58,17 +51,12 @@
         <div class="well"> 
           <h4>Servers (Instances)</h4>
           <ul class="list-group" id='lg-serv'>
-            <!-- <a class="list-group-item active" onclick="console.log('vseen clicked');"><span class="badge">Running</span> vseen</a>
-            <a class="list-group-item" onclick="console.log('basement_107 clicked');"><span class="badge">Running</span> basement_107</a>  -->
           </ul>
           <input type="hidden" class="form-control" id="selectedServer" value="">
         </div>
         <div class="well"> 
           <h4>Endpoints (Component level)</h4>
           <ul class="list-group" id='lg-endp-comp'>
-            <!-- <li class="list-group-item"><span class="badge">3213 (323.5 Kb)</span> input</li>
-            <li class="list-group-item"><span class="badge">2 (23.2 Kb)</span> output_1</li> 
-            <li class="list-group-item"><span class="badge">11 (300.3 Kb)</span> output_2</li>  -->
           </ul>
         </div>
       </div>
@@ -80,32 +68,11 @@
         <div class="well"> 
           <h4>Server load</h4>
           <ul class="list-group" id='lg-serv-load'>
-            <!-- <a href="#" class="list-group-item">
-              <h5 class="list-group-item-heading">CPU</h5>
-              <div class="progress">
-                <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="23" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 23%;">23 %</div>
-              </div>
-            </a>
-            <a href="#" class="list-group-item">
-              <h5 class="list-group-item-heading">Memory (235.3 MB free)</h5>
-              <div class="progress">
-                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 67%;">67 %</div>
-              </div>
-            </a>
-            <a href="#" class="list-group-item">
-              <h5 class="list-group-item-heading">Disc (1234.4 MB free)</h5>
-              <div class="progress">
-                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="14" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 14%;">14 %</div>
-              </div>
-            </a> -->
           </ul>
         </div>
         <div class="well"> 
           <h4>Endpoints (Instance level)</h4>
           <ul class="list-group"  id='lg-endp-serv'>
-            <!-- <li class="list-group-item"><span class="badge">3213 (323.5 Kb)</span> input</li>
-            <li class="list-group-item"><span class="badge">2 (23.2 Kb)</span> output_1</li> 
-            <li class="list-group-item"><span class="badge">11 (300.3 Kb)</span> output_2</li>  -->
           </ul>
         </div>
       </div>

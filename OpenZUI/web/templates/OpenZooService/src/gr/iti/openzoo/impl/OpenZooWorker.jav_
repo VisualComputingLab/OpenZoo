@@ -33,12 +33,11 @@ public abstract class OpenZooWorker implements Runnable {
     
     protected HashMap<String, JSONObject> requests = new HashMap<>();
     
-    public OpenZooWorker(String name)//, String webpath)
+    public OpenZooWorker(String name)
     {
         log.debug("-- OpenZooWorker()");
         
         this.thread_name = name;
-        //this.webAppPath = webpath;
     }
     
     public abstract boolean doWork(Message message);

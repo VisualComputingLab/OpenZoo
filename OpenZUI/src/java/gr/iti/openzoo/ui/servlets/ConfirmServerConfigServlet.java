@@ -5,10 +5,9 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
-import gr.iti.openzoo.ui.Triple;
-import gr.iti.openzoo.ui.WarFile;
-import static gr.iti.openzoo.ui.servlets.TopologiesServlet.cfg;
+import gr.iti.openzoo.pojos.Topology;
+import gr.iti.openzoo.pojos.Triple;
+import gr.iti.openzoo.pojos.WarFile;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ public class ConfirmServerConfigServlet extends HttpServlet {
     private Deployer deployer;
     private ArrayList<String> logs = new ArrayList<>();
 
+    @Override
     public void init()
     {
         kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
@@ -56,10 +56,8 @@ public class ConfirmServerConfigServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        //String action = request.getParameter("action");
         String name = request.getParameter("topo-name");
         Topology topo = kv.getTopology(name);
-//        ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
         ArrayList<JSONObject> triples = new ArrayList<>();
         logs.addAll(deployer.produceServerConfiguration(topo, triples));
         

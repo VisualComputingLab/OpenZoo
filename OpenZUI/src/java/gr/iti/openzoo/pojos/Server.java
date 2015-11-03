@@ -1,5 +1,6 @@
-package gr.iti.openzoo.ui;
+package gr.iti.openzoo.pojos;
 
+import gr.iti.openzoo.ui.Utilities;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;

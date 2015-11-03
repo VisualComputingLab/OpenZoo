@@ -2,7 +2,7 @@ package gr.iti.openzoo.ui.servlets;
 
 import freemarker.template.Configuration;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
+import gr.iti.openzoo.pojos.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
 import javax.servlet.ServletException;

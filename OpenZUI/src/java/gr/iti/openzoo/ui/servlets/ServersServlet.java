@@ -5,7 +5,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Server;
+import gr.iti.openzoo.pojos.Server;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -60,7 +60,6 @@ public class ServersServlet extends HttpServlet {
         
         // Fill data model from redis
         ArrayList<Server> allServers = kv.getServers();
-//        System.out.println("num of servers in redis: " + allServers.size());
         
         for (Server srv : allServers)
         {
@@ -117,8 +116,6 @@ public class ServersServlet extends HttpServlet {
         String action = request.getParameter("action");
         String name = request.getParameter("srv-name");
         
-//        System.out.println("POST Servers: action = " + action + ", name = " + name);
-        
         if (action.equalsIgnoreCase("delete") && name != null)
         {
             Server srv = kv.getServer(name, true);
@@ -169,9 +166,7 @@ public class ServersServlet extends HttpServlet {
         String pass = request.getParameter("tmc-pass");
         
         Server srv = new Server(name, address, port, user, pass);
-        
-//        System.out.println("ServersServlet::POST called: " + request);
-        
+                
         // add or update new server to redis
         kv.putServer(srv);
         

@@ -57,7 +57,6 @@ import org.codehaus.jettison.json.JSONObject;
  * Utilities class
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
- * @author Dimitris Samaras <dimitris.samaras@iti.gr>
  */
 public class Utilities {
     

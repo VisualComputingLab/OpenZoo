@@ -3,9 +3,7 @@ package gr.iti.openzoo.ui.servlets;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import static gr.iti.openzoo.ui.servlets.TopologiesServlet.cfg;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -105,6 +103,6 @@ public class InstallServersServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Cluster creation";
     }// </editor-fold>
 }

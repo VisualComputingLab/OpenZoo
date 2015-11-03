@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class ParametersWorker {
 
     private String id = null;
-    private HashMap<String, ParametersEndpoint> endpoints = new HashMap<String, ParametersEndpoint>();
+    private HashMap<String, ParametersEndpoint> endpoints = new HashMap<>();
 
     /**
      * @return the id

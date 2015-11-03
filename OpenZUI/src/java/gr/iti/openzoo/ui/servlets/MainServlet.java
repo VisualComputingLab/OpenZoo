@@ -4,7 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
+import gr.iti.openzoo.pojos.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,9 +23,6 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class MainServlet extends HttpServlet {
 
-//    protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-//    private Utilities util = new Utilities();
-//    private static KeyValueCommunication kv;
     protected static Configuration cfg;
     private Utilities util;
     private static KeyValueCommunication kv;
@@ -62,10 +59,7 @@ public class MainServlet extends HttpServlet {
         ArrayList<Topology> allTopos = kv.getTopologies();
         root.put("topologies", allTopos);
         root.put("logs", logs);
-        
-//        String name = request.getParameter("topo-name");
-//        root.put("topology_name", name);
-        
+                
         response.setContentType("text/html;charset=UTF-8");
         
         try (PrintWriter out = response.getWriter())

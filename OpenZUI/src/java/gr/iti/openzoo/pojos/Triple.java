@@ -1,4 +1,4 @@
-package gr.iti.openzoo.ui;
+package gr.iti.openzoo.pojos;
 
 /**
  *

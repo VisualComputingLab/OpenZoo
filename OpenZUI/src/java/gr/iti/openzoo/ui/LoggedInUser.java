@@ -10,7 +10,6 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class LoggedInUser {
 
-//    private static KeyValueCommunication kv;
     private Utilities util = new Utilities();
     
     private String email = null;

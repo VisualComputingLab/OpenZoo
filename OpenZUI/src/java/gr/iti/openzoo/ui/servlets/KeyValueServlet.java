@@ -2,11 +2,10 @@ package gr.iti.openzoo.ui.servlets;
 
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.MessageStatistics;
-import gr.iti.openzoo.ui.RepositoryParameters;
-import gr.iti.openzoo.ui.Server;
-import gr.iti.openzoo.ui.Topology;
+import gr.iti.openzoo.pojos.Server;
+import gr.iti.openzoo.pojos.Topology;
 import gr.iti.openzoo.ui.Utilities;
-import gr.iti.openzoo.ui.WarFile;
+import gr.iti.openzoo.pojos.WarFile;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -120,13 +119,6 @@ public class KeyValueServlet extends HttpServlet {
                         if (topo != null)
                             json.put("response", topo.toJSON());
                     }
-                    break;
-
-                case "repository":
-
-                    RepositoryParameters repo = kv.getRepositoryParameters();
-                    if (repo != null)
-                        json.put("response", repo.toJSON());
                     break;
                     
                 case "topoconf":

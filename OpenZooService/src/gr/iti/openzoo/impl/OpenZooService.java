@@ -19,7 +19,6 @@ import org.codehaus.jettison.json.JSONObject;
 /**
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
- * @author Dimitris Samaras <dimitris.samaras@iti.gr>
  */
 public abstract class OpenZooService {
 
@@ -28,28 +27,15 @@ public abstract class OpenZooService {
     protected ServiceParameters parameters = new ServiceParameters();
     protected JSONObject properties;
     protected static List<Connection> allConnections;
-    protected int parallelismIdx = 1;
     protected KeyValueCommunication kv;
     protected ArrayList<OpenZooWorker> workerUnion;
     protected HashSet<String> workerClasses;
     protected String realPath;
         
-    /**
-     * The class constructor
-     * <br />
-     * Retrieve values from the KV app folder about complementary services
-     *
-     * @param jsonObject JSONObject, the Rest post call payload
-     *
-     */
     public OpenZooService(String appName)
-    {
-        //Configurator.initialize(OpenZooService.class.getName(), ".");
-                
+    {                
         log.debug("-- OpenZooService()");
 
-        // Abandoned, because it's global
-        //realPath = System.getProperty("ApplicationPath");
         if ((new File("./webapps/")).exists())
             realPath = (new File("./webapps/" + appName)).getAbsolutePath();    // linux
         else realPath = (new File("../webapps/" + appName)).getAbsolutePath();  // windows
@@ -73,14 +59,8 @@ public abstract class OpenZooService {
         
         
         readParametersFromKV();
-        
-
-        //JSONObject json = new JSONObject(kv.getValue("queue"));
-        
+                
         // worker and endpoint parameters already there
-        
-        //log.debug(parameters.toString());
-
         
         workerUnion = new ArrayList<>();
         workerClasses = new HashSet<>();
@@ -163,7 +143,6 @@ public abstract class OpenZooService {
             {
                 Class<?> clazz = Class.forName(className);
                 Constructor<?> ctor = clazz.getConstructor(String.class);
-                //Object[] params = new Object[] {"test consumer xx"};
                 
                 String threadName;
                 int i;
@@ -174,7 +153,6 @@ public abstract class OpenZooService {
                     
                     OpenZooWorker consumer = (OpenZooWorker) ctor.newInstance(threadName);
                     
-//                    addWorker(consumer);
                     consumer.setServiceParameters(parameters);
                     workerUnion.add(consumer);
                     workerClasses.add(className);
@@ -294,7 +272,6 @@ public abstract class OpenZooService {
     public JSONObject status()
     {
         log.debug("-- OpenZooService.statusWorkers");
-        int i = 0;
         JSONObject response;
         
         try

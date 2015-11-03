@@ -5,7 +5,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
+import gr.iti.openzoo.pojos.Topology;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -125,6 +125,6 @@ public class ConfigurationsServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Running topology statistics";
     }// </editor-fold>
 }

@@ -15,7 +15,6 @@ import org.codehaus.jettison.json.JSONObject;
  * notification events about ServletContext life cycle changes.
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
- * @author Dimitris Samaras <dimitris.samaras@iti.gr>
  *
  */
 public class OpenZooContextListener implements ServletContextListener {
@@ -33,18 +32,9 @@ public class OpenZooContextListener implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        /*
-         * The ServletContext.getRealPath() converts a web content path 
-         * (the path in the expanded WAR folder structure on the server's disk file system)
-         * to an absolute disk file system path.
-         * The "/" represents the web content root.
-         */
-
+        
         sc = sce.getServletContext();
         REALPATH = sc.getRealPath("/");
-        // Abandoned, because it's global
-        //System.setProperty("ApplicationPath", REALPATH);
-        //System.out.println("ApplicationPath set!");
 
         /*
          * UUID is created during web service utilization on the OpenZoo framework UI

@@ -1,5 +1,7 @@
 package gr.iti.openzoo.ui;
 
+import gr.iti.openzoo.pojos.WarFile;
+import gr.iti.openzoo.pojos.Server;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

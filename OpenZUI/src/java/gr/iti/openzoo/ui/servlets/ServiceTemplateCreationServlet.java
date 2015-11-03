@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -269,7 +268,6 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         // first create the component files using the templates
         for (int i = 0; i < files.length; i++)
         {
-//            filename = baseDir + "/" + files[i];
             filename = files[i];
 
             tmpl = cfg.getTemplate(templDir + "/" + filename + ".ftl");

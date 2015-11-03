@@ -1,5 +1,10 @@
 package gr.iti.openzoo.ui;
 
+import gr.iti.openzoo.pojos.TopologyGraphNode;
+import gr.iti.openzoo.pojos.TopologyGraphConnection;
+import gr.iti.openzoo.pojos.WarFile;
+import gr.iti.openzoo.pojos.Topology;
+import gr.iti.openzoo.pojos.Server;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -334,61 +339,6 @@ public class KeyValueCommunication {
         catch (Exception ex)
         {
             error("Redis exception (putServer)", ex);
-        }
-    }
-    
-    public RepositoryParameters getRepositoryParameters()
-    {
-        return getRepositoryParameters(false);
-    }
-    
-    public RepositoryParameters getRepositoryParameters(boolean delete)
-    {        
-        String key = "repository";
-        
-        try (Jedis jedis = pool.getResource())
-        {
-            Map<String, String> prop = jedis.hgetAll(key);
-
-            if (delete)
-            {
-                jedis.del(key);
-            }
-
-            RepositoryParameters params;
-
-            if (prop == null || prop.isEmpty())
-                params = new RepositoryParameters("localhost", 21, "anonymous", "", "/");
-            else params = new RepositoryParameters(prop.get("host"), Integer.parseInt(prop.get("port")), prop.get("user"), prop.get("passwd"), prop.get("path"));
-
-            return params;
-        }
-        catch (Exception ex)
-        {
-            error("Redis exception (getRepositoryParameters)", ex);
-        }
-        
-        return null;
-    }
-    
-    public void putRepositoryParameters(RepositoryParameters params)
-    {
-        Map<String, String> prop = new HashMap<>();
-        
-        prop.put("host", params.getHost());
-        prop.put("port", "" + params.getPort());
-        prop.put("user", params.getUser());
-        prop.put("passwd", params.getPasswd());
-        prop.put("path", params.getPath());
-        
-        try (Jedis jedis = pool.getResource())
-        {
-            jedis.del("repository");
-            jedis.hmset("repository", prop);
-        }
-        catch (Exception ex)
-        {
-            error("Redis exception (putRepositoryParameters)", ex);
         }
     }
     

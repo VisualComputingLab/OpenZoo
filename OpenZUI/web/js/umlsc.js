@@ -1,3 +1,5 @@
+// @author Dimitris Samaras <dimitris.samaras@iti.gr>
+
 var warfiles = {};
 // the graph configuration object
 var graphConf = [];

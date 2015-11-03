@@ -1,5 +1,6 @@
-package gr.iti.openzoo.ui;
+package gr.iti.openzoo.pojos;
 
+import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,8 +37,6 @@ public class Topology {
     
     public enum Status { CREATED, DESIGNED, SEMIDEPLOYED, DEPLOYED, SEMISTARTED, STARTED }
     
-    //private static Utilities util = new Utilities();
-
     public Topology(String n, String d, String rh, int rp, String ru, String rps, String mh, int mp, String mu, String mps)
     {
         name = n;
