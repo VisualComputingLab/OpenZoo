@@ -5,9 +5,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
-import gr.iti.openzoo.ui.Topology;
-import gr.iti.openzoo.ui.Triple;
-import gr.iti.openzoo.ui.WarFile;
 import static gr.iti.openzoo.ui.servlets.TopologiesServlet.cfg;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,30 +15,26 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class ConfirmServerConfigServlet extends HttpServlet {
-    
+public class InstallServersServlet extends HttpServlet {
+
     protected static Configuration cfg;
     private static KeyValueCommunication kv;
     private JSONObject properties;
-    private Deployer deployer;
     private ArrayList<String> logs = new ArrayList<>();
-
+    
+    @Override
     public void init()
     {
         kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
-        
-        deployer = new Deployer(properties, kv);
-    }  
+    }    
     
     /**
      * Processes requests for both HTTP
@@ -55,45 +48,16 @@ public class ConfirmServerConfigServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        //String action = request.getParameter("action");
-        String name = request.getParameter("topo-name");
-        Topology topo = kv.getTopology(name);
-//        ArrayList<Triple<String, WarFile, JSONObject>> triples = new ArrayList<>();
-        ArrayList<JSONObject> triples = new ArrayList<>();
-        logs.addAll(deployer.produceServerConfiguration(topo, triples));
-        
-        // split instances to server buckets
-        HashMap<String, ArrayList<JSONObject>> server2instances = new HashMap<>();
-        String server_id;
-        ArrayList<JSONObject> instances;
-        
-        for (JSONObject triple : triples)
-        {
-            server_id = triple.optString("server_id");
-            instances = server2instances.get(server_id);
-            if (instances == null)
-            {
-                instances = new ArrayList<>();
-                server2instances.put(server_id, instances);
-            }
-            instances.add(triple);
-        }
-        
-        // build page using the triples
-        Template confirm_config = cfg.getTemplate("confirm_config.ftl");
+        Template servinst_tmpl = cfg.getTemplate("install_servers.ftl");
         
         Map<String, Object> root = new HashMap<>();
-                
-        root.put("topology_name", name);
-        root.put("server2instances", server2instances);
         root.put("logs", logs);
         
         response.setContentType("text/html;charset=UTF-8");
         
         try (PrintWriter out = response.getWriter())
         {
-            confirm_config.process(root, out);
+            servinst_tmpl.process(root, out);
         }
         catch (TemplateException ex)
         {
@@ -131,35 +95,7 @@ public class ConfirmServerConfigServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         logs.clear();
-        String action = request.getParameter("action");
-        String name = request.getParameter("topo-name");
-        Topology topo = kv.getTopology(name);
-        ArrayList<Triple<String, WarFile, JSONObject>> triples;
-        
-        if (action.equalsIgnoreCase("create_config")) //comes from TopologiesServlet.deploy
-        {
-            processRequest(request, response);
-        }
-        else if (action.equalsIgnoreCase("deploy_services"))// comes from self.submit
-        {
-            String s_configJson = request.getParameter("topo-config");
-            if (s_configJson != null && !s_configJson.isEmpty())
-            {
-                JSONArray configJson;
-                try
-                {
-                    configJson = new JSONArray(s_configJson);
-                    logs.addAll(deployer.deployTopologyServices(topo, configJson));
-                }
-                catch (JSONException e)
-                {
-                    System.err.println("JSONException while parsing configuration: " + e);
-                    logs.add("ERROR:" + "JSONException while parsing configuration: " + e);
-                }
-            }
-            response.setStatus(HttpServletResponse.SC_SEE_OTHER);
-            response.setHeader("Location", "Topologies");       
-        }        
+        processRequest(request, response);
     }
 
     /**
@@ -169,6 +105,6 @@ public class ConfirmServerConfigServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Server config confirmation";
+        return "Short description";
     }// </editor-fold>
 }

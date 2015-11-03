@@ -45,6 +45,10 @@
         <filter-name>MemberLoginFilter</filter-name>
         <url-pattern>/ServiceLogServlet</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>MemberLoginFilter</filter-name>
+        <url-pattern>/InstallServers</url-pattern>
+    </filter-mapping>
     <error-page>
         <error-code>401</error-code>
         <location>/denied.jsp</location>
@@ -101,6 +105,10 @@
         <servlet-name>ConfirmServerConfig</servlet-name>
         <servlet-class>gr.iti.openzoo.ui.servlets.ConfirmServerConfigServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>InstallServers</servlet-name>
+        <servlet-class>gr.iti.openzoo.ui.servlets.InstallServersServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthorizationServlet</servlet-name>
         <url-pattern>/AuthorizationServlet</url-pattern>
@@ -148,6 +156,10 @@
     <servlet-mapping>
         <servlet-name>ConfirmServerConfig</servlet-name>
         <url-pattern>/ConfirmServerConfig</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>InstallServers</servlet-name>
+        <url-pattern>/InstallServers</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

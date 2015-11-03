@@ -5,7 +5,7 @@
     <#include "navigation.ftl">
 
 <!--main-->
-<div class="container" id="main">
+<div class="container page-wrap" id="main">
   <div class="row">
 
     <div class="col-md-6 col-sm-12">
@@ -138,17 +138,9 @@
 
   <div class="clearfix"></div>
       
-  <hr>
-  <div class="col-md-12 text-center">
-    <p>
-      <a href="http://openzoo.org" target="_ext">openzoo website</a>
-      <br>
-      <a href="http://vcl.iti.gr" target="_ext">vcl@iti.gr</a> || <a href="http://www.certh.gr" target="_ext">CERTH</a>
-    </p>
-  </div>
-  <hr>
-
 </div><!--/main-->
+
+<#include "footer.ftl">
 
 
   <#include "login-about.ftl">

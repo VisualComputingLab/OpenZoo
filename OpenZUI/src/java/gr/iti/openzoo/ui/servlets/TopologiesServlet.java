@@ -6,8 +6,6 @@ import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
 import gr.iti.openzoo.ui.KeyValueCommunication;
 import gr.iti.openzoo.ui.Topology;
-import gr.iti.openzoo.ui.Triple;
-import gr.iti.openzoo.ui.WarFile;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;

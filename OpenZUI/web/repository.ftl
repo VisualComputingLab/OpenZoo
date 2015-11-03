@@ -5,13 +5,13 @@
     <#include "navigation.ftl">
 
 <!--main-->
-<div class="container" id="main">
+<div class="container page-wrap" id="main">
   <div class="row">
   
 
   	<div class="col-md-4 col-sm-6">
 
-      <div class="panel panel-default">
+      <!-- <div class="panel panel-default">
         <div class="panel-heading">
           <h4>Create service template</h4>
           <form class="form-horizontal" action="Templates" method="GET">
@@ -22,7 +22,7 @@
             </div>
           </form>
         </div>
-      </div>
+      </div> -->
 
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -93,7 +93,7 @@
     <div class="col-md-8 col-sm-6">
          
       <div class="panel panel-default">
-        <div class="panel-heading"><a href="#" class="pull-right">View all</a> <h4>WAR files in repo</h4></div>
+        <div class="panel-heading"><h4>WAR files in repo</h4></div>
         <div class="panel-body">
           <div class="table-responsive">
             <table class="table table-condensed table-hover">
@@ -148,20 +148,12 @@
  
   	
     <div class="clearfix"></div>
-      
-    <hr>
-    <div class="col-md-12 text-center">
-      <p>
-        <a href="http://openzoo.org" target="_ext">openzoo website</a>
-        <br>
-        <a href="http://vcl.iti.gr" target="_ext">vcl@iti.gr</a> || <a href="http://www.certh.gr" target="_ext">CERTH</a>
-      </p>
-    </div>
-    
+          
     
   </div>
 </div><!--/main-->
 
+<#include "footer.ftl">
 
 <!-- details modal-->
 <div class="modal fade" id="detailsModal">

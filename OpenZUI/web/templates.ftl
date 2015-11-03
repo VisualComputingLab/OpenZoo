@@ -5,10 +5,10 @@
     <#include "navigation.ftl">
 
 <!--main-->
-<div class="container" id="main">
+<div class="container page-wrap" id="main">
   <div class="row">
   
-  	<div class="col-md-12 col-sm-6">
+  	<div class="col-md-6 col-sm-6 col-md-offset-3">
       <div class="well"> 
         <form class="form-horizontal" id="template_create" method="POST" action="Templates">
           <h4>Template parameters</h4>
@@ -59,16 +59,16 @@
             </div>
           </div>
           <div class="form-group">
+            <label for="tmpl-numOutputs" class="col-sm-4 control-label">Number of output endpoints</label>
+            <div class="col-sm-8">
+              <input type="number" class="form-control" name="tmpl-numOutputs" id="tmpl-numOutputs" min="0" max="10" value="1">
+            </div>
+          </div>
+          <div class="form-group">
             <label for="tmpl-hasInput" class="col-sm-4 control-label">Has input endpoint</label>
             <div class="col-sm-4">
               <!-- <input type="checkbox" class="form-control" name="tmpl-hasInput" id="tmpl-hasInput" value="O" checked> -->
               <input type="checkbox" class="form-control" data-toggle="toggle" data-on="<i class='fa fa-plug'></i> Yes" data-off="<i class='fa fa-times'></i> No" data-onstyle="success" data-offstyle="warning" id="tmpl-hasInput" name="tmpl-hasInput" value="O" data-width="100%" checked>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="tmpl-numOutputs" class="col-sm-4 control-label">Number of output endpoints</label>
-            <div class="col-sm-4">
-              <input type="number" class="form-control" name="tmpl-numOutputs" id="tmpl-numOutputs" min="0" max="10" value="1">
             </div>
           </div>
           <div class="form-group">
@@ -116,17 +116,9 @@
   	
   <div class="clearfix"></div>
       
-  <hr>
-  <div class="col-md-12 text-center">
-    <p>
-      <a href="http://openzoo.org" target="_ext">openzoo website</a>
-      <br>
-      <a href="http://vcl.iti.gr" target="_ext">vcl@iti.gr</a> || <a href="http://www.certh.gr" target="_ext">CERTH</a>
-    </p>
-  </div>
 </div><!--/main-->
 
-
+<#include "footer.ftl">
 
 
 

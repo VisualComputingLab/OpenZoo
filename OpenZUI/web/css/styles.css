@@ -103,14 +103,23 @@ h3,h4,h5 {
  padding-top:120px;
 }
 
+.fa-wrench {
+color: rgb(255, 162, 0);
+}
 .fa-server {
-color: red;
+color: rgb(0, 160, 62);
+}
+.fa-cloud-download {
+color: rgb(36, 168, 172);
 }
 .fa-cloud-upload {
-color: blue;
+color: rgb(0, 135, 203);
 }
 .fa-cubes {
-color: green;
+color: rgb(152, 35, 149);
+}
+.fa-cogs {
+color: rgb(235, 101, 160);
 }
 
 .active{
@@ -169,4 +178,39 @@ top: 100;
 .list-group-horizontal .list-group-item:last-child {
 	border-top-right-radius:4px;
 	border-bottom-left-radius:0;
+}
+
+.p1tab {
+	padding-left:3em;
+}
+
+.p2tab {
+	padding-left:6em;
+}
+
+* {
+  margin: 0;
+}
+html, body {
+  height: 100%;
+}
+.page-wrap {
+  min-height: 100%;
+  /* equal to footer height */
+  margin-bottom: -142px; 
+}
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+.site-footer, .page-wrap:after {
+  height: 142px; 
+}
+.site-footer {
+  /*background: orange;*/
+}
+
+.pblock {
+	max-width: 300px;
+	min-height: 50px;
 }
