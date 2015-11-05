@@ -1,0 +1,26 @@
+{
+    "service":
+    {
+        "component_id": "ImageDownloader",
+        "name": "ImageDownloaderService",
+        "path": "/resources/manage",
+        "description": "A service for downloading images"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.ImageDownloaderWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "input",
+                    "type": "in"
+                },
+                {
+                    "endpoint_id": "output_1",
+                    "type": "out"
+                }
+            ]
+        }
+    ]
+}

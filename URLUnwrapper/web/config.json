@@ -1,0 +1,30 @@
+{
+    "service":
+    {
+        "component_id": "URLUnwrapper",
+        "name": "URLUnwrapperService",
+        "path": "/resources/manage",
+        "description": "A service for extracting valid URLs out of tweets"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.URLUnwrapperWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "input",
+                    "type": "in"
+                },
+                {
+                    "endpoint_id": "output_1",
+                    "type": "out"
+                },
+                {
+                    "endpoint_id": "output_2",
+                    "type": "out"
+                }
+            ]
+        }
+    ]
+}

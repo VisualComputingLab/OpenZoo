@@ -59,55 +59,55 @@
     </listener>
     <servlet>
         <servlet-name>AuthorizationServlet</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.AuthorizationServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.AuthorizationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Servers</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.ServersServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.ServersServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Repository</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.RepositoryServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.RepositoryServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Topologies</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.TopologiesServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.TopologiesServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DrawTopology</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.DrawTopologyServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.DrawTopologyServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProcessTopology</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.ProcessTopologyServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.ProcessTopologyServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>KeyValueServlet</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.KeyValueServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.KeyValueServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Main</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.MainServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.MainServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ServiceLogServlet</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.ServiceLogServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.ServiceLogServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ServiceTemplateCreation</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.ServiceTemplateCreationServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.ServiceTemplateCreationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Configurations</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.ConfigurationsServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.ConfigurationsServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ConfirmServerConfig</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.ConfirmServerConfigServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.ConfirmServerConfigServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>InstallServers</servlet-name>
-        <servlet-class>gr.iti.openzoo.ui.servlets.InstallServersServlet</servlet-class>
+        <servlet-class>gr.iti.openzoo.servlets.InstallServersServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AuthorizationServlet</servlet-name>

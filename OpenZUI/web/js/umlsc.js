@@ -348,9 +348,9 @@ $(document).ready(function() {
         else {
             graph.addCells(services);
         }
-        var opt = {};
-        opt.padding = 10;
-        paper.scaleContentToFit(opt);
+        // var opt = {};
+        // opt.padding = 10;
+        // paper.scaleContentToFit(opt);
     });
 
 

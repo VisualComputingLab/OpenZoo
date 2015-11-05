@@ -75,6 +75,9 @@ $(document).ready(function(){
 
 function FillTopologyBox(){
 
+    $('#redeployCompBtn').hide();
+    $('#resetCompBtn').hide();
+        
     var URL = "/OpenZUI/KeyValueServlet?action=topology";
 
     $.getJSON(URL, function(result){
@@ -286,7 +289,7 @@ function ServSelectedEvent(element, topo_name, service_id, server_id){
         var URL = "/OpenZUI/KeyValueServlet?action=server&name="+server_id;
         $.getJSON(URL, function(result){
             if (result.response == null) return;
-            var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerStatistics/resources/stats";
+            var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerResources/resources/manage";
             $.getJSON(StatsURL, function(sresult){
                 var cpu = Math.floor(sresult.cpu.systemCpuLoad * 100.0);
                 var memFree = sresult.mem.physicalFree;

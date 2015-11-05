@@ -32,7 +32,7 @@ $(document).ready(function(){/* jQuery toggle layout */
         $("#tmc-upd-pass").val(result.response.passwd);
         $("#tmc-upd-status").val(result.response.status);
 
-        var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerStatistics/resources/stats";
+        var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerResources/resources/manage";
         $.getJSON(StatsURL, function(sresult){
             $("#stats-cpu").val("" + Math.floor(sresult.cpu.systemCpuLoad * 100.0) + " %");
             $("#stats-mem").val("" + Math.floor(sresult.mem.physicalFree / 1024 / 1024) + " MB free / " + Math.floor(sresult.mem.physicalTotal / 1024 / 1024) + " MB total");
