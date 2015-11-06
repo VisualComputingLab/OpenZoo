@@ -422,7 +422,7 @@ public class Topology {
         HashMap<String, JSONArray> config = new HashMap<>();
         HashMap<String, JSONArray> objid2inst = new HashMap<>();
         String id;
-        JSONArray conf, json_i2k;
+        JSONArray conf, json_i2k, jarr_tmp;
         JSONObject property;
         
         try
@@ -432,7 +432,9 @@ public class Topology {
             for (int i = 0; i < graphConfiguration.length(); i++)
             {
                 JSONObject objs = graphConfiguration.getJSONObject(i);
-                config.put(objs.getString("objectId"), objs.getJSONArray("conf"));
+                jarr_tmp = objs.optJSONArray("conf");
+                if (jarr_tmp == null) continue;
+                config.put(objs.getString("objectId"), jarr_tmp);
                 if (objs.has("instances"))
                 {
                     objid2inst.put(objs.getString("objectId"), objs.getJSONArray("instances"));
@@ -490,6 +492,10 @@ public class Topology {
                         source_worker = target_worker = source_endpoint = target_endpoint = mapstr = routkeys = "";
                         
                         conf = config.get(id);
+                        if (conf == null)
+                        {
+                            continue;
+                        }
                         for (int j = 0; j < conf.length(); j++)
                         {
                             property = conf.getJSONObject(j);
