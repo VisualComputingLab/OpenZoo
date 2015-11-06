@@ -29,7 +29,7 @@
   </div>
   
 
-  <h3>A. General requirements for various framework components</h3>
+  <h3>A. Definition and requirements for various framework components</h3>
   <div class="row">
     <div class="panel-group" id="accordionA">
 
@@ -41,7 +41,7 @@
         </div>
         <div id="collapseA1" class="panel-collapse collapse">
           <div class="panel-body">
-            <p>The OZUI is a Tomcat application and uses RedisIO to store and exchange parameters with the OZServices.</p>
+            <p>The OpenZUI is a Tomcat application and uses RedisIO to store and exchange parameters with the OZServices.</p>
           </div>
         </div>
       </div>
