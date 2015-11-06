@@ -112,6 +112,10 @@ function adjustVertices(graph, cell) {
 
 function connection_manager_reload(sourceId, targetId, theObj, objectId) {
     //else close all forms and clean their fields to reload them
+    //console.log(sourceId +" "+targetId);
+    if (typeof sourceId==="undefined" || typeof targetId==="undefined"){
+        return;
+    }else{
     $('#service_manager').hide();
     $('#connection_manager').hide();
     //$('#routing_field').hide();
@@ -178,6 +182,7 @@ function connection_manager_reload(sourceId, targetId, theObj, objectId) {
     }
 
     $('#connection_manager').show(200);
+}
 }
 
 
@@ -305,6 +310,7 @@ $(document).ready(function() {
 
 
     graph = new joint.dia.Graph;
+    link = new joint.dia.Link;
 
     paper = new joint.dia.Paper({
         el: $('#paper'),
@@ -383,9 +389,9 @@ $(document).ready(function() {
         $('#connection_manager').hide();
         //$('#routing_field').hide();
         $('#routing_manager').hide();
-
-        // console.log(cell);
+ 
         if (("id" in cell.attributes.source) && ("id" in cell.attributes.target)) {
+            console.log(cell); 
             objectId = cell.id;
 
             graphConf = $.grep(graphConf, function(e) {
@@ -397,9 +403,10 @@ $(document).ready(function() {
             var sourceId = cell.attributes.source.id;
             var targetId = cell.attributes.target.id;
 
-            if (sourceId === "undefined" || targetId === "undefined") {
+            if (!("id" in cell.attributes.source) || !("id" in cell.attributes.target)) {
 
-                //console.log("...");
+                console.log("...");
+                cell.remove();
                 return;
 
             }
@@ -616,11 +623,11 @@ $(document).ready(function() {
 
     $("#addLinkBtn").on('click', function() {
 
-        var transitons = [
+        var transitions = [
             new uml.Transition({source: {id: services.hold0.id}, target: {id: services.hold1.id}, attrs: {'.connection': linkAttrs}})
         ];
 
-        graph.addCells(transitons);
+        graph.addCells(transitions);
 
     });
 
