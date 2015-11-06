@@ -498,6 +498,7 @@ public class Utilities {
     {
         File dir = new File(s_dir);
         File[] files = dir.listFiles();
+        if (files == null) return;
         String path;
         for (File file : files)
         {
