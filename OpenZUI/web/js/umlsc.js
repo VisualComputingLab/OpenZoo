@@ -292,6 +292,7 @@ function serializeFormToGraphConf(form, focusObjectId) {
 
 }
 
+
 var graph;
 var paper;
 
@@ -316,8 +317,10 @@ $(document).ready(function() {
 
     paper = new joint.dia.Paper({
         el: $('#paper'),
-        width: 800,
-        height: 600,
+//        width: 800,
+        width: $('#paper').width(),
+//        height: 600,
+        height: $('#paper').width()*3/4,
         gridSize: 1,
         model: graph,
         elementView: ClickableView
@@ -326,16 +329,28 @@ $(document).ready(function() {
     var uml = joint.shapes.uml;
 
     // var servicesCounter = 0;
+    // var services = {
+    //     hold0: new uml.StartState({
+    //         id: "transition-source",
+    //         position: {x: 600, y: 20},
+    //         size: {width: 30, height: 30}
+    //     }),
+    //     hold1: new uml.StartState({
+    //         id: "transition-target",
+    //         position: {x: 700, y: 20},
+    //         size: {width: 30, height: 30}
+    //     })
+    // }
     var services = {
         hold0: new uml.StartState({
             id: "transition-source",
-            position: {x: 600, y: 20},
-            size: {width: 30, height: 30}
+            position: {x: 0.75*$('#paper').width(), y: 0.033*$('#paper').height()},
+            size: {width: 0.0375*$('#paper').width(), height: 0.0375*$('#paper').width()}
         }),
         hold1: new uml.StartState({
             id: "transition-target",
-            position: {x: 700, y: 20},
-            size: {width: 30, height: 30}
+            position: {x: 0.875*$('#paper').width(), y: 0.033*$('#paper').height()},
+            size: {width: 0.0375*$('#paper').width(), height: 0.0375*$('#paper').width()}
         })
     }
 
@@ -356,9 +371,22 @@ $(document).ready(function() {
         else {
             graph.addCells(services);
         }
-        // var opt = {};
-        // opt.padding = 10;
-        // paper.scaleContentToFit(opt);
+
+        var bbox = graph.getBBox(graph.getElements());
+        // console.log("bbox.x = " + bbox.x);
+        // console.log("bbox.y = " + bbox.y);
+        // console.log("bbox.width = " + bbox.width);
+        // console.log("bbox.height = " + bbox.height);
+
+        if ((bbox.x + bbox.width > $('#paper').width()) || (bbox.y + bbox.height > $('#paper').height()))
+        {
+            console.log("Rescaling");
+            var opt = {};
+            opt.padding = 10;
+            // opt.maxScaleX = 1;
+            // opt.maxScaleY = 1;
+            paper.scaleContentToFit(opt);
+        }
     });
 
 
