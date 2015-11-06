@@ -114,7 +114,9 @@ function connection_manager_reload(sourceId, targetId, theObj, objectId) {
     //else close all forms and clean their fields to reload them
     //console.log(sourceId +" "+targetId);
     if (typeof sourceId==="undefined" || typeof targetId==="undefined"){
-        return;
+//        cellD =graph.getCell(objectId);
+//        cellD.remove();
+        return;    
     }else{
     $('#service_manager').hide();
     $('#connection_manager').hide();
@@ -390,8 +392,7 @@ $(document).ready(function() {
         //$('#routing_field').hide();
         $('#routing_manager').hide();
  
-        if (("id" in cell.attributes.source) && ("id" in cell.attributes.target)) {
-            console.log(cell); 
+        if (("id" in cell.attributes.source) && ("id" in cell.attributes.target)) { 
             objectId = cell.id;
 
             graphConf = $.grep(graphConf, function(e) {
@@ -489,7 +490,19 @@ $(document).ready(function() {
         }
     });
 
-
+//    paper.on('cell:pointerup', function(cellView){
+//       var objectType = cellView.model.attributes.type;
+//       if (objectType === 'uml.Transition'){
+//           var sourceId = cellView.model.attributes.source.id;
+//           var targetId = cellView.model.attributes.target.id;
+//           console.log(sourceId);
+//           console.log(targetId);
+//           if (typeof sourceId ==="undefined" ||typeof targetId ==="undefined"){
+//               cellView.remove();
+//           }
+//       }
+//    });
+    
     paper.on('cell:pointerup', myAdjustVertices);
 
     paper.on('cell:pointerdown', function(cellView, evt, x, y) {
@@ -737,7 +750,14 @@ $(document).ready(function() {
 
 
     $("#submitTopoBtn").on('click', function() {
-
+        var tCells =graph.attributes.cells.models;
+        var tFlag=true;
+        for (var c in tCells){
+            if (tCells[c].attributes.type ==="uml.Transition")
+                if (!("id" in tCells[c].attributes.source) || !("id" in tCells[c].attributes.target)){
+                    tFlag=false;
+                }
+        }
         if (graphConf.length != (graph.attributes.cells.models.length - 2)) {
             notDirty = false;
             mArr = [];
@@ -759,6 +779,9 @@ $(document).ready(function() {
             var diff = $(mArr).not(gArr).get();
 
             alertify.error("Check: " + diff)
+        }
+        if (tFlag===false){
+            alertify.error("There are stray links, remove them and submit")
         }
         else {
             notDirty = true;
