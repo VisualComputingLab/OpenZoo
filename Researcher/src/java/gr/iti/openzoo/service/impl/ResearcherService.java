@@ -1,6 +1,7 @@
 package gr.iti.openzoo.service.impl;
 
 import gr.iti.openzoo.impl.OpenZooService;
+import gr.iti.openzoo.impl.OpenZooWorker;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -39,5 +40,23 @@ public class ResearcherService extends OpenZooService {
         }
         
         return response;
+    }
+    
+    public JSONObject post(JSONObject content)
+    {
+        OpenZooWorker ozw = null;
+        
+        if (workerUnion.size() > 0)
+            ozw = (OpenZooWorker) workerUnion.get(0);
+        
+        if (ozw == null) return null;
+        
+        String ticket = ozw.publish(content);
+        int TIMEOUT_IN_SECS = 10;
+        
+        if (ticket != null)
+            return ozw.getResponse(ticket, TIMEOUT_IN_SECS);
+        
+        return null;
     }
 }

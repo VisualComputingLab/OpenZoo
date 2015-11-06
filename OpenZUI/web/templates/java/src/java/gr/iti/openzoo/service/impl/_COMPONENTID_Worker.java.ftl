@@ -29,20 +29,18 @@ import java.net.UnknownHostException;
  *
  * @author ${Author}
  */
-public class ${WorkerID}Worker extends OpenZooWorker {
+public class ${ComponentID}Worker extends OpenZooWorker {
 
 <#if HasInput??>
-    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
+    private final OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
 </#if>
-
 <#if (NumOutputs > 0)>
  <#list 1..NumOutputs as i>
-    private OpenZooOutputConnection outConn_${i} = new OpenZooOutputConnection(this, "output_${i}");
+    private final OpenZooOutputConnection outConn_${i} = new OpenZooOutputConnection(this, "output_${i}");
  </#list>
 </#if>
-
 <#if QueueLogging??>
-    private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
+    private final OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
 </#if>
 
 <#if UsesMongo??>
@@ -50,11 +48,11 @@ public class ${WorkerID}Worker extends OpenZooWorker {
     private DBCollection col_msgs;
 </#if>
     
-    public ${WorkerID}Worker(String threadName)
+    public ${ComponentID}Worker(String threadName)
     {        
         super(threadName);
         
-        log.debug("-- ${WorkerID}Worker()");
+        log.debug("-- ${ComponentID}Worker()");
     }
     
     @Override
@@ -88,7 +86,7 @@ public class ${WorkerID}Worker extends OpenZooWorker {
     @Override
     public void run()
     {
-        log.debug("-- ${WorkerID}Worker.run");
+        log.debug("-- ${ComponentID}Worker.run");
         
 <#if QueueLogging??>
         if (!logConn.init())

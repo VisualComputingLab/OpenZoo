@@ -20,30 +20,18 @@
     </target>
     <target name="-deploy-ant" if="deploy.ant.enabled" depends="-init,-check-credentials">
         <echo message="Deploying ${r'${deploy.ant.archive}'} to ${r'${Context(path)}'}"/>
-        <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask">
-            <classpath>
-                <pathelement path="${r'${tomcat.home}'}/lib/catalina-ant.jar"/>
-                <pathelement path="${r'${tomcat.home}'}/lib/tomcat-coyote.jar"/>
-                <pathelement path="${r'${tomcat.home}'}/lib/tomcat-util.jar"/>
-                <pathelement path="${r'${tomcat.home}'}/bin/tomcat-juli.jar"/>
-            </classpath>
-        </taskdef>
-        <deploy url="${r'${tomcat.url}'}/manager/text" username="${r'${tomcat.username}'}"
+        <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
+                 classpath="${r'${tomcat.home}'}/server/lib/catalina-ant.jar"/>
+        <deploy url="${r'${tomcat.url}'}/manager" username="${r'${tomcat.username}'}"
                 password="${r'${tomcat.password}'}" path="${r'${Context(path)}'}"
                 war="${r'${deploy.ant.archive}'}"/>
         <property name="deploy.ant.client.url" value="${r'${tomcat.url}'}${r'${Context(path)}'}"/>
     </target>
     <target name="-undeploy-ant" if="deploy.ant.enabled" depends="-init,-check-credentials">
         <echo message="Undeploying ${r'${Context(path)}'}"/>
-        <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask">
-            <classpath>
-                <pathelement path="${r'${tomcat.home}'}/lib/catalina-ant.jar"/>
-                <pathelement path="${r'${tomcat.home}'}/lib/tomcat-coyote.jar"/>
-                <pathelement path="${r'${tomcat.home}'}/lib/tomcat-util.jar"/>
-                <pathelement path="${r'${tomcat.home}'}/bin/tomcat-juli.jar"/>
-            </classpath>
-        </taskdef>
-        <undeploy url="${r'${tomcat.url}'}/manager/text" username="${r'${tomcat.username}'}" 
+        <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"
+                classpath="${r'${tomcat.home}'}/server/lib/catalina-ant.jar"/>
+        <undeploy url="${r'${tomcat.url}'}/manager" username="${r'${tomcat.username}'}" 
                   password="${r'${tomcat.password}'}" path="${r'${Context(path)}'}"/>
     </target>
 </project>

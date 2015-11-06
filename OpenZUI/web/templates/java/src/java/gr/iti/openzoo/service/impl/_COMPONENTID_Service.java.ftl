@@ -10,19 +10,19 @@ import gr.iti.openzoo.impl.OpenZooWorker;
  *
  * @author ${Author}
  */
-public class ${ServiceID}Impl extends OpenZooService {
+public class ${ComponentID}Service extends OpenZooService {
 
-    public ${ServiceID}Impl()
+    public ${ComponentID}Service()
     {
         super("${ComponentID}");
         
-        log.debug("-- ${ServiceID}Impl()");
+        log.debug("-- ${ComponentID}Service()");
     }
     
     public JSONObject get(String action)
     {
         JSONObject response;
-        String workerClassName = "gr.iti.openzoo.service.impl.${WorkerID}Worker";
+        String workerClassName = "gr.iti.openzoo.service.impl.${ComponentID}Worker";
         
         switch (action) {
             case "start":

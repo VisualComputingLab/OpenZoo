@@ -16,7 +16,13 @@
               <input type="hidden" class="form-control" name="topo-name" value="${topology_name}">
               <input type="hidden" class="form-control" name="topo-config" id="topo-config" >
                 <div type="button" id="cancelTopoBtn" class="btn btn-default"> Close</div>
-                <div type="button" id="submitTopoBtn" class="btn btn-success"><i class="fa fa-send"></i> Submit</div>
+                <!-- <div type="button" id="submitTopoBtn" class="btn btn-success"><i class="fa fa-send"></i> Submit</div> -->
+                <div type="button" id="submitTopoBtn" class="btn btn-success has-spinicon">
+                  <i class="fa fa-send"></i> Submit
+                  <span class="spinicon">
+                    <i class="fa fa-spinner fa-pulse"></i>
+                  </span>
+                </div>
             </form>
           </div> 
         </div>

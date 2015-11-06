@@ -10,3 +10,13 @@
 /ServerResources/nbproject/private/
 /TwitterListener/nbproject/private/
 /URLUnwrapper/nbproject/private/
+/ImageDownloader/dist/
+/ImageDownloader/build/
+/MongoManager/build/
+/MongoManager/dist/
+/Researcher/dist/
+/Researcher/build/
+/TwitterListener/build/
+/TwitterListener/dist/
+/URLUnwrapper/build/
+/URLUnwrapper/dist/

@@ -1,21 +1,22 @@
 package gr.iti.openzoo.service.impl;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
 
 /**
  *
  * @author ${Author}
  */
+@Provider
 public class ${ComponentID}CrossOriginResourceSharingFilter implements ContainerResponseFilter {
 
     @Override
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        response.getHttpHeaders().putSingle("Access-Control-Allow-Origin", "*");
-        response.getHttpHeaders().putSingle("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-        response.getHttpHeaders().putSingle("Access-Control-Allow-Headers", "content-type");
-        return response;
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext response) {
+        response.getHeaders().putSingle("Access-Control-Allow-Origin", "*");
+        response.getHeaders().putSingle("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE");
+        response.getHeaders().putSingle("Access-Control-Allow-Headers", "Content-Type");
     }
-
+    
 }

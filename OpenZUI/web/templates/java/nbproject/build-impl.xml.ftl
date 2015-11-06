@@ -106,12 +106,24 @@
         <condition property="do.display.browser">
             <istrue value="${r'${display.browser}'}"/>
         </condition>
+        <condition property="do.display.browser.debug.old">
+            <and>
+                <isset property="do.display.browser"/>
+                <not>
+                    <isset property="do.debug.client"/>
+                </not>
+                <not>
+                    <isset property="browser.context"/>
+                </not>
+            </and>
+        </condition>
         <condition property="do.display.browser.debug">
             <and>
                 <isset property="do.display.browser"/>
                 <not>
                     <isset property="do.debug.client"/>
                 </not>
+                <isset property="browser.context"/>
             </and>
         </condition>
         <available file="${r'${conf.dir}'}/MANIFEST.MF" property="has.custom.manifest"/>
@@ -459,7 +471,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                     </fileset>
                 </union>
                 <taskdef classname="org.testng.TestNGAntTask" classpath="${r'${run.test.classpath}'}" name="testng"/>
-                <testng classfilesetref="test.set" failureProperty="tests.failed" methods="${r'${testng.methods.arg}'}" mode="${r'${testng.mode}'}" outputdir="${r'${build.test.results.dir}'}" suitename="${ComponentID}" testname="TestNG tests" workingDir="${r'${basedir}'}">
+                <testng classfilesetref="test.set" failureProperty="tests.failed" listeners="org.testng.reporters.VerboseReporter" methods="${r'${testng.methods.arg}'}" mode="${r'${testng.mode}'}" outputdir="${r'${build.test.results.dir}'}" suitename="${ComponentID}" testname="TestNG tests" workingDir="${r'${basedir}'}">
                     <xmlfileset dir="${r'${build.test.classes.dir}'}" includes="@{testincludes}"/>
                     <propertyset>
                         <propertyref prefix="test-sys-prop."/>
@@ -852,7 +864,7 @@ exists or setup the property manually. For example like this:
         </ant>
     </target>
     <target depends="init, deps-module-jar, deps-ear-jar" name="deps-jar" unless="no.deps"/>
-    <target depends="init,deps-jar,generate-rest-config" name="-pre-pre-compile">
+    <target depends="init,deps-jar" name="-pre-pre-compile">
         <mkdir dir="${r'${build.classes.dir}'}"/>
     </target>
     <target name="-pre-compile">
@@ -968,56 +980,56 @@ exists or setup the property manually. For example like this:
         <dirname file="${r'${dist.war}'}" property="dist.jar.dir"/>
         <mkdir dir="${r'${dist.jar.dir}'}"/>
         <jar compress="${r'${jar.compress}'}" jarfile="${r'${dist.war}'}">
-            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*"/>
+            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*,${r'${dist.archive.excludes}'}"/>
         </jar>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist" if="do.war.package.with.custom.manifest" name="-do-dist-with-manifest">
         <dirname file="${r'${dist.war}'}" property="dist.jar.dir"/>
         <mkdir dir="${r'${dist.jar.dir}'}"/>
         <jar compress="${r'${jar.compress}'}" jarfile="${r'${dist.war}'}" manifest="${r'${build.meta.inf.dir}'}/MANIFEST.MF">
-            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*"/>
+            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*,${r'${dist.archive.excludes}'}"/>
         </jar>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist" if="do.tmp.war.package.without.custom.manifest" name="-do-tmp-dist-without-manifest">
         <dirname file="${r'${dist.war}'}" property="dist.jar.dir"/>
         <mkdir dir="${r'${dist.jar.dir}'}"/>
         <jar compress="${r'${jar.compress}'}" jarfile="${r'${dist.war}'}">
-            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*"/>
+            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*,${r'${dist.archive.excludes}'}"/>
         </jar>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist" if="do.tmp.war.package.with.custom.manifest" name="-do-tmp-dist-with-manifest">
         <dirname file="${r'${dist.war}'}" property="dist.jar.dir"/>
         <mkdir dir="${r'${dist.jar.dir}'}"/>
         <jar compress="${r'${jar.compress}'}" jarfile="${r'${dist.war}'}" manifest="${r'${build.meta.inf.dir}'}/MANIFEST.MF">
-            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*"/>
+            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*,${r'${dist.archive.excludes}'}"/>
         </jar>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,-do-dist-with-manifest,-do-dist-without-manifest" name="do-dist"/>
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${r'${libs.restapi.classpath}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${libs.restlib.classpath}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
-        <copyfiles files="${r'${file.reference.OpenZooService.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
+        <copyfiles files="${r'${reference.OpenZooService.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.commons-codec-1.8.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
+        <copyfiles files="${r'${file.reference.commons-pool2-2.4.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.jedis-2.7.3.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
+        <copyfiles files="${r'${file.reference.jettison-1.3.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.log4j-api-2.0.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.log4j-core-2.0.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
-        <copyfiles files="${r'${file.reference.mongo-2.9.3.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.rabbitmq-client.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
-        <copyfiles files="${r'${file.reference.commons-pool2-2.4.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <mkdir dir="${r'${build.web.dir}'}/META-INF"/>
         <manifest file="${r'${build.web.dir}'}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
         <copyfiles files="${r'${libs.restapi.classpath}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
         <copyfiles files="${r'${libs.restlib.classpath}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
-        <copyfiles files="${r'${file.reference.OpenZooService.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
+        <copyfiles files="${r'${reference.OpenZooService.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
         <copyfiles files="${r'${file.reference.commons-codec-1.8.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
+        <copyfiles files="${r'${file.reference.commons-pool2-2.4.2.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
         <copyfiles files="${r'${file.reference.jedis-2.7.3.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
+        <copyfiles files="${r'${file.reference.jettison-1.3.2.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
         <copyfiles files="${r'${file.reference.log4j-api-2.0.2.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
         <copyfiles files="${r'${file.reference.log4j-core-2.0.2.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
-        <copyfiles files="${r'${file.reference.mongo-2.9.3.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
         <copyfiles files="${r'${file.reference.rabbitmq-client.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
-        <copyfiles files="${r'${file.reference.commons-pool2-2.4.2.jar}'}" todir="${r'${build.web.dir}'}/WEB-INF/lib"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
         <delete dir="${r'${build.web.dir}'}/WEB-INF/lib"/>
@@ -1026,7 +1038,7 @@ exists or setup the property manually. For example like this:
         <dirname file="${r'${dist.ear.war}'}" property="dist.jar.dir"/>
         <mkdir dir="${r'${dist.jar.dir}'}"/>
         <jar compress="${r'${jar.compress}'}" jarfile="${r'${dist.ear.war}'}" manifest="${r'${build.web.dir}'}/META-INF/MANIFEST.MF">
-            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*"/>
+            <fileset dir="${r'${build.web.dir}'}" excludes="WEB-INF/classes/.netbeans_*,${r'${dist.archive.excludes}'}"/>
         </jar>
     </target>
     <target name="-post-dist">
@@ -1075,17 +1087,31 @@ exists or setup the property manually. For example like this:
     <target depends="init,-pre-dist,dist,-post-dist" name="verify">
         <nbverify file="${r'${dist.war}'}"/>
     </target>
-    <target depends="run-deploy,-init-display-browser,-display-browser-nb,-display-browser-cl" name="run-display-browser"/>
+    <target depends="run-deploy,-init-display-browser,-display-browser-nb-old,-display-browser-nb,-display-browser-cl" name="run-display-browser"/>
     <target if="do.display.browser" name="-init-display-browser">
+        <condition property="do.display.browser.nb.old">
+            <and>
+                <isset property="netbeans.home"/>
+                <not>
+                    <isset property="browser.context"/>
+                </not>
+            </and>
+        </condition>
         <condition property="do.display.browser.nb">
-            <isset property="netbeans.home"/>
+            <and>
+                <isset property="netbeans.home"/>
+                <isset property="browser.context"/>
+            </and>
         </condition>
         <condition property="do.display.browser.cl">
             <isset property="deploy.ant.enabled"/>
         </condition>
     </target>
-    <target if="do.display.browser.nb" name="-display-browser-nb">
+    <target if="do.display.browser.nb.old" name="-display-browser-nb-old">
         <nbbrowse url="${r'${client.url}'}"/>
+    </target>
+    <target if="do.display.browser.nb" name="-display-browser-nb">
+        <nbbrowse context="${r'${browser.context}'}" url="${r'${client.url}'}" urlPath="${r'${client.urlPart}'}"/>
     </target>
     <target if="do.display.browser.cl" name="-get-browser" unless="browser">
         <condition property="browser" value="rundll32">
@@ -1154,6 +1180,7 @@ exists or setup the property manually. For example like this:
         <nbstartserver debugmode="true"/>
         <antcall target="connect-debugger"/>
         <nbdeploy clientUrlPart="${r'${client.urlPart}'}" debugmode="true" forceRedeploy="true"/>
+        <antcall target="debug-display-browser-old"/>
         <antcall target="debug-display-browser"/>
         <antcall target="connect-client-debugger"/>
     </target>
@@ -1170,8 +1197,11 @@ exists or setup the property manually. For example like this:
             </sourcepath>
         </nbjpdaconnect>
     </target>
-    <target if="do.display.browser.debug" name="debug-display-browser">
+    <target if="do.display.browser.debug.old" name="debug-display-browser-old">
         <nbbrowse url="${r'${client.url}'}"/>
+    </target>
+    <target if="do.display.browser.debug" name="debug-display-browser">
+        <nbbrowse context="${r'${browser.context}'}" url="${r'${client.url}'}" urlPath="${r'${client.urlPart}'}"/>
     </target>
     <target if="do.debug.client" name="connect-client-debugger">
         <webproject1:nbjsdebugstart webUrl="${r'${client.url}'}"/>
@@ -1267,6 +1297,7 @@ exists or setup the property manually. For example like this:
         <startprofiler/>
         <nbstartserver profilemode="true"/>
         <nbdeploy clientUrlPart="${r'${client.urlPart}'}" forceRedeploy="true" profilemode="true"/>
+        <antcall target="debug-display-browser-old"/>
         <antcall target="debug-display-browser"/>
         <antcall target="-profile-start-loadgen"/>
     </target>
@@ -1357,7 +1388,7 @@ exists or setup the property manually. For example like this:
         <mkdir dir="${r'${build.test.results.dir}'}"/>
     </target>
     <target depends="init,compile-test,-pre-test-run" if="have.tests" name="-do-test-run">
-        <webproject2:test testincludes="**/*Test.java"/>
+        <webproject2:test includes="${r'${includes}'}" testincludes="**/*Test.java"/>
     </target>
     <target depends="init,compile-test,-pre-test-run,-do-test-run" if="have.tests" name="-post-test-run">
         <fail if="tests.failed" unless="ignore.failing.tests">Some tests failed; see details above.</fail>

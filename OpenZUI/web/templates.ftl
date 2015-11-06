@@ -34,7 +34,7 @@
               <input type="text" class="form-control" name="tmpl-componentID" value="" required>
             </div>
           </div>
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label for="tmpl-serviceID" class="col-sm-4 control-label">Service ID</label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="tmpl-serviceID" value="" required>
@@ -51,7 +51,7 @@
             <div class="col-sm-8">
               <input type="text" class="form-control" name="tmpl-resourcePath" value="" required>
             </div>
-          </div>
+          </div> -->
           <div class="form-group">
             <label for="tmpl-description" class="col-sm-4 control-label">Description</label>
             <div class="col-sm-8">

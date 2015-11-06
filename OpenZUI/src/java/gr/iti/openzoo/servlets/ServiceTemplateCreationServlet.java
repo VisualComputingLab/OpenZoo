@@ -55,15 +55,17 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         "nbproject/project.xml", 
         "nbproject/rest-build.xml", 
         "web/index.jsp", 
+        "web/index.html", 
         "web/config.json", 
         "web/META-INF/context.xml", 
         "web/WEB-INF/web.xml", 
         "src/conf/MANIFEST.MF", 
-        "src/java/gr/iti/openzoo/service/rest/_SERVICEID_Rest.java", 
+        "src/java/gr/iti/openzoo/service/rest/_COMPONENTID_Rest.java", 
+        "src/java/gr/iti/openzoo/service/rest/ApplicationConfig.java", 
         "src/java/gr/iti/openzoo/service/impl/_COMPONENTID_CrossOriginResourceSharingFilter.java", 
         "src/java/gr/iti/openzoo/service/impl/_COMPONENTID_ServletListener.java", 
-        "src/java/gr/iti/openzoo/service/impl/_SERVICEID_Impl.java", 
-        "src/java/gr/iti/openzoo/service/impl/_WORKERID_Worker.java"
+        "src/java/gr/iti/openzoo/service/impl/_COMPONENTID_Service.java", 
+        "src/java/gr/iti/openzoo/service/impl/_COMPONENTID_Worker.java"
     };
     
     @Override
@@ -190,11 +192,8 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         
         String author = request.getParameter("tmpl-author");
         String componentID = request.getParameter("tmpl-componentID");
-        String serviceID = request.getParameter("tmpl-serviceID");
-        String workerID = request.getParameter("tmpl-workerID");
-        String resourcePath = request.getParameter("tmpl-resourcePath");
         String description = request.getParameter("tmpl-description");
-
+        
         boolean hasInput = request.getParameter("tmpl-hasInput") != null;
         int numOutputs = Integer.parseInt(request.getParameter("tmpl-numOutputs"));
         boolean queueLogging = request.getParameter("tmpl-queueLogging") != null;
@@ -219,9 +218,6 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
 
         root.put("Author", author);
         root.put("ComponentID", componentID);
-        root.put("ServiceID", serviceID);
-        root.put("WorkerID", workerID);
-        root.put("ResourcePath", resourcePath);
         root.put("Description", description);
         if (hasInput)
             root.put("HasInput", true);
@@ -269,12 +265,12 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         for (int i = 0; i < files.length; i++)
         {
             filename = files[i];
+            
+            if (!(new File(webAppPath + "/" + templDir + "/" + filename + ".ftl")).exists()) continue;
 
             tmpl = cfg.getTemplate(templDir + "/" + filename + ".ftl");
             
             filename = filename.replace("_COMPONENTID_", componentID);
-            filename = filename.replace("_SERVICEID_", serviceID);
-            filename = filename.replace("_WORKERID_", workerID);
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputComponentDir + "/" + filename)))
             {

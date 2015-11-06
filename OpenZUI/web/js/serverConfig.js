@@ -35,6 +35,8 @@ $(document).ready(function(){
 
         var config = [];
 
+        $('#submitTopoBtn').toggleClass('active');
+
         $('.serverConf').each(function() {
             var server_id = this.id;
             var list = document.getElementById(server_id);

@@ -1,9 +1,9 @@
 package gr.iti.openzoo.service.rest;
 
-import gr.iti.openzoo.service.impl.ResearcherService;
-import javax.ws.rs.Consumes;
+import gr.iti.openzoo.service.impl.${ComponentID}Service;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
@@ -16,17 +16,17 @@ import org.codehaus.jettison.json.JSONObject;
 /**
  * REST Web Service
  *
- * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
+ * @author ${Author}
  */
 @Path("manage")
-public class ResearcherRest {
+public class ${ComponentID}Rest {
 
     @Context
     private UriInfo context;
     
-    private final static ResearcherService impl = new ResearcherService();
+    private final static ${ComponentID}Service impl = new ${ComponentID}Service();
 
-    public ResearcherRest() {
+    public ${ComponentID}Rest() {
     }
 
     @GET
@@ -35,12 +35,13 @@ public class ResearcherRest {
         
         return impl.get(action).toString();
     }
-    
+
+<#if IsBroker??>
     @POST
     @Consumes("application/json")
     @Produces("application/json")
     public String postJson(String content) {
-
+    
         JSONObject input;
         try
         {
@@ -54,4 +55,5 @@ public class ResearcherRest {
         
         return impl.post(input).toString();
     }
+</#if>
 }

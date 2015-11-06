@@ -27,9 +27,9 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class MongoManagerWorker extends OpenZooWorker {
     
-    private OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
-    private OpenZooOutputConnection outConnBroker = new OpenZooOutputConnection(this, "output_1");
-    private OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
+    private final OpenZooInputConnection inConn = new OpenZooInputConnection(this, "input");
+    private final OpenZooOutputConnection outConnBroker = new OpenZooOutputConnection(this, "output_1");
+    private final OpenZooLoggingConnection logConn = new OpenZooLoggingConnection(this);
     
     private Mongo mongo;
     private DBCollection col_tweets, col_msgs;
