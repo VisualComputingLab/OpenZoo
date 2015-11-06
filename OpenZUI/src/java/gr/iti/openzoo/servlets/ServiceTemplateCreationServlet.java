@@ -236,10 +236,10 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         Template tmpl;
         File dir;
         String templDir = "templates/java";
-        String OZServiceDir = webAppPath + "/templates/OpenZooService";
+        //String OZServiceDir = webAppPath + "/templates/OpenZooService";
         String outputBaseDir = localRepository + "/templates/" + UUID.randomUUID().toString();
         String outputComponentDir = outputBaseDir + "/" + componentID;
-        String outputOZServiceDir = outputBaseDir + "/OpenZooService";
+        //String outputOZServiceDir = outputBaseDir + "/OpenZooService";
         String s_ZipFile = localRepository + "/templates/" + componentID + ".zip";
         
         dir = new File(outputComponentDir);
@@ -247,10 +247,10 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
             FileUtils.deleteQuietly(dir);
         dir.mkdirs();
         
-        dir = new File(outputOZServiceDir);
-        if (dir.exists())
-            FileUtils.deleteQuietly(dir);
-        dir.mkdirs();
+//        dir = new File(outputOZServiceDir);
+//        if (dir.exists())
+//            FileUtils.deleteQuietly(dir);
+//        dir.mkdirs();
         
         dir = new File(outputBaseDir);
         System.out.println("Output base dir will be: " + dir.getAbsolutePath());
@@ -284,8 +284,8 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         }
         
         // then copy the OpenZooService files
-        System.out.println("Copying OpenZooService files from " + new File(OZServiceDir).getAbsolutePath());
-        FileUtils.copyDirectory(new File(OZServiceDir), new File(outputOZServiceDir));
+//        System.out.println("Copying OpenZooService files from " + new File(OZServiceDir).getAbsolutePath());
+//        FileUtils.copyDirectory(new File(OZServiceDir), new File(outputOZServiceDir));
 
         
         // finally, create zip file with both directories
