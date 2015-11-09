@@ -11,22 +11,22 @@ A framework for distributed stream/batch processing
 
 ##Installation
 1. Download the whole repository, containing the following services:
-  1. OpenZUI: The GUI to the OpenZoo framework
-  2. OpenZooService: The basic service functionality, to be inherited by all services
-  3. ServerResources: A web service for retrieving server capacity/load information, to be installed on every OpenZoo server
-  4. ImageDownloader: A dummy service for downloading images
-  5. MongoManager: A test service for accessing MongoDB
-  6. TwitterListener: A test service for wrapping the TwitterStream API
-  7. URLUnwrapper: A test service for unwrapping short URLs
-  8. Researcher: A test service for forwarding user requests
+  - OpenZUI: The GUI to the OpenZoo framework
+  - OpenZooService: The basic service functionality, to be inherited by all services
+  - ServerResources: A web service for retrieving server capacity/load information, to be installed on every OpenZoo server
+  - ImageDownloader: A dummy service for downloading images
+  - MongoManager: A test service for accessing MongoDB
+  - TwitterListener: A test service for wrapping the TwitterStream API
+  - URLUnwrapper: A test service for unwrapping short URLs
+  - Researcher: A test service for forwarding user requests
 2. Run Tomcat 7 server on all available servers and create a password protected user on each tomcat server.
 3. Install RedisIO on a server.
 4. Open projects with Netbeans 8.
 5. Build projects, starting by ServerResources, since it needs to be included in the OpenZUI war later. This is going to be done automatically (on -post-dist).
 6. Edit OpenZUI/web/config.json:
-  1. update keyvalue.host and keyvalue.port with the RedisIO server and port
-  2. update localRepository with a folder with read/write permissions for the tomcat user, anywhere on the server where OpenZUI will be installed.
-  3. update demouser.username and demouser.passwd if necessary
+  - update keyvalue.host and keyvalue.port with the RedisIO server and port
+  - update localRepository with a folder with read/write permissions for the tomcat user, anywhere on the server where OpenZUI will be installed.
+  - update demouser.username and demouser.passwd if necessary
 7. Deploy OpenZUI project to a tomcat server. Everything else can be done through OpenZUI (http://TOMCAT_SERVER:TOMCAT_PORT/OpenZUI/).
 
 
