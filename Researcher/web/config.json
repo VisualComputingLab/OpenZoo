@@ -1,0 +1,27 @@
+{
+    "service":
+    {
+        "component_id": "Researcher",
+        "name": "ResearcherService",
+        "path": "/resources/manage",
+        "description": "Service for answering requests",
+        "type": "broker"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.ResearcherWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "input",
+                    "type": "in"
+                },
+                {
+                    "endpoint_id": "output_1",
+                    "type": "out"
+                }
+            ]
+        }
+    ]
+}

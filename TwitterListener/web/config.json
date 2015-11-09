@@ -1,0 +1,30 @@
+{
+    "service":
+    {
+        "component_id": "TwitterListener",
+        "name": "TwitterListenerService",
+        "path": "/resources/manage",
+        "description": "A service for wrapping the Twitter stream API"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.TwitterListenerWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "output_1",
+                    "type": "out"
+                }
+            ]
+        }
+    ],
+    "requires":
+    [
+        "consumerKey",
+	"consumerSecret",
+	"accessToken",
+	"accessTokenSecret",
+        "keywords"
+    ]
+}

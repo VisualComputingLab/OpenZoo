@@ -1,0 +1,32 @@
+{
+    "service":
+    {
+        "component_id": "MongoManager",
+        "name": "MongoManagerService",
+        "path": "/resources/manage",
+        "description": "A service for reading/storing results into a database"
+    },
+    "workers":
+    [
+        {
+            "worker_id": "gr.iti.openzoo.service.impl.MongoManagerWorker",
+            "endpoints":
+            [
+                {
+                    "endpoint_id": "input",
+                    "type": "in"
+                },
+                {
+                    "endpoint_id": "output_1",
+                    "type": "out"
+                }
+            ]
+        }
+    ],
+    "requires":
+    [
+        "mongo_database",
+	"mongo_collection_images",
+        "mongo_collection_messages"
+    ]
+}

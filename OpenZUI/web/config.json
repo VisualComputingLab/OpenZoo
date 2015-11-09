@@ -1,0 +1,13 @@
+{
+    "keyvalue":
+    {
+        "host": "160.40.51.105",
+        "port": 6379
+    },
+    "localRepository": "D:/openzui/repo",
+    "demouser":
+    {
+        "username": "admin",
+        "passwd": "open"
+    }
+}
