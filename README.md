@@ -1,4 +1,4 @@
-# OpenZoo
+# <a href="http://openzoo.org" target="_ext">OpenZoo</a>
 A framework for distributed stream/batch processing
 
 ##Prerequisites:
