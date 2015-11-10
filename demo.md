@@ -17,7 +17,7 @@ In the following, the OpenZUI interfaces will be demostrated, using the provided
 A set of test services are provided for demonstrating the usage of the OpenZoo framework.
 The user has to upload the 5 test services in OpenZUI and create the following topology:
 
-![Test topology](../images/TwitterTopo.png)
+![Test topology](http://visualcomputinglab.github.io/OpenZoo/images/TwitterTopo.png)
 
 We define 1 instance of TwitterListener, 2 instances of URLUnwrapper, 2 instances of ImageDownloader, 1 instance of MongoManager and 1 instance of Researcher.
 
