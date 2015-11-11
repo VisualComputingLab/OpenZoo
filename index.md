@@ -20,6 +20,7 @@ OpenZoo offers the following core functionalities:
 * Easy exchange of components
 * One touch creation of service wrappers
 * Abstraction layer over communication, persistence, caching, etc.
+* Schema-free JSON as message exchange format
 
 ## Applications
 A wide range of applications can be developed on top of OpenZoo:
@@ -33,7 +34,8 @@ OpenZoo has been tested as a real time search and analytics framework, based on 
 It has been also successfully tested as a video processing framework, extracting features out of gigs of video, in a Big Data oriented application.
 
 ## Support
-OpenZoo supports both Windows (tested on XP and Win 7) and Linux (tested on Ubuntu).
+OpenZoo supports both Windows (tested on XP and Win7) and Linux (tested on Ubuntu 14.04 LTS).
 It uses MongoDB for persistence, RabbitMQ as a communication medium and RedisIO for exchanging parameters.
 Services are running on Tomcat (tested on Tomcat 7).
 Currently, only Java is supported for service development. C++ and Python service templates are the next major milestone.
+
