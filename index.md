@@ -3,16 +3,16 @@ title: Overview
 layout: default
 ---
 # Overview
-OpenZoo is an open-source, MIT licenced, distributed, stream/batch processing framework.
-It has been developed by the Visual Computing Lab (VCL) of the Information Technologies Institute (ITI), which is a founding member of the Centre for Research & Technology Hellas (CERTH).
+OpenZoo is an open-source, [MIT licenced](https://opensource.org/licenses/MIT), distributed, stream/batch processing framework.
+It has been developed and maintained by the [Visual Computing Lab (VCL)](http://vcl.iti.gr) of the [Information Technologies Institute (ITI)](http://www.iti.gr), which is a founding member of the [Centre for Research & Technology Hellas (CERTH)](http://www.certh.gr/root.en.aspx).
 OpenZoo currently consists of a java service template, a management GUI and several test services for demonstrating the use of the framework.
 
 ## Features
 OpenZoo offers the following core functionalities:
 
 * Remote deployment of services
-* API for service registration, intercommunication and monitoring
-* Load balancing
+* Basic classes for service registration, intercommunication and monitoring
+* Load balancing through the usage of queues
 * Data storage
 * Data caching
 * Easy service topology creation and management
@@ -25,7 +25,7 @@ OpenZoo offers the following core functionalities:
 ## Applications
 A wide range of applications can be developed on top of OpenZoo:
 
-* Real time search and analytics
+* Real time search and analytics applications
 * Streaming and batch processing frameworks
 * Distributed and scalable architectures
 

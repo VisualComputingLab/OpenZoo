@@ -16,7 +16,7 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Openzoo by VisualComputingLab</title>
+    <title>OpenZoo by VisualComputingLab</title>
   </head>
 
 
@@ -25,8 +25,8 @@
 
         <header>
       <div class="inner">
-        <h1>Openzoo</h1>
-        <h2>A framework for distributed stream/batch processing</h2>
+        <h1>OpenZoo</h1>
+        <h2>A framework for distributed stream and batch processing</h2>
         <a href="https://github.com/VisualComputingLab/OpenZoo" class="button" target="_ext"><small>View project on</small> GitHub</a>
       </div>
     </header>
@@ -38,7 +38,7 @@
 
           <h1>How it works</h1>
 
-<p>All framework services inherit a basic OpenZoo service, which almost automates the communication with RedisIO, RabbitMQ, MongoDB and the outer world.</p>
+<p>The following sections serve as an introduction to the framework.</p>
 
 <h2>Overview</h2>
 
@@ -51,34 +51,37 @@ Apart from that, each service may have, not one, but several instances, doing th
 
 <p><img src="http://visualcomputinglab.github.io/OpenZoo/images/MultiInstance.png" alt="Several instances read from a queue and write to another queue" /></p>
 
-<p>Assuming that the input can be divided in small pieces, that can be processed in parallel, this behaviour massively speeds up the procedure.
+<p>Assuming that the input can be divided in small pieces, which can be processed in parallel, this behaviour massively speeds up the procedure.
 This can be done for every service in a topology.</p>
 
-<p>In OpenZoo, services are built as depicted:</p>
+<p>In OpenZoo, a single service is built as depicted:</p>
 
 <p><img src="http://visualcomputinglab.github.io/OpenZoo/images/OZComponent.png" alt="OpenZoo Component" /></p>
 
-<p>In the sequel, the terms service and component will be used interchangeably.
-The service is living in a Tomcat container.
-It can be started, stopped, resetted and queried over a web interface.
-The service contains a worker, that does the actual job.
+<p>In the sequel, the terms service and component will be used interchangeably.</p>
+
+<p>The <strong>service</strong> is living in a <strong>Tomcat</strong> container.
+It can be started, stopped, resetted and queried over a <strong>web interface</strong>.
+The service contains a <strong>worker</strong>, that does the actual job.
 Several identical worker threads can be created for the same service (on the same server), so that the server resources are fully utilized.
 Also several instances of the service can be deployed, each on a different server.
-The instances may be identical or each instance may be dedicated to a specific type of input.
-The topology is the predefined way of exchanging information between different services.
+The instances may be identical or each instance may be dedicated to a specific type of input.</p>
+
+<p>The topology is the predefined way of exchanging information between different services.
 Below, a typical data ingestion topology is depicted:</p>
 
 <p><img src="http://visualcomputinglab.github.io/OpenZoo/images/TypicalIngestion.png" alt="Typical ingestion topology" /></p>
 
 <p>The crawler introduces content into the system, comming either from the web or the filesystem.
 Several instances of the metadata extractor, working in parallel, process the content.
-The indexer indexes some of the produced metadata and the database manager stores everything in the database.
-Also, a typical search topology follows:</p>
+The indexer indexes some of the produced metadata and the database manager stores everything in the database.</p>
+
+<p>Also, a typical search topology follows:</p>
 
 <p><img src="http://visualcomputinglab.github.io/OpenZoo/images/TypicalSearch.png" alt="Typical search topology" /></p>
 
-<p>A request broker, receives requests (queries) from the user application and forwards them into the system.
-The query is received by an arbitrary index instance (in case of several copies of the same index) or by the appropriate index instance (in case of a distributed index) and a result list is produced.
+<p>A request broker, receives requests (queries) from the user application and forwards them to the system.
+The query is received by the next free index instance (in case of several copies of the same index) or by the appropriate index instance (in case of a distributed index) and a result list is produced.
 The database manager enriches the results with the stored metadata and the final result list is returned to the broker, which answers the request.</p>
 
 <p>Of course, the last two topologies can be merged to one, which will simultaneously ingest content and answer requests about it.</p>
@@ -89,9 +92,9 @@ The database manager enriches the results with the stored metadata and the final
 The main parts of each component are the following:</p>
 
 <ul>
-<li>A REST class, as an endpoint for web requests (GET, POST, etc.).</li>
-<li>A Service class, responsible for starting, stopping and managing worker threads.</li>
-<li>A Worker class, containing the actual code. Each worker can have zero or one input endpoint and zero or more output endpoints.</li>
+<li>A <strong>REST class</strong>, as an endpoint for web requests (GET, POST, etc.).</li>
+<li>A <strong>Service class</strong>, responsible for starting, stopping and managing worker threads. The Service class is instantiated by the REST class.</li>
+<li>A <strong>Worker class</strong>, containing the actual code. Each worker can have zero or one input endpoint and zero or more output endpoints. Several worker threads can be instantiated by the Service class.</li>
 </ul>
 
 
@@ -106,72 +109,147 @@ The main parts of each component are the following:</p>
 
 <h2>Service types</h2>
 
-<p>As already depicted in the previous examples, there are two types of services.
-The operator is a pure service, that receives input from a queue (or from the web/filesystem, in case of a crawler) and writes output to another queue (or to a database in case of a database manager).
+<p>As already depicted in the previous examples, there are two types of services.</p>
+
+<p>The <strong>operator</strong> is a pure service, that receives input from a queue (or from the web/filesystem, in case of a crawler) and writes output to another queue (or to a database in case of a database manager).
 It cannot communicate with the application user.
-It has to have at least one endpoint: an input or an output.
+It has to have at least one endpoint: an input <strong>or</strong> an output.
 Also, it can have several instances and several worker threads per instance.</p>
 
-<p>The broker is a more sophisticated service, which accepts requests from the user application, forwards them to the system and waits for responses.
+<p>The <strong>broker</strong> is a more sophisticated service, which accepts requests from the user application, forwards them to the system and waits for responses.
 As soon as a response is received, it is forwarded to the user application.
-It has to have at least one input endpoint and one output endpoint.
+It has to have at least one input endpoint <strong>and</strong> one output endpoint.
 Finally, there should be only one instance of it, with just one worker thread.</p>
 
 <h2>Service web interfaces</h2>
 
-<p>All services accept a GET request with an action parameter:
+<p>All services accept a <strong>GET</strong> request with an action parameter:
 The action can be one of start/stop/reset/status and forces the service to do exactly that.</p>
 
-<p>Broker services accept also a POST request, for posting queries and and returning the response.
-The POST body should be an application specific JSONObject.</p>
+<p>Broker services accept also a <strong>POST</strong> request, for posting queries and returning the response.
+The POST body should be an application specific JSONObject containing the query.</p>
 
 <h2>Communication format</h2>
 
 <p>The common communication format for the whole framework is JSON.
-All JSON messages have the following structure:
-_id: string: a unique message id
-header: JSONObject: intended for routing information, not application specific parameters
-payload: JSONObject: application specific information. Structure defined by service.
-log: JSONArray: Each component, which processed the message, leaves its signature here.
-Each record has the following structure:
-compId: String: unique name of component
-instId: String: component instance id
-workId: String: worker class
-epInId: String: input endpoint id: optional
-epOutId: String output endpoint id: optional
-success: boolean: was processing successful?
-start: long: epoch timestamp, starting millisecond
-end: long: epoch timestamp, ending millisecond</p>
+All JSON messages have the following structure:</p>
+
+<table style="width: 100%; margin-bottom: 20px; margin-top: 20px">
+  <tr>
+    <th style="width:100px;">key</th>
+    <th style="width:100px;">value type</th>
+    <th style="padding: 20px;">value description</th>
+  </tr>
+  <tr>
+    <td style="width:100px;">_id</td>
+    <td style="width:100px;">String</td>
+    <td style="text-align: left; padding: 20px;">A unique, autogenerated message id</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">header</td>
+    <td style="width:100px;">JSONObject</td>
+    <td style="text-align: left; padding: 20px;">Intended for routing information, not application specific parameters</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">payload</td>
+    <td style="width:100px;">JSONObject</td>
+    <td style="text-align: left; padding: 20px;">Application specific information. Structure defined by service.</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">log</td>
+    <td style="width:100px;">JSONArray</td>
+    <td style="text-align: left; padding: 20px;">Each component, which processed the message, leaves its signature here.</td>
+  </tr>
+</table>
+
+
+<p>Each log record is a JSONObject with the following structure:</p>
+
+<table style="width: 100%; margin-bottom: 20px; margin-top: 20px">
+  <tr>
+    <th style="width:100px;">key</th>
+    <th style="width:100px;">value type</th>
+    <th style="padding: 20px;">value description</th>
+  </tr>
+  <tr>
+    <td style="width:100px;">compId</td>
+    <td style="width:100px;">String</td>
+    <td style="text-align: left; padding: 20px;">Unique name of component</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">instId</td>
+    <td style="width:100px;">String</td>
+    <td style="text-align: left; padding: 20px;">Component instance id</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">workId</td>
+    <td style="width:100px;">String</td>
+    <td style="text-align: left; padding: 20px;">Worker class</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">epInId</td>
+    <td style="width:100px;">String</td>
+    <td style="text-align: left; padding: 20px;">Input endpoint id</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">epOutId</td>
+    <td style="width:100px;">String</td>
+    <td style="text-align: left; padding: 20px;">Output endpoint id</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">success</td>
+    <td style="width:100px;">Boolean</td>
+    <td style="text-align: left; padding: 20px;">was processing successful?</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">start</td>
+    <td style="width:100px;">Long</td>
+    <td style="text-align: left; padding: 20px;">epoch timestamp, processing start millisecond</td>
+  </tr>
+  <tr>
+    <td style="width:100px;">end</td>
+    <td style="width:100px;">Long</td>
+    <td style="text-align: left; padding: 20px;">epoch timestamp, processing end millisecond</td>
+  </tr>
+</table>
+
+
+<p>The logging information is added automatically by each component, when the message is posted to the output.</p>
 
 <p>Even binary data can be added to the payload, through the appropriate function, although it is not recommended to exchange large binary files through the queues.</p>
 
-<p>A routing key can be added to the message.</p>
+<pre><code>- public void addBinaryFile(String key, String path); // reads file from path, converts it to base64 and adds it to the message under the specified key
+- public byte[] getBinaryFile(String key);            // reads and decodes the base64 string under the specified key and returns the decoded byte array
+</code></pre>
 
-<p>The logging information is added automatically.</p>
+<p>A routing key can be also added to the message by the appropriate function.</p>
+
+<pre><code>- public void setRoutingKey(String rk);
+</code></pre>
 
 <h2>Service endpoints</h2>
 
-<p>3 types of endpoints exist:</p>
+<p>Three endpoint types exist:</p>
 
 <ul>
-<li>Input endpoint</li>
+<li>Input endpoints</li>
 </ul>
 
 
-<p>Accept input from the queue. It has the following interfaces:</p>
+<p>They accept input from the queue and have the following interfaces:</p>
 
-<pre><code>- public Message getNext(): Blocking function, which returns the next message from queue.
-- public boolean ack(Message msg): Acknowledge a message received from the queue. The acknowledgment should happen after the message processing.
+<pre><code>- public Message getNext();              // Blocking function, which returns the next message from queue.
+- public boolean ack(Message msg);       // Acknowledge a message received from the queue. The acknowledgment should happen after the message processing.
 </code></pre>
 
 <ul>
-<li>Output endpoint</li>
+<li>Output endpoints</li>
 </ul>
 
 
-<p>Post message to the queue. It has the following interface:</p>
+<p>They post messages to the queue and have the following interface:</p>
 
-<pre><code>- public void put(Message msg): Post message to the queue.
+<pre><code>- public void put(Message msg);         // Post message to the queue.
 </code></pre>
 
 <ul>
@@ -179,58 +257,32 @@ end: long: epoch timestamp, ending millisecond</p>
 </ul>
 
 
-<p>Posts logging information to a dedicated queue. It has the following interfaces:</p>
+<p>They post logging information to a dedicated queue and have the following interfaces:</p>
 
-<pre><code>- public void info(String logmessage): Post informational message.
-- public void error(String logmessage): Post error message.
-- public void debug(String logmessage): Post debugging information.
+<pre><code>- public void info(String logmessage);  // Post informational message.
+- public void error(String logmessage); // Post error message.
+- public void debug(String logmessage); // Post debugging information.
 </code></pre>
 
 <p>All 3 endpoint types need to be initialized through calling:</p>
 
-<pre><code>- public boolean init()
+<pre><code>- public boolean init();
 </code></pre>
 
 <h2>Worker interfaces</h2>
 
 <p>All workers inherit the following overridable interfaces:</p>
 
-<ul>
-<li>public void run()</li>
-</ul>
-
-
-<p>Contains the endpoint initialization and the main worker loop, where messages are received, processed and posted.</p>
-
-<ul>
-<li>public boolean doWork(Message message)</li>
-</ul>
-
-
-<p>Contains the actual code for processing a message.</p>
-
-<ul>
-<li>public String publish(JSONObject obj)</li>
-</ul>
-
-
-<p>For broker services, contains the preparation and posting of a query received from the user application. It returns a hash value of the object as a receipt, for a later retrieval of the results.</p>
+<pre><code>- public void run();                      // Contains the endpoint initialization and the main worker loop, where messages are received, processed and posted.
+- public boolean doWork(Message message); // Contains the actual code for processing a message.
+- public String publish(JSONObject obj);  // For broker services, contains the preparation and posting of a query received from the user application. It returns a hash value of the object as a receipt, for a later retrieval of the results.
+</code></pre>
 
 <p>Also, the following interfaces are inherited:</p>
 
-<ul>
-<li>public JSONObject getResponse(String hash, int timeout)</li>
-</ul>
-
-
-<p>Retrieves the query results, using the receipt from the publish call.</p>
-
-<ul>
-<li>public String getRequiredParameter(String param)</li>
-</ul>
-
-
-<p>Reads a parameter from the RedisIO.</p>
+<pre><code>- public JSONObject getResponse(String hash, int timeout); // Retrieves the query results, using the receipt from the publish call.
+- public String getRequiredParameter(String param);        // Reads a parameter from the RedisIO.
+</code></pre>
 
 
         </section>

@@ -16,7 +16,7 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Openzoo by VisualComputingLab</title>
+    <title>OpenZoo by VisualComputingLab</title>
   </head>
 
 
@@ -25,8 +25,8 @@
 
         <header>
       <div class="inner">
-        <h1>Openzoo</h1>
-        <h2>A framework for distributed stream/batch processing</h2>
+        <h1>OpenZoo</h1>
+        <h2>A framework for distributed stream and batch processing</h2>
         <a href="https://github.com/VisualComputingLab/OpenZoo" class="button" target="_ext"><small>View project on</small> GitHub</a>
       </div>
     </header>
@@ -36,18 +36,20 @@
       <div class="inner clearfix">
         <section id="main-content">
 
-          <p>Two major steps must be followed for installing OpenZoo: the installation and configuration of the third party software and the installation of the OpenZoo management GUI (OpenZUI), along with the templates and the examples.
+          <h1>Installation overview</h1>
+
+<p>Two major steps must be followed for installing OpenZoo: the installation and configuration of the third party software and the installation of the OpenZoo management GUI (OpenZUI), along with the templates and the examples.
 In the following, detailed instructions are given for both.</p>
 
 <h1>Prerequisites</h1>
 
 <ul>
+<li>Netbeans 8 for developing the services and creating the war files of the services and the OpenZUI.</li>
 <li>Apache Tomcat 7 for the OpenZUI and the servers. Apache Tomcat 8 should also work, but it is not tested yet.</li>
 <li>RedisIO for storing and exchanging framework parameters.</li>
-<li>RabbitMQ server for the communication between the services.</li>
-<li>Netbeans 8 for developing the services and creating the war files of the services and the OpenZUI.</li>
-<li>MongoDB 2.6 or higher for storing results.</li>
-<li>Twitter authorization tokens (https://dev.twitter.com/oauth/overview/application-owner-access-tokens) for using the demonstration topology described in the sequel.</li>
+<li>RabbitMQ for the communication between the services.</li>
+<li>MongoDB 2.6 or higher for storing results. Version 3.0 or higher is recommended.</li>
+<li><a href="https://dev.twitter.com/oauth/overview/application-owner-access-tokens">Twitter authorization tokens</a> for using the demonstration topology described in the sequel.</li>
 </ul>
 
 
@@ -57,7 +59,7 @@ In the following, detailed instructions are given for both.</p>
 
 <h2>Platform (Cluster servers)</h2>
 
-<p>Disc space, CPU and memory requirements depend on the deployed services. The framework itself does not need more than 512 MBs of memory. 2 GBs of memory is a reasonable value.
+<p>Disc space, CPU and memory requirements depend on the deployed services. The framework itself does not need more than 512 MBs of memory. 2 GBs of memory per server is a reasonable value.
 The servers need a static IP, in order to be accessible over a long time period. DHCP can also be used for short time periods.
 Be sure to install the latest OS updates, e.g. for Ubuntu:</p>
 
@@ -65,7 +67,7 @@ Be sure to install the latest OS updates, e.g. for Ubuntu:</p>
 
 <p>sudo apt-get dist-upgrade</p></blockquote>
 
-<h2>Apache Tomcat 7, along with Java 7</h2>
+<h2><a href="http://tomcat.apache.org/">Apache Tomcat 7</a>, along with Java 7</h2>
 
 <p>Tomcat needs to be installed on every server that will participate to the OpenZoo server cluster, as well as to the server where the OpenZUI management application will be deployed.</p>
 
@@ -113,9 +115,16 @@ CATALINA_HOME=/var/lib/tomcat7
 
 <blockquote><p>sudo cp setenv.sh /usr/share/tomcat7/bin/</p></blockquote>
 
-<pre><code>Set JAVA_HOME
-Set appropriate limits for –Xms, Xmx, MaxPermSize if neccessary.
+<p>Set JAVA_HOME path and appropriate limits for –Xms, Xmx, MaxPermSize in the script, if neccessary.
+The default values for memory are 1GB for initial and maximum heap size and 512 MB for PermGen.</p>
+
+<pre><code>JAVA_HOME="/usr/lib/jvm/default-java"
+-Xms1024m
+-Xmx1024m
+-XX:MaxPermSize=512m
 </code></pre>
+
+<p>More information on choosing meaningful parameters can be found in this brief, excelent post about <a href="https://rimuhosting.com/knowledgebase/linux/java/-Xmx-settings">Tomcat memory settings</a>.</p>
 
 <ul>
 <li>Restart tomcat</li>
@@ -131,7 +140,9 @@ Set appropriate limits for –Xms, Xmx, MaxPermSize if neccessary.
 
 <blockquote><p>sudo apt-get install tomcat7-admin</p></blockquote>
 
-<h2>RedisIO</h2>
+<p>The Tomcat credentials are needed later for registering the servers through OpenZUI.</p>
+
+<h2><a href="http://redis.io/">RedisIO</a></h2>
 
 <p>Redis needs to be installed just once, preferably on the server where the OpenZUI management tool will be installed.</p>
 
@@ -152,9 +163,14 @@ deb-src http://packages.dotdeb.org squeeze all
 
 <p>sudo apt-get update</p>
 
-<p>sudo apt-get install redis-server</p>
+<p>sudo apt-get install redis-server</p></blockquote>
 
-<p>sudo nano /etc/redis/redis.conf</p></blockquote>
+<ul>
+<li>Allow remote connections</li>
+</ul>
+
+
+<blockquote><p>sudo nano /etc/redis/redis.conf</p></blockquote>
 
 <p>Find the following line</p>
 
@@ -166,9 +182,16 @@ deb-src http://packages.dotdeb.org squeeze all
 <pre><code>bind X.X.X.X 127.0.0.1
 </code></pre>
 
+<ul>
+<li>Restart server</li>
+</ul>
+
+
 <blockquote><p>sudo service redis-server restart</p></blockquote>
 
-<h2>RabbitMQ</h2>
+<p>The Redis IP will used later, before deploying the OpenZUI application.</p>
+
+<h2><a href="https://www.rabbitmq.com/">RabbitMQ</a></h2>
 
 <p>You can install one RabbitMQ server per topology, or use one for all your topologies.</p>
 
@@ -209,12 +232,14 @@ deb-src http://packages.dotdeb.org squeeze all
 
 <p>sudo service rabbitmq-server restart</p></blockquote>
 
-<h2>MongoDB</h2>
+<p>This information (username and password) will be used later when creating a topology.</p>
+
+<h2><a href="https://www.mongodb.org/">MongoDB</a></h2>
 
 <p>You can install one MongoDB server per topology, or use one for all your topologies, selecting different database names for each topology.</p>
 
 <ul>
-<li>Install Mongo 3.0</li>
+<li>Install Mongo 2.6 or higher (3.0 or higher recommended)</li>
 </ul>
 
 
@@ -227,7 +252,7 @@ deb-src http://packages.dotdeb.org squeeze all
 <p>sudo apt-get install mongodb-org=3.0.0 mongodb-org-server=3.0.0 mongodb-org-shell=3.0.0 mongodb-org-mongos=3.0.0 mongodb-org-tools=3.0.0</p></blockquote>
 
 <ul>
-<li>Hold Mongo version if needed</li>
+<li>Hold Mongo version if we want to prevent version upgrades in the future</li>
 </ul>
 
 
@@ -242,7 +267,7 @@ deb-src http://packages.dotdeb.org squeeze all
 <p>echo "mongodb-org-tools hold" | sudo dpkg --set-selections</p></blockquote>
 
 <ul>
-<li>Disable interface binding</li>
+<li>Disable interface binding, so that clients can connect from anywhere</li>
 </ul>
 
 
@@ -261,7 +286,7 @@ deb-src http://packages.dotdeb.org squeeze all
 <blockquote><p>sudo service mongod start</p></blockquote>
 
 <ul>
-<li>We will also create user dbadmin with password dbpwd for the admin database and the testdb database and enable authentication. Of course, different credentials can be selected.</li>
+<li>Create users for the database administration</li>
 </ul>
 
 
@@ -273,12 +298,22 @@ deb-src http://packages.dotdeb.org squeeze all
 var schema = db.system.version.findOne({"_id" : "authSchema"})
 schema.currentVersion = 3
 db.system.version.save(schema)
-db.createUser( { user: "dbadmin", pwd: "dbpwd", roles: [ { role: "userAdminAnyDatabase", db: "admin" } ] } )
+db.createUser( { user: "dbowner", pwd: "dbownpwd", roles: [ { role: "dbOwner", db: "admin" } ] } )
 use testdb
-db.createUser( { user: "dbadmin", pwd: "dbpwd", roles: [ {role: "readWrite", db: "topodb"} ] } )
+db.createUser( { user: "dbadmin", pwd: "dbpwd", roles: [ {role: "readWrite", db: "testdb"} ] } )
 </code></pre>
 
-<p>Enable authentication</p>
+<p>After setting the authSchema version, we create a <em>dbowner</em> user (please use a different password) with the role dbOwner.
+This user can do anything with any database on the server. It is intended for general database administration and will not be used by OpenZoo. Please use it with caution.</p>
+
+<p>The last two lines create a <em>testdb database</em> and a user with read/write rights on that database.
+Please use your own names for the database, the user and, of course, a different password.
+The dbadmin credentials will be used later when creating a topology. The database name will be passed to the appropriate component through the OpenZUI.</p>
+
+<ul>
+<li>Enable authentication</li>
+</ul>
+
 
 <blockquote><p>sudo nano /etc/mongod.conf</p></blockquote>
 
@@ -293,11 +328,17 @@ db.createUser( { user: "dbadmin", pwd: "dbpwd", roles: [ {role: "readWrite", db:
   authorization: enabled
 </code></pre>
 
-<p>Restart Mongo</p>
+<ul>
+<li>Restart Mongo</li>
+</ul>
+
 
 <blockquote><p>sudo service mongod restart</p></blockquote>
 
-<p>Check authentication</p>
+<ul>
+<li>Check authentication</li>
+</ul>
+
 
 <blockquote><p>mongo testdb –u dbadmin –p dbpwd</p></blockquote>
 
@@ -312,29 +353,29 @@ db.createUser( { user: "dbadmin", pwd: "dbpwd", roles: [ {role: "readWrite", db:
 <li><p>Download the whole repository, containing the following services:</p>
 
 <ul>
-<li>OpenZUI: The GUI to the OpenZoo framework</li>
-<li>OpenZooService: The basic service functionality, to be inherited by all services</li>
-<li>ServerResources: A web service for retrieving server capacity/load information, to be installed on every OpenZoo server</li>
-<li>ImageDownloader: A dummy service for downloading images</li>
-<li>MongoManager: A test service for accessing MongoDB</li>
-<li>TwitterListener: A test service for wrapping the TwitterStream API</li>
-<li>URLUnwrapper: A test service for unwrapping short URLs</li>
-<li>Researcher: A test service for forwarding user requests</li>
+<li><strong>OpenZUI</strong>: Administration GUI for the OpenZoo framework</li>
+<li><strong>OpenZooService</strong>: The basic service functionality, to be inherited by all services</li>
+<li><strong>ServerResources</strong>: Web service for retrieving server capacity/load information, to be (automatically) installed on every OpenZoo server</li>
+<li><strong>ImageDownloader</strong>: Test (dummy) service for downloading images</li>
+<li><strong>MongoManager</strong>: Test service for accessing MongoDB</li>
+<li><strong>TwitterListener</strong>: Test service for wrapping the TwitterStream API</li>
+<li><strong>URLUnwrapper</strong>: Test service for unwrapping short URLs</li>
+<li><strong>Researcher</strong>: Test service for forwarding user requests</li>
 </ul>
 </li>
 <li><p>Run Tomcat 7 server on all available servers and create a password protected user on each tomcat server, as described in the section above.</p></li>
 <li><p>Install RedisIO on a server, preferably on the same server where OpenZUI will be installed, as described in the section above.</p></li>
 <li><p>Open all projects with Netbeans 8.</p></li>
-<li><p>Build projects, starting by ServerResources, since it needs to be included in the OpenZUI war later. This is going to be done automatically (on -post-dist).</p></li>
+<li><p>Build projects, starting by ServerResources, since it needs to be included in the OpenZUI war later. The inclusion is going to be done automatically (on -post-dist).</p></li>
 <li><p>Edit OpenZUI/web/config.json:</p>
 
 <ul>
 <li>update keyvalue.host and keyvalue.port with the RedisIO server and port</li>
 <li>update localRepository with a folder with read/write permissions for the tomcat user, anywhere on the server where OpenZUI will be installed.</li>
-<li>update demouser.username and demouser.passwd if necessary</li>
+<li>update demouser.username and demouser.passwd, if necessary</li>
 </ul>
 </li>
-<li><p>Deploy OpenZUI project to a tomcat server. Everything else can be done through OpenZUI (http://TOMCAT_SERVER:TOMCAT_PORT/OpenZUI/).</p></li>
+<li><p>Deploy OpenZUI project to a tomcat server. Everything else can be done through OpenZUI, which will be accessible through http://TOMCAT_SERVER:TOMCAT_PORT/OpenZUI/.</p></li>
 </ol>
 
 
