@@ -20,22 +20,22 @@ We should not forget to build the ServerResources project before we build and de
 
 Using the credentials that we set at the OpenZUI web/config.json file, we log into OpenZUI.
 
-![OpenZUI login](../images/0_Login.png)
+![OpenZUI login](http://visualcomputinglab.github.io/OpenZoo/images/0_Login.png)
 
 After the successfull login, we see the main page of OpenZUI.
 
-![OpenZUI main](../images/1_Main.png)
+![OpenZUI main](http://visualcomputinglab.github.io/OpenZoo/images/1_Main.png)
 
 ## Server registration
 
 If all servers are setup as described above, we don't need to read the instructions under "Server setup".
 We can proceed directly to "Server registration".
 
-![OpenZUI server registration 1](../images/2_Server_Registration_1.png)
+![OpenZUI server registration 1](http://visualcomputinglab.github.io/OpenZoo/images/2_Server_Registration_1.png)
 
 We add both our servers by setting the server name, server IP, Tomcat port and Tomcat credentials:
 
-![OpenZUI server registration 2](../images/2_Server_Registration_2.png)
+![OpenZUI server registration 2](http://visualcomputinglab.github.io/OpenZoo/images/2_Server_Registration_2.png)
 
 If everything runs smoothly, a green status tick will be visible beside each server.
 We can then proceed to the next step by clicking on the red OpenZoo icon on the upper left of the page.
@@ -45,7 +45,7 @@ We can then proceed to the next step by clicking on the red OpenZoo icon on the 
 We now proceed to the "Service templates" page.
 Here, we can create an empty, runnable component, with all its dependencies, customized to our needs.
 
-![OpenZUI service template 1](../images/3_Service_Template_1.png)
+![OpenZUI service template 1](http://visualcomputinglab.github.io/OpenZoo/images/3_Service_Template_1.png)
 
 The parameters to be set are the following:
 
@@ -84,7 +84,7 @@ At this point, a comma separated list of parameter names can be specified.
 These parameters will then be requested during the creation of the topology.
 Currently, all parameters as handled as String values, and it is upon the developer to convert them in the desired types, after they are read inside the service (function "public String getRequiredParameter(String param)" of the worker, see "How it works"/"Worker interfaces").
 
-![OpenZUI service template 2](../images/3_Service_Template_2.png)
+![OpenZUI service template 2](http://visualcomputinglab.github.io/OpenZoo/images/3_Service_Template_2.png)
 
 After all parameters are set, we press the Create button and a zip file with the generated wrapper is offered for download.
 
@@ -100,12 +100,12 @@ For a demonstration using the test components, comming together with OpenZoo, we
 
 After downloading the template services and altering their code, we would need to upload the final services to the OpenZoo repository through the "Service repository" interface.
 
-![OpenZUI service repository 1](../images/4_Service_Repository_1.png)
+![OpenZUI service repository 1](http://visualcomputinglab.github.io/OpenZoo/images/4_Service_Repository_1.png)
 
 A set of test services are provided for demonstrating the usage of the OpenZoo framework.
 We have to open the corresponding projects with Netbeans 8, build them and upload the resulting war files into the service repository.
 
-![OpenZUI service repository 2](../images/4_Service_Repository_2.png)
+![OpenZUI service repository 2](http://visualcomputinglab.github.io/OpenZoo/images/4_Service_Repository_2.png)
 
 If everything runs smoothly, a green status tick will be visible beside each component.
 We can then proceed to the next step by clicking on the red OpenZoo icon on the upper left of the page.
@@ -145,14 +145,14 @@ b. For any other kind of messages, it inserts or updates the URL in the images c
 
 We have now to create our topology in the "Topology management" interface.
 
-![OpenZUI topology management 1](../images/5_Topology_Management_1.png)
+![OpenZUI topology management 1](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_1.png)
 
 We input a unique name for the topology, a description and access information for RabbitMQ and MongoDB.
 Each topology can have its own RabbitMQ and MongoDB servers, but we can also use one RabbitMQ and one MongoDB for all our topologies.
 
 After clicking the Create button, we are redirected to a drawing interface.
 
-![OpenZUI topology management 2](../images/5_Topology_Management_2.png)
+![OpenZUI topology management 2](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_2.png)
 
 We can now, through drag & drop, define our topology.
 The combobox at the top contains all our components.
@@ -172,15 +172,15 @@ A "threads per core" value of 0 has a special meaning: It means that only one wo
 All broker service have an "instances" value of 1 and a "threads per core" value of 0.
 We define 1 instance of TwitterListener, 2 instances of URLUnwrapper, 2 instances of ImageDownloader, 1 instance of MongoManager and 1 instance of Researcher.
 
-![OpenZUI topology management 3](../images/5_Topology_Management_3.png)
+![OpenZUI topology management 3](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_3.png)
 
-![OpenZUI topology management 4](../images/5_Topology_Management_4.png)
+![OpenZUI topology management 4](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_4.png)
 
-![OpenZUI topology management 5](../images/5_Topology_Management_5.png)
+![OpenZUI topology management 5](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_5.png)
 
-![OpenZUI topology management 6](../images/5_Topology_Management_6.png)
+![OpenZUI topology management 6](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_6.png)
 
-![OpenZUI topology management 7](../images/5_Topology_Management_7.png)
+![OpenZUI topology management 7](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_7.png)
 
 After defining the topology nodes (components), we should define the connections between them.
 Pressing the "Add link" button, an arrow is inserted between the two black points at the upper right of the drawing.
@@ -195,8 +195,8 @@ There are 3 connection types:
 - The Route connection type, which defines that each instance should have a list of routing keys and receive all messages containing the appropriate key (Message interface: message.setRoutingKey("coord")).
 - The All connection type, which defines that all instances should receive all messages.
 
-![OpenZUI topology management 81](../images/5_Topology_Management_81.png)
-![OpenZUI topology management 82](../images/5_Topology_Management_82.png)
+![OpenZUI topology management 81](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_81.png)
+![OpenZUI topology management 82](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_82.png)
 
 The connection from URLUnwrapper to ImageDownloader is of type Route.
 We have defined two instances of ImageDownloader, so we will have to define a list of routing keys for each instance.
@@ -206,13 +206,13 @@ All tweets with images, but no senders coordinates will be delivered to instance
 Since the ImageDownloader just forwards the messages, this does not have any practical meaning, ut it is used as a demonstration of the routing functionality.
 This would be usefull, for example, if we would use a distributed indexer, where different types of input get indexed on different servers (index instances).
 
-![OpenZUI topology management 83](../images/5_Topology_Management_83.png)
-![OpenZUI topology management 84](../images/5_Topology_Management_84.png)
+![OpenZUI topology management 83](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_83.png)
+![OpenZUI topology management 84](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_84.png)
 
 The connection of the Researcher to the MongoManager is a two-way connection:
 
-![OpenZUI topology management 85](../images/5_Topology_Management_85.png)
-![OpenZUI topology management 86](../images/5_Topology_Management_86.png)
+![OpenZUI topology management 85](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_85.png)
+![OpenZUI topology management 86](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_86.png)
 
 After configuring all components and connections, our topology is ready for deployment, so we can click on Submit.
 
@@ -220,11 +220,11 @@ After configuring all components and connections, our topology is ready for depl
 
 We are now back to the Topology table.
 
-![OpenZUI topology management 91](../images/5_Topology_Management_91.png)
+![OpenZUI topology management 91](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_91.png)
 
 We can now click on the table row that contains our topology and press the Deploy button.
 
-![OpenZUI topology management 92](../images/5_Topology_Management_92.png)
+![OpenZUI topology management 92](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_92.png)
 
 We see now a list of the cluster servers, eache with a subset of our services.
 The numner beside each service is the instance number of this instance.
@@ -239,7 +239,7 @@ This configuration has been created automatically, taking into account the follo
 We can change the configuration by drag & drop, but we have to keep in mind that we cannot have two instances of the same service on the same server.
 When is changing this configuration neccessary? In case that we need a broker at a specific server, so that it answers requests, as an example.
 
-![OpenZUI topology management 93](../images/5_Topology_Management_93.png)
+![OpenZUI topology management 93](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_93.png)
 
 When we are done with changing the server configuration, we can click on Submit, so that our topology is deployed.
 
@@ -247,9 +247,9 @@ After a while, we are redirected back to our Topology table.
 
 We can now click on the table row that contains our topology and press the Start button.
 
-![OpenZUI topology management 94](../images/5_Topology_Management_94.png)
+![OpenZUI topology management 94](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_94.png)
 
-![OpenZUI topology management 95](../images/5_Topology_Management_95.png)
+![OpenZUI topology management 95](http://visualcomputinglab.github.io/OpenZoo/images/5_Topology_Management_95.png)
 
 We can later stop and undeploy our topology at the same place.
 
@@ -258,7 +258,7 @@ We can later stop and undeploy our topology at the same place.
 After deploying and starting the topology, statistics can be seen in the Topology monitoring interface.
 The results of the processing can be seen in the MongoDB.
 
-![OpenZUI topology monitoring 1](../images/6_Topology_Monitoring_1.png)
+![OpenZUI topology monitoring 1](http://visualcomputinglab.github.io/OpenZoo/images/6_Topology_Monitoring_1.png)
 
 We can see 4 columns.
 On the left column, all topologies are listed.
@@ -271,7 +271,7 @@ Below the first two columns, we can see an overview of the topology.
 At the bottom side of the page, we can see the service logs, for which the option queueLogging was set during the template creation (which use a logging connection).
 The service logs can be cleared, paused and filtered by the logging level (debug, info, error).
 
-![OpenZUI topology monitoring 2](../images/6_Topology_Monitoring_2.png)
+![OpenZUI topology monitoring 2](http://visualcomputinglab.github.io/OpenZoo/images/6_Topology_Monitoring_2.png)
 
 There are two buttons in the Components column:
 
