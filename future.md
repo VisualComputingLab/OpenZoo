@@ -4,7 +4,7 @@ layout: default
 ---
 # Future work
 There is a lot of stuff that we would like to add or improve.
-If you would like to contribute to OpenZoo, please [feel free to do so](http://visualcomputinglab.github.io/OpenZoo/authors).
+If you would like to contribute to OpenZoo, please [feel free to do so](http://OpenZoo.org/authors).
 
 ## Programming languages
 We are currently working on a C++ and a Python template for OpenZoo, meaning that the developer will have more options for writing the services than just Java.

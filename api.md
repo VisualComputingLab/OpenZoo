@@ -13,14 +13,14 @@ A topology is a set of services, each of them accomplishing a single subtask, in
 The services are interconnected in a predefined way, in order to exchange information.
 Apart from that, each service may have, not one, but several instances, doing the same thing.
 
-![Several instances read from a queue and write to another queue](http://visualcomputinglab.github.io/OpenZoo/images/MultiInstance.png)
+![Several instances read from a queue and write to another queue](http://OpenZoo.org/images/MultiInstance.png)
 
 Assuming that the input can be divided in small pieces, which can be processed in parallel, this behaviour massively speeds up the procedure.
 This can be done for every service in a topology.
 
 In OpenZoo, a single service is built as depicted: 
 
-![OpenZoo Component](http://visualcomputinglab.github.io/OpenZoo/images/OZComponent.png)
+![OpenZoo Component](http://OpenZoo.org/images/OZComponent.png)
 
 In the sequel, the terms service and component will be used interchangeably.
 
@@ -34,7 +34,7 @@ The instances may be identical or each instance may be dedicated to a specific t
 The topology is the predefined way of exchanging information between different services.
 Below, a typical data ingestion topology is depicted:
 
-![Typical ingestion topology](http://visualcomputinglab.github.io/OpenZoo/images/TypicalIngestion.png)
+![Typical ingestion topology](http://OpenZoo.org/images/TypicalIngestion.png)
 
 The crawler introduces content into the system, comming either from the web or the filesystem.
 Several instances of the metadata extractor, working in parallel, process the content.
@@ -42,7 +42,7 @@ The indexer indexes some of the produced metadata and the database manager store
 
 Also, a typical search topology follows:
 
-![Typical search topology](http://visualcomputinglab.github.io/OpenZoo/images/TypicalSearch.png)
+![Typical search topology](http://OpenZoo.org/images/TypicalSearch.png)
 
 A request broker, receives requests (queries) from the user application and forwards them to the system.
 The query is received by the next free index instance (in case of several copies of the same index) or by the appropriate index instance (in case of a distributed index) and a result list is produced.

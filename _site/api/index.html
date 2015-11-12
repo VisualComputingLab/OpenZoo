@@ -6,10 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="http://visualcomputinglab.github.io/OpenZoo/stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="http://visualcomputinglab.github.io/OpenZoo/stylesheets/github-light.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="http://visualcomputinglab.github.io/OpenZoo/stylesheets/print.css" media="print">
-    <link rel="stylesheet" href="http://visualcomputinglab.github.io/OpenZoo/fonts/font-awesome-4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="http://OpenZoo.org/stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://OpenZoo.org/stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://OpenZoo.org/stylesheets/print.css" media="print">
+    <link rel="stylesheet" href="http://OpenZoo.org/fonts/font-awesome-4.4.0/css/font-awesome.min.css">
 
 
     <!--[if lt IE 9]>
@@ -49,14 +49,14 @@ A topology is a set of services, each of them accomplishing a single subtask, in
 The services are interconnected in a predefined way, in order to exchange information.
 Apart from that, each service may have, not one, but several instances, doing the same thing.</p>
 
-<p><img src="http://visualcomputinglab.github.io/OpenZoo/images/MultiInstance.png" alt="Several instances read from a queue and write to another queue" /></p>
+<p><img src="http://OpenZoo.org/images/MultiInstance.png" alt="Several instances read from a queue and write to another queue" /></p>
 
 <p>Assuming that the input can be divided in small pieces, which can be processed in parallel, this behaviour massively speeds up the procedure.
 This can be done for every service in a topology.</p>
 
 <p>In OpenZoo, a single service is built as depicted:</p>
 
-<p><img src="http://visualcomputinglab.github.io/OpenZoo/images/OZComponent.png" alt="OpenZoo Component" /></p>
+<p><img src="http://OpenZoo.org/images/OZComponent.png" alt="OpenZoo Component" /></p>
 
 <p>In the sequel, the terms service and component will be used interchangeably.</p>
 
@@ -70,7 +70,7 @@ The instances may be identical or each instance may be dedicated to a specific t
 <p>The topology is the predefined way of exchanging information between different services.
 Below, a typical data ingestion topology is depicted:</p>
 
-<p><img src="http://visualcomputinglab.github.io/OpenZoo/images/TypicalIngestion.png" alt="Typical ingestion topology" /></p>
+<p><img src="http://OpenZoo.org/images/TypicalIngestion.png" alt="Typical ingestion topology" /></p>
 
 <p>The crawler introduces content into the system, comming either from the web or the filesystem.
 Several instances of the metadata extractor, working in parallel, process the content.
@@ -78,7 +78,7 @@ The indexer indexes some of the produced metadata and the database manager store
 
 <p>Also, a typical search topology follows:</p>
 
-<p><img src="http://visualcomputinglab.github.io/OpenZoo/images/TypicalSearch.png" alt="Typical search topology" /></p>
+<p><img src="http://OpenZoo.org/images/TypicalSearch.png" alt="Typical search topology" /></p>
 
 <p>A request broker, receives requests (queries) from the user application and forwards them to the system.
 The query is received by the next free index instance (in case of several copies of the same index) or by the appropriate index instance (in case of a distributed index) and a result list is produced.
@@ -288,32 +288,32 @@ All JSON messages have the following structure:</p>
         </section>
 
                 <aside id="sidebar">
-          <a href="http://visualcomputinglab.github.io/OpenZoo/index.html" style="font-size: 16px;">
+          <a href="http://OpenZoo.org/index.html" style="font-size: 16px;">
             <i class="fa fa-map-signs fa-2x fa-fw"></i>
             Overview
           </a>
           <hr>
-          <a href="http://visualcomputinglab.github.io/OpenZoo/api" style="font-size: 16px;">
+          <a href="http://OpenZoo.org/api" style="font-size: 16px;">
             <i class="fa fa-object-ungroup fa-2x fa-fw"></i>
             How it works
           </a>
           <hr>
-          <a href="http://visualcomputinglab.github.io/OpenZoo/install" style="font-size: 16px;">
+          <a href="http://OpenZoo.org/install" style="font-size: 16px;">
             <i class="fa fa-wrench fa-2x fa-fw"></i>
             Installation
           </a>
           <hr>
-          <a href="http://visualcomputinglab.github.io/OpenZoo/demo" style="font-size: 16px;">
+          <a href="http://OpenZoo.org/demo" style="font-size: 16px;">
             <i class="fa fa-cogs fa-2x fa-fw"></i>
             Example topology
           </a>
           <hr>
-          <a href="http://visualcomputinglab.github.io/OpenZoo/future" style="font-size: 16px;">
+          <a href="http://OpenZoo.org/future" style="font-size: 16px;">
             <i class="fa fa-lightbulb-o fa-2x fa-fw"></i>
             Future work
           </a>
           <hr>
-          <a href="http://visualcomputinglab.github.io/OpenZoo/authors" style="font-size: 16px;">
+          <a href="http://OpenZoo.org/authors" style="font-size: 16px;">
             <i class="fa fa-users fa-2x fa-fw"></i>
             Authors
           </a>
