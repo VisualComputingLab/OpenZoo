@@ -45,7 +45,7 @@ We add both our servers by setting the server name, server IP, Tomcat port and T
 If everything runs smoothly, a green status tick will be visible beside each server.
 We can then proceed to the next step by clicking on the red OpenZoo icon on the upper left of the page.
 
-## Server templates
+## Service templates
 
 We now proceed to the "Service templates" page.
 Here, we can create an empty, runnable component, with all its dependencies, customized to our needs.
