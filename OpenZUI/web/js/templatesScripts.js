@@ -57,23 +57,9 @@ $(document).ready(function(){
       else
       { 
         alertify.success('Creating...')
-        setTimeout(reset(), 1500);
         return;
       }
     });
-    
-  function reset() {
-            $('[name="tmpl-proglang"]').val('Java');
-            $('[name="tmpl-componentID"]').val('');
-            $('[name="tmpl-description"]').val('');
-            $('[name="tmpl-numOutputs"]').val('1');
-            $('#tmpl-requiredParameters').val('');
-            $('#tmpl-queueLogging').prop("checked", true).change();
-            $('#tmpl-usesMongo').prop("checked", false).change();
-            $('#tmpl-workerType').prop("checked", true).change();
-            $('#tmpl-hasInput').prop("checked", true).change();
- 
-   };
 });
 
 
