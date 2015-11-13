@@ -41,3 +41,5 @@ A solution could be the authentication layer of Redis:
 Again, apart from the performance considerations, this is not the perfect solution, since:
 
 > The AUTH command, like every other Redis command, is sent unencrypted, so it does not protect against an attacker that has enough access to the network to perform eavesdropping.
+
+Another idea would be to use MongoDB as a key-value repository. This would introduce a performance drop, but also enable deployment in the open internet.

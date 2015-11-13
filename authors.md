@@ -4,6 +4,8 @@ layout: default
 ---
 # Authors
 
+OpenZoo has been developed and maintained by the [Visual Computing Lab (VCL)](http://vcl.iti.gr) of the [Information Technologies Institute (ITI)](http://www.iti.gr), which is a founding member of the [Centre for Research & Technology Hellas (CERTH)](http://www.certh.gr/root.en.aspx).
+
 <table style="width: 300px; margin-bottom: 100px; margin-top: 20px">
   <tr>
     <td style="width:50px;"><img src="http://www.iti.gr/iti/cache/image/files/image/personnel/lazar.240.jpg" style="width:50px;"></td>

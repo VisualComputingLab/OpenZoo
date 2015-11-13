@@ -7,7 +7,7 @@ Two major steps must be followed for installing OpenZoo: the installation and co
 In the following, detailed instructions are given for both.
 
 # Prerequisites
-- Netbeans 8 for developing the services and creating the war files of the services and the OpenZUI.
+- Netbeans 8 EE for developing the services and creating the war files of the services and the OpenZUI.
 - Apache Tomcat 7 for the OpenZUI and the servers. Apache Tomcat 8 should also work, but it is not tested yet.
 - RedisIO for storing and exchanging framework parameters.
 - RabbitMQ for the communication between the services.
@@ -26,7 +26,7 @@ Be sure to install the latest OS updates, e.g. for Ubuntu:
 > sudo apt-get dist-upgrade
 
 
-## [Apache Tomcat 7](http://tomcat.apache.org/), along with Java 7
+## [Apache Tomcat 7](http://tomcat.apache.org/), along with [Java 7](http://openjdk.java.net/)
 Tomcat needs to be installed on every server that will participate to the OpenZoo server cluster, as well as to the server where the OpenZUI management application will be deployed.
 
 
