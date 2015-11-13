@@ -54,7 +54,7 @@ Here, we can create an empty, runnable component, with all its dependencies, cus
 
 The parameters to be set are the following:
 
-**Progeamming Language**:
+**Programming Language**:
 Currently, only Java-based components are supported. In the future, also C++ and Python will be supported.
 
 **Author**:
