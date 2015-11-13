@@ -175,7 +175,7 @@ public class ServersServlet extends HttpServlet {
             if (srv.isActive())
             {
                 // deploy ServerResources war on new server
-                String warfilepath = getServletContext().getRealPath("/") + "ServerResources.war";
+                String warfilepath = getServletContext().getRealPath("/") + "/ServerResources.war";
                 JSONObject outjson = deployer.deployService("http://" + address + ":" + port, user + ":" + pass, warfilepath, "/ServerResources");
 
                 if (outjson == null)
@@ -192,6 +192,8 @@ public class ServersServlet extends HttpServlet {
                         default:
                             wrn("Server was added to the cluster, but deployment of the statistics service reported: " + outjson);
                     }
+                    
+                    //System.out.println("outjson = " + outjson.toString());
                 }
             }
             else
