@@ -217,6 +217,8 @@ Give in the following commands in the Mongo shell:
 
 ~~~~~~
 use admin
+db.createUser( { user: "dbowner", pwd: "dbownpwd", roles: [ { role: "dbOwner", db: "admin" } ] } )
+db.dropUser("dbowner")
 var schema = db.system.version.findOne({"_id" : "authSchema"})
 schema.currentVersion = 3
 db.system.version.save(schema)
@@ -225,7 +227,7 @@ use testdb
 db.createUser( { user: "dbadmin", pwd: "dbpwd", roles: [ {role: "readWrite", db: "testdb"} ] } )
 ~~~~~~
 
-After setting the authSchema version, we create a *dbowner* user (please use a different password) with the role dbOwner.
+We create an initial user, we set the authSchema version, we drop the user and then recreate the *dbowner* user (please use a different password) with the role dbOwner.
 This user can do anything with any database on the server. It is intended for general database administration and will not be used by OpenZoo. Please use it with caution.
 
 The last two lines create a *testdb database* and a user with read/write rights on that database.

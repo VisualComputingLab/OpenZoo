@@ -44,7 +44,7 @@ In the following, detailed instructions are given for both.</p>
 <h1>Prerequisites</h1>
 
 <ul>
-<li>Netbeans 8 for developing the services and creating the war files of the services and the OpenZUI.</li>
+<li>Netbeans 8 EE for developing the services and creating the war files of the services and the OpenZUI.</li>
 <li>Apache Tomcat 7 for the OpenZUI and the servers. Apache Tomcat 8 should also work, but it is not tested yet.</li>
 <li>RedisIO for storing and exchanging framework parameters.</li>
 <li>RabbitMQ for the communication between the services.</li>
@@ -67,7 +67,7 @@ Be sure to install the latest OS updates, e.g. for Ubuntu:</p>
 
 <p>sudo apt-get dist-upgrade</p></blockquote>
 
-<h2><a href="http://tomcat.apache.org/">Apache Tomcat 7</a>, along with Java 7</h2>
+<h2><a href="http://tomcat.apache.org/">Apache Tomcat 7</a>, along with <a href="http://openjdk.java.net/">Java 7</a></h2>
 
 <p>Tomcat needs to be installed on every server that will participate to the OpenZoo server cluster, as well as to the server where the OpenZUI management application will be deployed.</p>
 
@@ -295,6 +295,8 @@ deb-src http://packages.dotdeb.org squeeze all
 <p>Give in the following commands in the Mongo shell:</p>
 
 <pre><code>use admin
+db.createUser( { user: "dbowner", pwd: "dbownpwd", roles: [ { role: "dbOwner", db: "admin" } ] } )
+db.dropUser("dbowner")
 var schema = db.system.version.findOne({"_id" : "authSchema"})
 schema.currentVersion = 3
 db.system.version.save(schema)
@@ -303,7 +305,7 @@ use testdb
 db.createUser( { user: "dbadmin", pwd: "dbpwd", roles: [ {role: "readWrite", db: "testdb"} ] } )
 </code></pre>
 
-<p>After setting the authSchema version, we create a <em>dbowner</em> user (please use a different password) with the role dbOwner.
+<p>We create an initial user, we set the authSchema version, we drop the user and then recreate the <em>dbowner</em> user (please use a different password) with the role dbOwner.
 This user can do anything with any database on the server. It is intended for general database administration and will not be used by OpenZoo. Please use it with caution.</p>
 
 <p>The last two lines create a <em>testdb database</em> and a user with read/write rights on that database.
