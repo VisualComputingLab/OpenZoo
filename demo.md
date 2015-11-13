@@ -68,7 +68,7 @@ Some words about the service functionality.
 
 **Number of output endpoints**:
 The service can have zero or more output endpoints.
-A service that saves results on the database/filesytem and does not forward any messages to other components, would not need an output endpoint.
+A service that saves results on the database/filesystem and does not forward any messages to other components, would not need an output endpoint.
 
 **Has input endpoint**:
 The service can have zero or one input endpoint.
