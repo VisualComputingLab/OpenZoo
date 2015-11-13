@@ -188,12 +188,11 @@ public class ServersServlet extends HttpServlet {
                             break;
                         case "failure":
                             err("Server was added to the cluster, but there was an error during deployment of the statistics service");
+                            srv.setStatus("inactive");
                             break;
                         default:
                             wrn("Server was added to the cluster, but deployment of the statistics service reported: " + outjson);
                     }
-                    
-                    //System.out.println("outjson = " + outjson.toString());
                 }
             }
             else
