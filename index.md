@@ -31,8 +31,9 @@ A wide range of applications can be developed on top of OpenZoo:
 * Distributed and scalable architectures
 
 ## Success cases
-OpenZoo has been tested as a real time search and analytics framework, based on images shared through Twitter. It was running for over a year, distributed on several (8-15) servers, processing millions of tweets per week.
-It has been also successfully tested as a video processing framework, extracting features out of gigs of video, in a Big Data oriented application.
+OpenZoo has been tested as a real time search and analytics framework, based on images shared through Twitter, during the [CUbRIK project](http://cordis.europa.eu/project/rcn/100872_en.html). It was running for over a year, distributed on several (8-15) servers, processing millions of tweets per week.
+It is currently used as a video processing framework, part of the Big Data oriented [LASIE project](http://www.lasie-project.eu/), extracting visual features out of Gigs of video.
+In the near future, it is going to be used in a mixture of the above mentioned cases, retrieving social media content, including video, during the [TRILLION project](http://trillion-project.eng.it/).
 
 ## Support
 OpenZoo supports both Windows (tested on XP and Win7) and Linux (tested on Ubuntu 14.04 LTS).
