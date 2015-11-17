@@ -22,3 +22,5 @@
 /URLUnwrapper/dist/
 /ServerResources/build/
 /ServerResources/dist/
+/OpenZUI/web/ServerResources.war
+/OpenZUI/web/config.json

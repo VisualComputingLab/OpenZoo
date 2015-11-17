@@ -38,6 +38,7 @@ public class ProcessTopologyServlet extends HttpServlet {
             throws ServletException, IOException {
         try
         {
+            request.setCharacterEncoding("UTF-8");
             String name = request.getParameter("topo-name");
             String graphStr = request.getParameter("topo-graph");
             

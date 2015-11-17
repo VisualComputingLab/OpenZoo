@@ -167,12 +167,13 @@ public class KeyValueServlet extends HttpServlet {
         }
         
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        
         
         try (PrintWriter out = response.getWriter())
         {
             out.println(json);
         }
-        
         
         
         //processRequest(request, response);
