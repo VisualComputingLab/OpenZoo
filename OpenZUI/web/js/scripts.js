@@ -32,6 +32,10 @@ $(document).ready(function(){/* jQuery toggle layout */
         $("#tmc-upd-pass").val(result.response.passwd);
         $("#tmc-upd-status").val(result.response.status);
 
+        $("#stats-cpu").val("");
+        $("#stats-mem").val("");
+        $("#stats-disc").val("");
+
         var StatsURL = "http://" + result.response.address + ":" + result.response.port + "/ServerResources/resources/manage";
         $.getJSON(StatsURL, function(sresult){
             $("#stats-cpu").val("" + Math.floor(sresult.cpu.systemCpuLoad * 100.0) + " %");
@@ -203,3 +207,6 @@ function fetchServicesList(callback){
 
 };
 
+SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement || function(toElement) {
+return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());
+};
