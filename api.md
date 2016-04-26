@@ -218,5 +218,5 @@ All workers inherit the following overridable interfaces:
 Also, the following interfaces are inherited:
 
     - public JSONObject getResponse(String hash, int timeout); // Retrieves the query results, using the receipt from the publish call.
-    - public String getRequiredParameter(String param);        // Reads a parameter from the RedisIO.
+    - public String getRequiredParameter(String param);        // Reads a parameter from the Blackboard.
 
