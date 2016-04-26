@@ -159,7 +159,7 @@ deb http://www.rabbitmq.com/debian/ testing main
 
 > sudo rabbitmqctl set_user_tags qadmin administrator
 
-> sudo rabbitmqctl set_permissions qadmin ".*" ".*" ".*"
+> sudo rabbitmqctl set_permissions qadmin \"\.\*\" \"\.\*\" \"\.\*\"
 
 > sudo rabbitmqctl delete_user guest
 
@@ -176,7 +176,7 @@ One instance of MongoDB will be used as a blackboard, for storing and exchanging
 
 > sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 
-> echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb.list
+> echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" \| sudo tee /etc/apt/sources.list.d/mongodb.list
 
 > sudo apt-get update
 
@@ -184,15 +184,15 @@ One instance of MongoDB will be used as a blackboard, for storing and exchanging
 
 - Hold Mongo version if we want to prevent version upgrades in the future
 
-> echo "mongodb-org hold" | sudo dpkg --set-selections
+> echo "mongodb-org hold" \| sudo dpkg --set-selections
 
-> echo "mongodb-org-server hold" | sudo dpkg --set-selections
+> echo "mongodb-org-server hold" \| sudo dpkg --set-selections
 
-> echo "mongodb-org-shell hold" | sudo dpkg --set-selections
+> echo "mongodb-org-shell hold" \| sudo dpkg --set-selections
 
-> echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+> echo "mongodb-org-mongos hold" \| sudo dpkg --set-selections
 
-> echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+> echo "mongodb-org-tools hold" \| sudo dpkg --set-selections
 
 
 - Disable interface binding, so that clients can connect from anywhere
