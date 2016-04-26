@@ -56,6 +56,21 @@ public class TopologyGraphConnection {
         }
     }
     
+    public TopologyGraphConnection(String s_c, String s_w, String s_e, String t_c, String t_w, String t_e, int t_i, int mapp, String qn, String en, HashSet<String> rk)
+    {
+        source_component = s_c;
+        target_component = t_c;
+        source_worker = s_w;
+        target_worker = t_w;
+        source_endpoint = s_e;
+        target_endpoint = t_e;
+        target_instance = t_i;
+        mapping = mapp;
+        queue_name = qn;
+        exchange_name = en;
+        routing_keys = rk;
+    }
+    
     public TopologyGraphConnection(String topo_name, String transition_id, String s_c, String s_w, String s_e, String t_c, String t_w, String t_e, int t_i, String mapstr, String routkeys)
     {
         source_component = s_c;

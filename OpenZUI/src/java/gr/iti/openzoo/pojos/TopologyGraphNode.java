@@ -30,6 +30,14 @@ public class TopologyGraphNode {
         requirements = new HashMap<>();
     }
     
+    public TopologyGraphNode(String cid, int inst, int tpc, HashMap<String, String> reqs)
+    {
+        component_id = cid;
+        instances = inst;
+        threadspercore = tpc;
+        requirements = reqs;
+    }
+    
     public TopologyGraphNode(String cid)
     {
         component_id = cid;
@@ -66,5 +74,10 @@ public class TopologyGraphNode {
      */
     public HashMap<String, String> getRequirements() {
         return requirements;
+    }
+    
+    public void setRequirements(HashMap<String, String> req)
+    {
+        requirements = req;
     }
 }

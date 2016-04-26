@@ -233,6 +233,18 @@ public class ${ComponentID}Worker extends OpenZooWorker {
 <#if QueueLogging??>
         logConn.info("Died!");
 </#if>
+
+ <#if HasInput??>
+        inConn.close();
+ </#if>
+ <#if (NumOutputs > 0)>
+    <#list 1..NumOutputs as i> 
+        outConn_${i}.close();
+    </#list>
+</#if>
+<#if QueueLogging??>
+        logConn.close();
+</#if>
     }
 
 <#if UsesMongo??>

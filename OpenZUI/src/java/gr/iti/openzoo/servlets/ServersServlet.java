@@ -4,7 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import gr.iti.openzoo.pojos.Server;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class ServersServlet extends HttpServlet {
 
     protected static Configuration cfg;
     private Utilities util;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
     private Deployer deployer;
     private ArrayList<String> logs = new ArrayList<>();
@@ -35,7 +35,7 @@ public class ServersServlet extends HttpServlet {
     public void init()
     {
         util = (Utilities) getServletContext().getAttribute("util");
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
                 
@@ -58,7 +58,7 @@ public class ServersServlet extends HttpServlet {
         
         Map<String, Object> root = new HashMap<>();
         
-        // Fill data model from redis
+        // Fill data model from KV
         ArrayList<Server> allServers = kv.getServers();
         
         for (Server srv : allServers)
@@ -167,7 +167,7 @@ public class ServersServlet extends HttpServlet {
         
         Server srv = new Server(name, address, port, user, pass);
                 
-        // add or update new server to redis
+        // add or update new server to KV
         kv.putServer(srv);
         
         if (action.equalsIgnoreCase("create"))

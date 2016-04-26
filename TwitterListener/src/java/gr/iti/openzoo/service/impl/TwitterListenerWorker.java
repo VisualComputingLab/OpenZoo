@@ -199,9 +199,12 @@ public class TwitterListenerWorker extends OpenZooWorker {
         twitterStream.cleanUp();
         twitter4j.internal.json.DataObjectFactoryUtil.clearThreadLocalMap();
         twitterStream.shutdown();
-
+        
         log.info("Died!");
         logConn.info("Died!");
+        
+        outConn.close();
+        logConn.close();
     }
 
     @Override

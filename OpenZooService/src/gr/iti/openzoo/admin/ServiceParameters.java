@@ -8,7 +8,7 @@ public class ServiceParameters implements java.io.Serializable {
     
     private ParametersGeneral general = new ParametersGeneral();
     private ParametersMessaging rabbit = new ParametersMessaging();
-    private ParametersKeyValue redis = new ParametersKeyValue();
+    private ParametersKeyValue kv = new ParametersKeyValue();
     private ParametersDatabase mongo = new ParametersDatabase();
 
     /**
@@ -42,15 +42,15 @@ public class ServiceParameters implements java.io.Serializable {
     /**
      * @return the redis
      */
-    public ParametersKeyValue getRedis() {
-        return redis;
+    public ParametersKeyValue getKV() {
+        return kv;
     }
 
     /**
      * @param redis the redis to set
      */
-    public void setRedis(ParametersKeyValue redis) {
-        this.redis = redis;
+    public void setKV(ParametersKeyValue kv) {
+        this.kv = kv;
     }
 
     /**
@@ -73,7 +73,7 @@ public class ServiceParameters implements java.io.Serializable {
         String out = "";
         out += general.toString();
         out += rabbit.toString();
-        out += redis.toString();
+        out += kv.toString();
         out += mongo.toString();
         
         return out;

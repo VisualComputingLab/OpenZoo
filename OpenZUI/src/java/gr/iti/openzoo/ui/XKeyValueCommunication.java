@@ -17,7 +17,7 @@ import redis.clients.jedis.JedisPoolConfig;
  *
  * @author Michalis Lazaridis <michalis.lazaridis@iti.gr>
  */
-public class KeyValueCommunication {
+public class XKeyValueCommunication {
 
     private final static int redis_timeout = 5000;
     
@@ -26,7 +26,7 @@ public class KeyValueCommunication {
     String redis_host;
     int redis_port;
     
-    public KeyValueCommunication(String redisHost, int redisPort)
+    public XKeyValueCommunication(String redisHost, int redisPort)
     {
         redis_host = redisHost;
         redis_port = redisPort;
@@ -60,6 +60,7 @@ public class KeyValueCommunication {
             pool.destroy();
     }
     
+    // not used
     public String getFirstKeyLike(String key)
     {        
         try (Jedis jedis = pool.getResource())
@@ -76,6 +77,7 @@ public class KeyValueCommunication {
         return null;
     }
     
+    // not used
     public String getFirstHashKeyLike(String key, String pattern)
     {        
         try (Jedis jedis = pool.getResource())
@@ -97,11 +99,13 @@ public class KeyValueCommunication {
         return null;
     }
     
+    // not used
     public String getValue(String key)
     {
         return getValue(key, false);
     }
     
+    // not used
     public String getValue(String key, boolean delete)
     {        
         try (Jedis jedis = pool.getResource())
@@ -118,6 +122,7 @@ public class KeyValueCommunication {
         return null;
     }
         
+    // not used
     public void setValue(String key, String value)
     {        
         try (Jedis jedis = pool.getResource())
@@ -131,6 +136,7 @@ public class KeyValueCommunication {
         }
     }
     
+    // not used
     public void incrValue(String key)
     {                
         try (Jedis jedis = pool.getResource())
@@ -143,11 +149,13 @@ public class KeyValueCommunication {
         }
     }
     
+    // not used
     public String getHashValue(String key, String field)
     {
         return getHashValue(key, field, false);
     }
     
+    // not used
     public String getHashValue(String key, String field, boolean delete)
     {
         try (Jedis jedis = pool.getResource())
@@ -164,6 +172,7 @@ public class KeyValueCommunication {
         return null;
     }
     
+    // not used
     public void setHashValue(String key, String field, String value)
     {        
         try (Jedis jedis = pool.getResource())

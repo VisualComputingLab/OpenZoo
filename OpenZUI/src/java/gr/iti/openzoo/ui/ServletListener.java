@@ -18,7 +18,7 @@ public class ServletListener implements ServletContextListener {
 
     protected static Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
     private Utilities util = new Utilities();
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -45,7 +45,11 @@ public class ServletListener implements ServletContextListener {
                 sce.getServletContext().setAttribute("localRepository", localRepository);
                 System.out.println("Using " + fd.getAbsolutePath() + " as local repository");
                 
-                kv = new KeyValueCommunication(properties.getJSONObject("keyvalue").getString("host"), properties.getJSONObject("keyvalue").getInt("port"));
+                kv = new Blackboard(properties.getJSONObject("blackboard").getString("host"), 
+                        properties.getJSONObject("blackboard").getInt("port"), 
+                        properties.getJSONObject("blackboard").getString("user"), 
+                        properties.getJSONObject("blackboard").getString("passwd"), 
+                        properties.getJSONObject("blackboard").getString("database"));
                 System.out.println("Created KV pool");
                 sce.getServletContext().setAttribute("kv", kv);
             }

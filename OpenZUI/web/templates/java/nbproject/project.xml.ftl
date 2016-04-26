@@ -30,10 +30,6 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${r'${file.reference.jedis-2.7.3.jar}'}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
                     <file>${r'${file.reference.jettison-1.3.2.jar}'}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -47,6 +43,10 @@
                 </library>
                 <library dirs="200">
                     <file>${r'${file.reference.rabbitmq-client.jar}'}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${r'${file.reference.mongo-2.9.3.jar}'}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>

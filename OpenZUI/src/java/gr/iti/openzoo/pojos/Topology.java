@@ -538,7 +538,7 @@ public class Topology {
                         }
                         else
                         {                        
-                            conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, -1, mapstr, null);
+                            conn = new TopologyGraphConnection(this.getName(), id, source_component, source_worker, source_endpoint, target_component, target_worker, target_endpoint, 0, mapstr, null);
                             this.addConnection(conn);
                         }
                         break;

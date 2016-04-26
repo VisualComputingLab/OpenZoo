@@ -116,6 +116,10 @@ public class ImageDownloaderWorker extends OpenZooWorker {
 
         log.info("Died!");
         logConn.info("Died!");
+        
+        inConn.close();
+        outConn.close();
+        logConn.close();
     }
     
 }

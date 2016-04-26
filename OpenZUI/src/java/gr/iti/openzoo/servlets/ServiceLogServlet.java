@@ -1,6 +1,6 @@
 package gr.iti.openzoo.servlets;
 
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import gr.iti.openzoo.pojos.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
@@ -21,14 +21,14 @@ import org.codehaus.jettison.json.JSONObject;
 public class ServiceLogServlet extends HttpServlet {
         
     private Utilities util;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
         
     @Override
     public void init()
     {
         util = (Utilities) getServletContext().getAttribute("util");
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         properties = (JSONObject) getServletContext().getAttribute("properties");
     }
 

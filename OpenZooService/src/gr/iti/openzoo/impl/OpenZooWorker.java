@@ -3,7 +3,7 @@ package gr.iti.openzoo.impl;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import gr.iti.openzoo.admin.KeyValueCommunication;
+import gr.iti.openzoo.admin.Blackboard;
 import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.admin.ServiceParameters;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public abstract class OpenZooWorker implements Runnable {
     protected Channel channel;
     
     protected ServiceParameters serviceParams = null;
-    protected KeyValueCommunication kv;
+    protected Blackboard kv;
     
     protected HashMap<String, JSONObject> requests = new HashMap<>();
     
@@ -50,7 +50,11 @@ public abstract class OpenZooWorker implements Runnable {
     {
         log.debug("-- OpenZooWorker.startIt");
         
-        kv = new KeyValueCommunication(serviceParams.getRedis().getHost(), serviceParams.getRedis().getPort());
+        kv = new Blackboard(serviceParams.getKV().getHost(),
+                serviceParams.getKV().getPort(),
+                serviceParams.getKV().getUser(),
+                serviceParams.getKV().getPasswd(),
+                serviceParams.getKV().getDb());
                 
         factory.setHost(serviceParams.getRabbit().getHost());
         factory.setPort(serviceParams.getRabbit().getPort());
@@ -93,6 +97,8 @@ public abstract class OpenZooWorker implements Runnable {
             {
                 log.error("IOException during closing connections to rabbitmq: " + ex);
             }
+        
+        kv.stop();
     }
         
     protected void setServiceParameters(ServiceParameters spv2)
@@ -105,7 +111,8 @@ public abstract class OpenZooWorker implements Runnable {
     // TODO: add instance id for giving  different parameters to different instances
     public String getRequiredParameter(String param)
     {
-        return kv.getHashValue("topologies:" + serviceParams.getGeneral().getTopologyID(), "requires:" + serviceParams.getGeneral().getComponentID() + ":" + param);
+        //return kv.getHashValue("topologies:" + serviceParams.getGeneral().getTopologyID(), "requires:" + serviceParams.getGeneral().getComponentID() + ":" + param);
+        return kv.getRequiredParameter(serviceParams.getGeneral().getTopologyID(), serviceParams.getGeneral().getComponentID(), param);
     }
     
     protected Message createEmptyMessage()

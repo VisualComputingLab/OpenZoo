@@ -1,7 +1,7 @@
 package gr.iti.openzoo.servlets;
 
 import freemarker.template.Configuration;
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import gr.iti.openzoo.pojos.Topology;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.IOException;
@@ -20,14 +20,14 @@ public class ProcessTopologyServlet extends HttpServlet {
 
     protected static Configuration cfg;
     private Utilities util;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
     
     @Override
     public void init()
     {
         util = (Utilities) getServletContext().getAttribute("util");
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
     }

@@ -3,7 +3,7 @@ package gr.iti.openzoo.servlets;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -22,14 +22,14 @@ import org.codehaus.jettison.json.JSONObject;
 public class InstallServersServlet extends HttpServlet {
 
     protected static Configuration cfg;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
     private ArrayList<String> logs = new ArrayList<>();
     
     @Override
     public void init()
     {
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
     }    

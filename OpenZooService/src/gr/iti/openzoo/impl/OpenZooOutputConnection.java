@@ -2,7 +2,7 @@ package gr.iti.openzoo.impl;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
-import gr.iti.openzoo.admin.KeyValueCommunication;
+import gr.iti.openzoo.admin.Blackboard;
 import gr.iti.openzoo.admin.Message;
 import gr.iti.openzoo.admin.ParametersQueue;
 import static gr.iti.openzoo.admin.ParametersQueue.Mapping.ALL;
@@ -29,8 +29,14 @@ public class OpenZooOutputConnection {
     private String queue_name = null;
     private String exchange_name = null;
     private OpenZooWorker worker;
-    private KeyValueCommunication kv;
-    private String topologyId, componentId, instanceId, workerId;
+    private Blackboard kv;
+    private String topologyId, componentId, workerId;
+    private int instanceId;
+    
+    // for sending statistics every STATS_PACKAGE_LENGTH messages
+    private int message_counter;
+    private int bytes_counter;
+    private final int STATS_PACKAGE_LENGTH = 10;
     
     public OpenZooOutputConnection(OpenZooWorker ozw, String id)
     {
@@ -41,7 +47,11 @@ public class OpenZooOutputConnection {
     public boolean init()
     {
         channel = worker.channel;
-        kv = new KeyValueCommunication(worker.serviceParams.getRedis().getHost(), worker.serviceParams.getRedis().getPort());
+        kv = new Blackboard(worker.serviceParams.getKV().getHost(),
+                worker.serviceParams.getKV().getPort(),
+                worker.serviceParams.getKV().getUser(),
+                worker.serviceParams.getKV().getPasswd(),
+                worker.serviceParams.getKV().getDb());
                 
         // get topology_id, component_id, name, worker_id
         topologyId = worker.serviceParams.getGeneral().getTopologyID();
@@ -57,16 +67,18 @@ public class OpenZooOutputConnection {
         
         try
         {
-            String pattern = "connection:" + componentId + ":" + workerId + ":" + id + ":(.*):(.*):(.*)";
-            String keyval = kv.getFirstHashKeyLike("topologies:" + topologyId, pattern);
+//            String pattern = "connection:" + componentId + ":" + workerId + ":" + id + ":(.*):(.*):(.*)";
+//            String keyval = kv.getFirstHashKeyLike("topologies:" + topologyId, pattern);
+//            
+//            if (keyval == null)
+//            {
+//                log.error("Could not find an appropriate KV record: " + pattern);
+//                return false;
+//            }
+//                        
+//            JSONObject queue = new JSONObject(kv.getHashValue("topologies:" + topologyId, keyval));
             
-            if (keyval == null)
-            {
-                log.error("Could not find an appropriate KV record: " + pattern);
-                return false;
-            }
-                        
-            JSONObject queue = new JSONObject(kv.getHashValue("topologies:" + topologyId, keyval));
+            JSONObject queue = kv.getQueueParametersOut(topologyId, componentId, workerId, id);
             queueParams = new ParametersQueue(queue);
         }
         catch (JSONException e)
@@ -77,8 +89,11 @@ public class OpenZooOutputConnection {
         mapping = queueParams.getMapping();
         
         // delete if exists
-        kv.delHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
-        kv.delHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
+        //kv.delHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
+        //kv.delHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId);
+        kv.incEndpointStats(topologyId, componentId, workerId, id, instanceId, -1, -1);
+        message_counter = 0;
+        bytes_counter = 0;
         
         try
         {
@@ -133,12 +148,27 @@ public class OpenZooOutputConnection {
                     break;
             }
             
-            kv.incrHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, 1);
-            kv.incrHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, bytes.length);
+            //kv.incrHashValue("statistics:" + topologyId, "endpoint:messages:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, 1);
+            //kv.incrHashValue("statistics:" + topologyId, "endpoint:bytes:" + componentId + ":" + workerId + ":" + id + ":" + instanceId, bytes.length);
+            
+            message_counter += 1;
+            bytes_counter += bytes.length;
+            
+            if (message_counter >= STATS_PACKAGE_LENGTH)
+            {
+                kv.incEndpointStats(topologyId, componentId, workerId, id, instanceId, message_counter, bytes_counter);
+                message_counter = 0;
+                bytes_counter = 0;
+            }
         }
         catch (IOException e)
         {
             log.error("IOException in put: " + e);
         }
+    }
+    
+    public void close()
+    {
+        kv.stop();
     }
 }

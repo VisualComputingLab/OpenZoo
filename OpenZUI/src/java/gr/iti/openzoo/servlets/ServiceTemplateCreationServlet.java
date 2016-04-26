@@ -3,7 +3,7 @@ package gr.iti.openzoo.servlets;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import gr.iti.openzoo.ui.Utilities;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,7 +33,7 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
 
     protected static Configuration cfg;
     private Utilities util;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
     private String localRepository;
     private String webAppPath;
@@ -72,7 +72,7 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
     public void init()
     {
         util = (Utilities) getServletContext().getAttribute("util");
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
         localRepository = (String) getServletContext().getAttribute("localRepository");
@@ -96,7 +96,7 @@ public class ServiceTemplateCreationServlet extends HttpServlet {
         
         Map<String, Object> root = new HashMap<>();
         
-        // Fill data model from redis
+        // Fill data model from KV
         root.put("logs", logs);
         
         response.setContentType("text/html;charset=UTF-8");

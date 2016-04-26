@@ -1,7 +1,7 @@
 package gr.iti.openzoo.impl;
 
 import com.rabbitmq.client.Connection;
-import gr.iti.openzoo.admin.KeyValueCommunication;
+import gr.iti.openzoo.admin.Blackboard;
 import gr.iti.openzoo.admin.ServiceParameters;
 import gr.iti.openzoo.util.SerializationUtil;
 import java.io.File;
@@ -27,7 +27,6 @@ public abstract class OpenZooService {
     protected ServiceParameters parameters = new ServiceParameters();
     protected JSONObject properties;
     protected static List<Connection> allConnections;
-    protected KeyValueCommunication kv;
     protected ArrayList<OpenZooWorker> workerUnion;
     protected HashSet<String> workerClasses;
     protected String realPath;
@@ -53,10 +52,7 @@ public abstract class OpenZooService {
         catch (ClassNotFoundException e) 
         {
             log.error("Error class not found Service Params " + e);
-        }
-        
-        kv = new KeyValueCommunication(parameters.getRedis().getHost(), parameters.getRedis().getPort());
-        
+        }        
         
         readParametersFromKV();
                 
@@ -64,43 +60,57 @@ public abstract class OpenZooService {
         
         workerUnion = new ArrayList<>();
         workerClasses = new HashSet<>();
+        
     }
         
     final public void readParametersFromKV()
     {
+        Blackboard kv = new Blackboard(parameters.getKV().getHost(),
+                                        parameters.getKV().getPort(),
+                                        parameters.getKV().getUser(),
+                                        parameters.getKV().getPasswd(),
+                                        parameters.getKV().getDb());
+        
         //read from KV
             
         // general
-        parameters.getGeneral().setNumOfThreadsPerCore(0); // default special value, means that there should be only one thread, irrelevant of num of processors
-        String node_object = kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "node:" + parameters.getGeneral().getComponentID());
-        try
+//        parameters.getGeneral().setNumOfThreadsPerCore(0); // default special value, means that there should be only one thread, irrelevant of num of processors
+//        
+//        String node_object = kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "node:" + parameters.getGeneral().getComponentID());
+//        try
+//        {
+//            JSONObject node_json = new JSONObject(node_object);
+//            parameters.getGeneral().setNumOfThreadsPerCore(node_json.getInt("threadspercore"));
+//        }
+//        catch (JSONException e)
+//        {
+//            log.error("JSONException while trying to read threadspercore parameter from KV: " + e);
+//        }
+        
+        JSONObject theNode = kv.getNode(parameters.getGeneral().getTopologyID(), parameters.getGeneral().getComponentID());
+        if (theNode != null)
         {
-            JSONObject node_json = new JSONObject(node_object);
-            parameters.getGeneral().setNumOfThreadsPerCore(node_json.getInt("threadspercore"));
-        }
-        catch (JSONException e)
-        {
-            log.error("JSONException while trying to read threadspercore parameter from KV: " + e);
+            parameters.getGeneral().setNumOfThreadsPerCore(theNode.optInt("threadspercore", 0));
         }
         
         
-        
-
         // rabbit
-        parameters.getRabbit().setHost(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:host"));
-        parameters.getRabbit().setPort(Integer.parseInt(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:port")));
-        parameters.getRabbit().setUser(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:user"));
-        parameters.getRabbit().setPasswd(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:passwd"));
-        parameters.getRabbit().setVhost(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "rabbit:vhost"));
+        JSONObject rabbit = kv.getRabbit(parameters.getGeneral().getTopologyID());
+        parameters.getRabbit().setHost(rabbit.optString("host", "localhost"));
+        parameters.getRabbit().setPort(rabbit.optInt("port", 5672));
+        parameters.getRabbit().setUser(rabbit.optString("user", "guest"));
+        parameters.getRabbit().setPasswd(rabbit.optString("passwd", "guest"));
 
         // redis is already there
 
-        // mongo      
-        parameters.getMongo().setHost(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:host"));
-        parameters.getMongo().setPort(Integer.parseInt(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:port")));
-        parameters.getMongo().setUser(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:user"));
-        parameters.getMongo().setPasswd(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:passwd"));
-        parameters.getMongo().setDb(kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "mongo:db"));
+        // mongo
+        JSONObject mongo = kv.getMongo(parameters.getGeneral().getTopologyID());
+        parameters.getMongo().setHost(mongo.optString("host", "localhost"));
+        parameters.getMongo().setPort(mongo.optInt("port", 27017));
+        parameters.getMongo().setUser(mongo.optString("user", null));
+        parameters.getMongo().setPasswd(mongo.optString("passwd", null));
+        
+        kv.stop();
     }
     
     public JSONObject startWorkers(String className)
@@ -230,7 +240,6 @@ public abstract class OpenZooService {
             response.put("stop", stopjson);
 
             // update parameters from KV
-            kv.stop();
             
             try 
             {
@@ -246,9 +255,9 @@ public abstract class OpenZooService {
             {
                 log.error("Error class not found Service Params " + e);
             }
-
-            kv = new KeyValueCommunication(parameters.getRedis().getHost(), parameters.getRedis().getPort());
+            
             readParametersFromKV();
+
             log.debug(parameters.toString());
             
 

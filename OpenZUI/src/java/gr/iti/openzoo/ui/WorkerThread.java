@@ -34,12 +34,12 @@ public class WorkerThread implements Runnable
     private JSONObject server_conf;
     private String repository;
     private String topology_id;
-    private KeyValueCommunication kv;
+    private Blackboard kv;
     private List<String> logs;
     
     private String action;
     
-    public WorkerThread(String act, String srvname, WarFile wf, JSONObject srvconf, String repo, JSONObject j, int i, String toponame, KeyValueCommunication kvc, List<String> loglist)
+    public WorkerThread(String act, String srvname, WarFile wf, JSONObject srvconf, String repo, JSONObject j, int i, String toponame, Blackboard kvc, List<String> loglist)
     {
         action = act;
         servername = srvname;
@@ -74,7 +74,7 @@ public class WorkerThread implements Runnable
         JSONObject config = Utilities.readJSONFromWAR(repository + "/" + war.getFilename(), "config.json");
         try
         {
-            config.put("keyvalue", new JSONObject().put("host", kv.getKVHost()).put("port", kv.getKVPort()));
+            config.put("blackboard", new JSONObject().put("host", kv.getHost()).put("port", kv.getPort()).put("user", kv.getUser()).put("passwd", kv.getPasswd()).put("database", kv.getDatabase()));
             config.put("instance_id", server_conf.getInt("instance_id"));
             config.put("topology_id", topology_id);
 
@@ -218,7 +218,7 @@ public class WorkerThread implements Runnable
                 JSONObject config = Utilities.readJSONFromWAR(repository + "/" + war.getFilename(), "config.json");
                 try
                 {
-                    config.put("keyvalue", new JSONObject().put("host", kv.getKVHost()).put("port", kv.getKVPort()));
+                    config.put("blackboard", new JSONObject().put("host", kv.getHost()).put("port", kv.getPort()).put("user", kv.getUser()).put("passwd", kv.getPasswd()).put("database", kv.getDatabase()));
                     config.put("instance_id", server_conf.getInt("instance_id"));
                     config.put("topology_id", topology_id);
 

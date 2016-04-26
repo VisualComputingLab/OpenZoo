@@ -45,7 +45,7 @@ public class Message {
     // whether or not the processing was successful
     private boolean success = true;
     
-    public Message(QueueingConsumer.Delivery delivery, String cid, String iid, String wid, String eid)
+    public Message(QueueingConsumer.Delivery delivery, String cid, int iid, String wid, String eid)
     {        
         if (delivery != null)
         {
@@ -113,7 +113,7 @@ public class Message {
         return ts + hn + th + ct;
     }
     
-    public Message(JSONObject hdr, JSONObject pld, String cid, String iid, String wid, String einid)
+    public Message(JSONObject hdr, JSONObject pld, String cid, int iid, String wid, String einid)
     {
         // create id: Timestamp:hostname:processid:counter
         id = createMessageId();

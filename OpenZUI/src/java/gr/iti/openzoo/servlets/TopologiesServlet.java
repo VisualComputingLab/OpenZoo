@@ -4,7 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import gr.iti.openzoo.pojos.Topology;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,7 +25,7 @@ import org.codehaus.jettison.json.JSONObject;
 public class TopologiesServlet extends HttpServlet {
 
     protected static Configuration cfg;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
     private Deployer deployer;
     private ArrayList<String> logs = new ArrayList<>();
@@ -33,7 +33,7 @@ public class TopologiesServlet extends HttpServlet {
     @Override
     public void init()
     {
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
         
@@ -57,7 +57,7 @@ public class TopologiesServlet extends HttpServlet {
         
         Map<String, Object> root = new HashMap<>();
         
-        // Fill data model from redis
+        // Fill data model from KV
         ArrayList<Topology> allTopologies = kv.getTopologies();
 
         root.put("topologies", allTopologies);
@@ -172,7 +172,7 @@ public class TopologiesServlet extends HttpServlet {
                 // create topology object
                 top = new Topology(name, descr, rabbit_host, rabbit_port, rabbit_user, rabbit_pass, mongo_host, mongo_port, mongo_user, mongo_pass);
                 
-                // add topology to redis
+                // add topology to KV
                 kv.putTopology(top);
                 
                 // At this point we have to open the topology drawing interface
@@ -195,7 +195,7 @@ public class TopologiesServlet extends HttpServlet {
                 top.setMongo_user(mongo_user);
                 top.setMongo_passwd(mongo_pass);
                 
-                // update topology in redis
+                // update topology in KV
                 kv.putTopology(top);
 
                 // At this point we have to open the topology drawing interface

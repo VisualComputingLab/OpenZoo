@@ -3,7 +3,7 @@ package gr.iti.openzoo.servlets;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import gr.iti.openzoo.ui.Utilities;
 import gr.iti.openzoo.pojos.WarFile;
 import java.io.File;
@@ -32,7 +32,7 @@ public class RepositoryServlet extends HttpServlet {
 
     protected static Configuration cfg;
     private Utilities util;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
     private String localRepository;
     private ArrayList<String> logs = new ArrayList<>();
@@ -41,7 +41,7 @@ public class RepositoryServlet extends HttpServlet {
     public void init()
     {
         util = (Utilities) getServletContext().getAttribute("util");
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
         localRepository = (String) getServletContext().getAttribute("localRepository");
@@ -63,7 +63,7 @@ public class RepositoryServlet extends HttpServlet {
         
         Map<String, Object> root = new HashMap<>();
         
-        // Fill data model from redis
+        // Fill data model from KV
         
         ArrayList<WarFile> allWarfiles = kv.getWarFiles();
         if (allWarfiles == null)

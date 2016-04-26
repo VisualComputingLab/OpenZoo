@@ -60,6 +60,9 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class Utilities {
     
+    private static int HTTP_CONNECTION_TIMEOUT = 5000;
+    private static int HTTP_READ_TIMEOUT = 5000;
+    
     public String callGET(URL url, String usr, String pass)
     {
         String output = null;
@@ -77,6 +80,8 @@ public class Utilities {
                 httpCon.setRequestProperty("Authorization", "Basic " + DatatypeConverter.printBase64Binary(servercredentials.getBytes()));
             httpCon.setDoOutput(true);
             httpCon.setRequestMethod("GET");
+            httpCon.setConnectTimeout(HTTP_CONNECTION_TIMEOUT);
+            httpCon.setReadTimeout(HTTP_READ_TIMEOUT);
             output = convertStreamToString(httpCon.getInputStream());
             code = httpCon.getResponseCode();
             msg = httpCon.getResponseMessage();

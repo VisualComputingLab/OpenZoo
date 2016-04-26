@@ -25,7 +25,7 @@ public class OpenZooBeholder implements Runnable {
     private String serverHostname;
     private String service_name;
     private Boolean enough = false;
-    private KeyValueCommunication kv;
+    private Blackboard kv;
 
     public OpenZooBeholder() {
         // do nothing
@@ -38,7 +38,11 @@ public class OpenZooBeholder implements Runnable {
     public void run() {
         log.debug("-- OpenZooBeholder.run");
         
-        kv = new KeyValueCommunication(parameters.getRedis().getHost(), parameters.getRedis().getPort());
+        kv = new Blackboard(parameters.getKV().getHost(),
+                parameters.getKV().getPort(),
+                parameters.getKV().getUser(),
+                parameters.getKV().getPasswd(),
+                parameters.getKV().getDb());
 
         while (!enough)
         {
@@ -65,6 +69,7 @@ public class OpenZooBeholder implements Runnable {
             }
         }
         
+        kv.stop();
         log.debug("-- OpenZooBeholder exits");
     }
 
@@ -125,12 +130,12 @@ public class OpenZooBeholder implements Runnable {
         // check if flag component_id:instance_id:reset exists in KV
         // if it exists, delete it and return true
         
-        String reset = kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "reset:" + parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":" + "reset", true);
-        
-        if (reset != null && reset.equalsIgnoreCase("true"))
-        {
-            return true;
-        }
+//        String reset = kv.getHashValue("topologies:" + parameters.getGeneral().getTopologyID(), "reset:" + parameters.getGeneral().getComponentID() + ":" + parameters.getGeneral().getInstanceID() + ":" + "reset", true);
+//        
+//        if (reset != null && reset.equalsIgnoreCase("true"))
+//        {
+//            return true;
+//        }
         
         return false;
     }

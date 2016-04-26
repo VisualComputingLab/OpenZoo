@@ -149,6 +149,11 @@ public class URLUnwrapperWorker extends OpenZooWorker {
 
         log.info("Died!");
         logConn.info("Died!");
+        
+        inConn.close();
+        outConnDl.close();
+        outConnDb.close();
+        logConn.close();
     }
     
     private Boolean processTweet(JSONObject jobj)

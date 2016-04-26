@@ -12,7 +12,7 @@ public class ParametersGeneral implements java.io.Serializable {
     private String realPath = null;
     private String topologyID = null;
     private String componentID = null;
-    private String instanceID = null;
+    private int instanceID = 0;
     private Integer numOfThreadsPerCore = 1;
 
     /**
@@ -93,14 +93,14 @@ public class ParametersGeneral implements java.io.Serializable {
         this.componentID = componentID;
     }
     
-    public String getInstanceID() {
+    public int getInstanceID() {
         return instanceID;
     }
 
     /**
      * @param id the id to set
      */
-    public void setInstanceID(String instanceID) {
+    public void setInstanceID(int instanceID) {
         this.instanceID = instanceID;
     }
 

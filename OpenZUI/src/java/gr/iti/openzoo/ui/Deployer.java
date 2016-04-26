@@ -36,12 +36,12 @@ import org.codehaus.jettison.json.JSONObject;
 public class Deployer {
 
     private Utilities util = new Utilities();
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private String repo;
     
     private static final int THREADPOOL_SIZE = 5;
     
-    public Deployer(JSONObject properties, KeyValueCommunication thekv)
+    public Deployer(JSONObject properties, Blackboard thekv)
     {
         try 
         {

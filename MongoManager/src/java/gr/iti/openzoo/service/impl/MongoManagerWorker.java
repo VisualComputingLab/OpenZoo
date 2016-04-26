@@ -198,9 +198,13 @@ public class MongoManagerWorker extends OpenZooWorker {
         }
         
         mongo.close();
-
+        
         log.info("Died!");
         logConn.info("Died!");
+        
+        inConn.close();
+        outConnBroker.close();
+        logConn.close();
     }
     
     // -1: error, 0: created, 1: updated

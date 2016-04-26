@@ -4,7 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import gr.iti.openzoo.ui.Deployer;
-import gr.iti.openzoo.ui.KeyValueCommunication;
+import gr.iti.openzoo.ui.Blackboard;
 import gr.iti.openzoo.pojos.Topology;
 import gr.iti.openzoo.pojos.Triple;
 import gr.iti.openzoo.pojos.WarFile;
@@ -28,7 +28,7 @@ import org.codehaus.jettison.json.JSONObject;
 public class ConfirmServerConfigServlet extends HttpServlet {
     
     protected static Configuration cfg;
-    private static KeyValueCommunication kv;
+    private static Blackboard kv;
     private JSONObject properties;
     private Deployer deployer;
     private ArrayList<String> logs = new ArrayList<>();
@@ -36,7 +36,7 @@ public class ConfirmServerConfigServlet extends HttpServlet {
     @Override
     public void init()
     {
-        kv = (KeyValueCommunication) getServletContext().getAttribute("kv");
+        kv = (Blackboard) getServletContext().getAttribute("kv");
         cfg = (Configuration) getServletContext().getAttribute("cfg");
         properties = (JSONObject) getServletContext().getAttribute("properties");
         

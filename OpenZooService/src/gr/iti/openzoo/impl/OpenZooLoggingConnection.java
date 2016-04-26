@@ -27,7 +27,8 @@ public class OpenZooLoggingConnection {
     private Channel channel;
     private String queue_name = null;
     private OpenZooWorker worker;
-    private String topologyId, componentId, instanceId, workerId;
+    private String topologyId, componentId, workerId;
+    private int instanceId;
     
     public OpenZooLoggingConnection(OpenZooWorker ozw)
     {
@@ -96,5 +97,9 @@ public class OpenZooLoggingConnection {
         {
             log.error("Exception in put: " + e);
         }
+    }
+    
+    public void close()
+    {
     }
 }

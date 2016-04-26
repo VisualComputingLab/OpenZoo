@@ -43,8 +43,11 @@ public class OpenZooContextListener implements ServletContextListener {
         try 
         {        
             // read KV parameters
-            parameters.getRedis().setHost(properties.getJSONObject("keyvalue").getString("host"));
-            parameters.getRedis().setPort(properties.getJSONObject("keyvalue").getInt("port"));
+            parameters.getKV().setHost(properties.getJSONObject("blackboard").getString("host"));
+            parameters.getKV().setPort(properties.getJSONObject("blackboard").getInt("port"));
+            parameters.getKV().setUser(properties.getJSONObject("blackboard").getString("user"));
+            parameters.getKV().setPasswd(properties.getJSONObject("blackboard").getString("passwd"));
+            parameters.getKV().setDb(properties.getJSONObject("blackboard").getString("database"));
             
             // read service parameters
             parameters.getGeneral().setComponentID(properties.getJSONObject("service").getString("component_id"));
@@ -55,7 +58,7 @@ public class OpenZooContextListener implements ServletContextListener {
             
             // set topology id, instance id
             parameters.getGeneral().setTopologyID(properties.getString("topology_id"));
-            parameters.getGeneral().setInstanceID(properties.getString("instance_id"));
+            parameters.getGeneral().setInstanceID(properties.getInt("instance_id"));
         }
         catch (JSONException ex) 
         {

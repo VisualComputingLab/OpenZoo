@@ -1,8 +1,11 @@
 {
-    "keyvalue":
+    "blackboard":
     {
-        "host": "REDIS_IP",
-        "port": 6379
+        "host": "BLACKBOARD_IP",
+        "port": 27017,
+        "user": "dbadmin",
+        "passwd": "oz",
+        "database": "openzoo"
     },
     "localRepository": "LOCAL_REPOSITORY_FOLDER",
     "demouser":

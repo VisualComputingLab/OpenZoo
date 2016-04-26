@@ -91,6 +91,41 @@ public class Worker {
         
         return sb.toString();
     }
+    
+    public JSONObject toJSON()
+    {
+        JSONObject json = new JSONObject();
+        JSONArray jarr = new JSONArray();
+        JSONObject endp;
+        
+        try
+        {
+            json.put("worker_id", worker_id);
+            
+            for (String ss : in)
+            {
+                endp = new JSONObject();
+                endp.put("endpoint_id", ss);
+                endp.put("type", "in");
+                jarr.put(endp);
+            }
+            for (String ss : out)
+            {
+                endp = new JSONObject();
+                endp.put("endpoint_id", ss);
+                endp.put("type", "out");
+                jarr.put(endp);
+            }
+            
+            json.put("endpoints", jarr);
+        }
+        catch (JSONException e)
+        {
+            System.err.println("JSONException during creating worker json: " + e);
+        }
+        
+        return json;
+    }
 
     /**
      * @return the component_id

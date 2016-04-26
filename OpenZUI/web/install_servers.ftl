@@ -41,7 +41,7 @@
         </div>
         <div id="collapseA1" class="panel-collapse collapse">
           <div class="panel-body">
-            <p>The OpenZUI is a Tomcat application and uses RedisIO to store and exchange parameters with the OZServices.</p>
+            <p>The OpenZUI is a Tomcat application, which uses MongoDB to store and exchange parameters with the OZServices.</p>
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@
     </div>
   </div>
 
-  <h3>B. Step by step instructions for installation/configuration</h3>
+  <h3>B. Step by step instructions for installation/configuration (<a href="http://openzoo.org/install/" target="_blank">Updated and more accurate instgructions</a>)</h3>
   
 
   <div class="row">
@@ -153,7 +153,7 @@
         </div>
       </div>
 
-      <div class="panel panel-default">
+      <!-- <div class="panel panel-default">
         <div class="panel-heading">
           <h4 class="panel-title">
             <a data-toggle="collapse" data-parent="#accordion" href="#collapseB4"><h4>RedisIO</h4></a>
@@ -173,7 +173,7 @@
               <p class="p1tab">> sudo service redis-server restart</p>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -211,7 +211,9 @@
         </div>
         <div id="collapseB6" class="panel-collapse collapse">
           <div class="panel-body">
-            <p>You can use one MongoDB server per topology, or use one for all your topologies.</p>
+            <p>MongoDB is used a) for exchanging parameters between the OpenZUI and the OZServices (blackboard) and b) for saving processing results.</p>
+            <p>For a) there is one central MongoDB, defined in the config.json of your OpenZUI.</p>
+            <p>For b) you can use one MongoDB server per topology, or use one for all your topologies.</p>
             <p>We will also create user dbadmin with password dbpwd and database topodb.</p>
             <p>Install Mongo</p>
               <p class="p1tab">> sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10</p>

@@ -30,7 +30,7 @@ public class MessageStatistics {
             data.put(key, sub);
         }
                         
-        sub.set(0,val);
+        sub.set(0, sub.get(0) + val);
     }
     
     public void addEndpointBytes(String key, Long val)
@@ -45,7 +45,7 @@ public class MessageStatistics {
             data.put(key, sub);
         }
         
-        sub.set(1, val);
+        sub.set(1, sub.get(1) + val);
     }
     
     public JSONObject getJSON()

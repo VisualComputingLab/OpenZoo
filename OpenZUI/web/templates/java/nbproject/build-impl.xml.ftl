@@ -1011,11 +1011,11 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${r'${reference.OpenZooService.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.commons-codec-1.8.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.commons-pool2-2.4.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
-        <copyfiles files="${r'${file.reference.jedis-2.7.3.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.jettison-1.3.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.log4j-api-2.0.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.log4j-core-2.0.2.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <copyfiles files="${r'${file.reference.rabbitmq-client.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
+        <copyfiles files="${r'${file.reference.mongo-2.9.3.jar}'}" iftldtodir="${r'${build.web.dir}'}/WEB-INF" todir="${r'${dist.ear.dir}'}/lib"/>
         <mkdir dir="${r'${build.web.dir}'}/META-INF"/>
         <manifest file="${r'${build.web.dir}'}/META-INF/MANIFEST.MF" mode="update"/>
     </target>

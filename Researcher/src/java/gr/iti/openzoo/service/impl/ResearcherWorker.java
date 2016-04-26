@@ -116,10 +116,14 @@ public class ResearcherWorker extends OpenZooWorker {
             inConn.ack(message);
             requests.put(message.getID(), message.getPayload());
         }
-        
+                
         // Do your cleaning here
         requests.clear();
         log.info("Died!");
         logConn.info("Died!");
+        
+        inConn.close();
+        outConn_1.close();
+        logConn.close();
     }
 }
