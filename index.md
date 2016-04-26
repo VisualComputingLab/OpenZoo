@@ -37,7 +37,7 @@ In the near future, it is going to be used in a mixture of the above mentioned c
 
 ## Support
 OpenZoo supports both Windows (tested on XP and Win7) and Linux (tested on Ubuntu 14.04 LTS).
-It uses MongoDB for persistence, RabbitMQ as a communication medium and RedisIO for exchanging parameters.
+It uses RabbitMQ as a communication medium and MongoDB for persistence and exchange of parameters.
 Services are running on Tomcat (tested on Tomcat 7).
 Currently, only Java is supported for service development. C++ and Python service templates are the next major milestone.
 

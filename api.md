@@ -60,9 +60,9 @@ The main parts of each component are the following:
 
 The service template enables also the following:
 
-- Reading topology parameters (server addresses, routing information, instantiation, etc.) from the RedisIO
-- Exchanging service specific parameters through RedisIO
-- Writing service statistics to the RedisIO
+- Reading topology parameters (server addresses, routing information, instantiation, etc.) from the MongoDB
+- Exchanging service specific parameters through MongoDB
+- Writing service statistics to the MongoDB
 
 
 ## Service types

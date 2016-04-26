@@ -15,7 +15,7 @@ We have also another server at our disposal, *Leda*, for management purposes. Le
 
 Let's assume that we have installed the following software on each server, as described in the Installation page:
 
-- ***Leda***: **Tomcat** (credentials: admin/tpwd), **RedisIO**, **RabbitMQ** (credentials: qadmin/qpwd), **MongoDB** (credentials: dbadmin/dbpwd), **OpenZUI** (credentials: admin/open)
+- ***Leda***: **Tomcat** (credentials: admin/tpwd), **RabbitMQ** (credentials: qadmin/qpwd), **MongoDB** (credentials: dbadmin/dbozpwd for blackboard, dbadmin/dbpwd for storing results), **OpenZUI** (credentials: admin/open)
 - ***Castor***: **Tomcat** (user: admin, pwd: tpwd)
 - ***Polydeuces***: **Tomcat** (user: admin, pwd: tpwd)
 
@@ -192,6 +192,9 @@ We can now create our topology in the "Topology management" interface.
 
 We input a unique name for the topology, a description and access information for RabbitMQ and MongoDB.
 Each topology can have its own RabbitMQ and MongoDB servers, but we can also use one RabbitMQ and one MongoDB for all our topologies.
+
+Note: The MongoDB required here is for storing the results. The MongoDB used as a blackboard (which can be of course the same instance) is given in the config.json of the OpenZUI application.
+
 
 After clicking the Create button, we are redirected to a drawing interface.
 
