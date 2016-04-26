@@ -239,6 +239,9 @@ After defining the topology nodes (components), we should define the connections
 Pressing the **Add link** button, an arrow is inserted between the two black points at the upper right of the drawing.
 We can now drag the source and the target of the arrow to the appropriate components, by placing the mouse pointer over the arrow head or tail, until the mouse pointer transforms to a hand, and drag it to the desired destination.
 
+**IMPORTANT: Please keep in mind that although several connections can point to the same input endpoint of a component, the opposite is not supported: A component output cannot be the source of several connections.**
+Instead of using the same output as source for several connections, we can define several outputs, each of them used as a source for a connection to another component.
+
 After setting both the source and the target, a connection configuration panel appears.
 We can now set the source and the target endpoint of the connection, since a component can have more than one outputs, which serve as inputs to the next component.
 
