@@ -170,7 +170,7 @@ An OpenZoo message is created with a header containing the parameter {"search": 
 It then waits for a response at its input, and when it is there, it is returned to the caller.
     </td>
   </tr>
-<tr>
+  <tr>
     <td style="padding:10px;">MongoManager</td>
     <td style="padding:10px;">Operator</td>
     <td style="padding:10px;">1/1</td>
@@ -181,6 +181,7 @@ a) When it receives a message with a message header containing the parameter {"s
 It then sends to its output a message containing the top num results.
 b) For any other kind of messages, it inserts or updates the URL in the images collection and saves the message in the messages collection.
     </td>
+  </tr>
 </table>
 
 
